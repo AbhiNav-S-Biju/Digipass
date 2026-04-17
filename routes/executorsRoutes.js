@@ -6,6 +6,7 @@ const {
   resendExecutorVerification,
   verifyExecutorToken,
   setupExecutorPassword,
+  executorLogin,
   grantAccess,
   revokeAccess
 } = require('../controllers/executorsController');
@@ -13,6 +14,7 @@ const { authenticateToken: authMiddleware } = require('../middleware/auth');
 
 router.get('/verify', verifyExecutorToken);
 router.post('/setup-password', setupExecutorPassword);
+router.post('/login', executorLogin);
 
 router.use(authMiddleware);
 

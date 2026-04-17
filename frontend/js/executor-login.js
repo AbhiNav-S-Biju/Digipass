@@ -25,7 +25,7 @@ document.getElementById('executorLoginForm').addEventListener('submit', async (e
   button.disabled = true;
 
   try {
-    const response = await fetch(`${API_URL}/executor/login`, {
+    const response = await fetch(`${API_URL}/executors/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

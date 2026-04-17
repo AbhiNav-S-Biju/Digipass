@@ -1,5 +1,5 @@
 const pool = require('../db');
-const { hashPassword } = require('../utils/bcrypt');
+const { hashPassword, comparePassword } = require('../utils/bcrypt');
 const { generateToken } = require('../utils/jwt');
 const { generateVerificationToken, hashVerificationToken, getVerificationExpiryDate } = require('../utils/executorVerification');
 const { generateExecutorVerificationQR, getExecutorVerificationUrl } = require('../utils/qrCode');
@@ -586,12 +586,96 @@ async function setupExecutorPassword(req, res) {
   }
 }
 
+async function executorLogin(req, res) {
+  try {
+    const { executor_email, password } = req.body;
+
+    if (!executor_email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Executor email and password are required'
+      });
+    }
+
+    console.log('[Executor Controller] executorLogin called');
+    console.log(`  - executor_email: ${executor_email}`);
+
+    // Find executor by email
+    const { rows: executorRows } = await pool.query(
+      `SELECT
+        executor_id,
+        executor_name,
+        executor_email,
+        executor_phone,
+        relationship,
+        verification_status,
+        access_granted,
+        executor_password_hash,
+        created_at
+      FROM executors
+      WHERE executor_email = $1`,
+      [executor_email.trim().toLowerCase()]
+    );
+
+    if (executorRows.length === 0) {
+      console.log('[Executor Controller] Executor not found');
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials'
+      });
+    }
+
+    const executor = executorRows[0];
+
+    // Check if executor is verified
+    if (executor.verification_status !== 'verified') {
+      console.log('[Executor Controller] Executor not verified');
+      return res.status(401).json({
+        success: false,
+        message: 'Executor account is not verified. Please complete verification first.'
+      });
+    }
+
+    // Verify password
+    const passwordMatch = await comparePassword(password, executor.executor_password_hash);
+    if (!passwordMatch) {
+      console.log('[Executor Controller] Password mismatch');
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials'
+      });
+    }
+
+    console.log('[Executor Controller] Executor login successful');
+    console.log(`  - executor_id: ${executor.executor_id}`);
+
+    // Generate JWT token
+    const token = generateToken(executor.executor_id);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Executor login successful',
+      data: {
+        token,
+        executor: buildExecutorResponse(executor)
+      }
+    });
+  } catch (error) {
+    console.error('Executor Login Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to login executor'
+    });
+  }
+}
+
 module.exports = {
   addExecutor,
   getExecutors,
   resendExecutorVerification,
   verifyExecutorToken,
   setupExecutorPassword,
+  executorLogin,
   grantAccess,
   revokeAccess
 };
