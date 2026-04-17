@@ -14,6 +14,11 @@ async function verifyToken() {
     showStatus('Verifying your identity...', 'loading');
 
     const response = await fetch(`${API_BASE_URL}/executors/verify?token=${token}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
     const result = await response.json();
 
     if (result.success) {
@@ -73,7 +78,7 @@ async function handlePasswordSetup(event) {
     button.disabled = true;
     button.textContent = 'Setting up...';
 
-    const response = await fetch(`${API_BASE_URL}/executor/setup-password`, {
+    const response = await fetch(`${API_BASE_URL}/executors/setup-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -83,6 +88,10 @@ async function handlePasswordSetup(event) {
         password: password
       })
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
 
     const result = await response.json();
 
