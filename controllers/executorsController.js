@@ -582,7 +582,7 @@ async function setupExecutorPassword(req, res) {
   }
 }
 
-
+module.exports = {
   addExecutor,
   getExecutors,
   resendExecutorVerification,
