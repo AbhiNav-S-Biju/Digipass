@@ -111,6 +111,10 @@ app.listen(PORT, () => {
   
   // Start dead man's switch scheduler asynchronously (non-blocking)
   setImmediate(() => {
-    startDeadMansSwitchScheduler();
+    try {
+      startDeadMansSwitchScheduler();
+    } catch (err) {
+      console.error('[DeadMansSwitch] Failed to start scheduler:', err.message);
+    }
   });
 });

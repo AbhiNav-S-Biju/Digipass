@@ -1,4 +1,4 @@
-const API_URL = 'https://digipass-production.up.railway.app:8080/api';
+const API_URL = 'https://digipass-production.up.railway.app/api';
 
 function getExecutorToken() {
   return localStorage.getItem('executorToken');

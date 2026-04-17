@@ -90,7 +90,9 @@ function startDeadMansSwitchScheduler() {
   console.log(`[DeadMansSwitch] Scheduler started with cron "${SCHEDULE_EXPRESSION}"`);
 
   cron.schedule(SCHEDULE_EXPRESSION, () => {
-    processDeadMansSwitch();
+    processDeadMansSwitch().catch(err => {
+      console.error('[DeadMansSwitch] Error processing dead mans switch:', err.message);
+    });
   });
 }
 
