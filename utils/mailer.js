@@ -31,6 +31,7 @@ function createTransporter() {
       user: smtpUser,
       pass: smtpPass
     },
+    family: 4,  // Force IPv4 (Gmail has issues with IPv6 on some servers)
     logger: true,
     debug: true,
     requireTLS: !secure,
