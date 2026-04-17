@@ -1,4 +1,4 @@
-const API_URL = window.location.origin + '/api';
+const API_URL = 'https://digipass-production.up.railway.app:8080/api';
 
 // Show message
 function showMessage(message, type = 'info') {

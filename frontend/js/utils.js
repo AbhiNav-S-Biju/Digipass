@@ -1,6 +1,6 @@
 // Utility functions for protected pages
 
-const API_URL = window.location.origin + '/api';
+const API_URL = 'https://digipass-production.up.railway.app:8080/api';
 
 // Get token from localStorage
 function getToken() {

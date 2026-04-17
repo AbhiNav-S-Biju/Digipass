@@ -1,5 +1,5 @@
 // API configuration - works on both localhost and production
-const API_BASE_URL = window.location.origin + '/api';
+const API_BASE_URL = 'https://digipass-production.up.railway.app:8080/api';
 
 // Check if user is logged in
 function checkAuth() {
