@@ -1,4 +1,9 @@
+const pool = require('../db');
 const { hashPassword } = require('../utils/bcrypt');
+const { generateToken } = require('../utils/jwt');
+const { generateVerificationToken, hashVerificationToken, getVerificationExpiryDate } = require('../utils/executorVerification');
+const { generateExecutorVerificationQR, getExecutorVerificationUrl } = require('../utils/qrCode');
+const { sendExecutorVerificationEmail } = require('../utils/mailer');
 
 function buildExecutorResponse(executor) {
   return {
@@ -80,7 +85,7 @@ async function addExecutor(req, res) {
     console.log(`  - executor_id: ${executor.executor_id}`);
     console.log(`  - verification link will be sent to: ${executor.executor_email}`);
     
-    const fallbackVerificationUrl = getQRUrl(verificationToken);
+    const fallbackVerificationUrl = getExecutorVerificationUrl(verificationToken);
 
     // Generate QR code for verification
     let qrCodeDataUrl = null;
@@ -562,7 +567,6 @@ async function setupExecutorPassword(req, res) {
     console.log(`  - verification_status: verified`);
 
     // Generate JWT token for auto-login
-    const { generateToken } = require('../utils/jwt');
     const jwtToken = generateToken(executor.executor_id);
 
     return res.status(200).json({
