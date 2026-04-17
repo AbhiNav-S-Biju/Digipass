@@ -3,8 +3,9 @@ const { Resend } = require('resend');
 let resend = null;
 
 function getExecutorVerificationUrl(token) {
-  const baseUrl = process.env.APP_BASE_URL || 'http://localhost:8080';
-  return `${baseUrl}/executor-verify.html?token=${encodeURIComponent(token)}`;
+  // Use FRONTEND_URL for frontend file, fallback to APP_BASE_URL for local dev
+  const frontendUrl = process.env.FRONTEND_URL || process.env.APP_BASE_URL || 'http://localhost:3000';
+  return `${frontendUrl}/executor-verify.html?token=${encodeURIComponent(token)}`;
 }
 
 function initResend() {

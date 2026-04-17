@@ -32,8 +32,9 @@ async function generateExecutorVerificationQR(token) {
  * @returns {string} Verification URL
  */
 function getExecutorVerificationUrl(token) {
-  const baseUrl = process.env.APP_BASE_URL || 'http://localhost:3000';
-  return `${baseUrl}/executor-verify?token=${token}`;
+  // Use FRONTEND_URL for frontend file, fallback to APP_BASE_URL for local dev
+  const frontendUrl = process.env.FRONTEND_URL || process.env.APP_BASE_URL || 'http://localhost:3000';
+  return `${frontendUrl}/executor-verify.html?token=${token}`;
 }
 
 module.exports = {
