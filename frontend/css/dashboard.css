@@ -114,14 +114,33 @@ body {
 
 .page h1, .page h2 {
     margin-bottom: 2rem;
-    color: #333;
+    color: #1f2937;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
 }
 
 .panel {
     background: white;
-    padding: 1.75rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(54, 70, 128, 0.08);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(54, 70, 128, 0.08);
+    border: 1px solid #f0f0f0;
+    transition: box-shadow 0.2s ease;
+}
+
+.panel:hover {
+    box-shadow: 0 8px 24px rgba(54, 70, 128, 0.12);
+}
+
+.panel h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #1f2937;
+    font-size: 1.3rem;
+    font-weight: 700;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
 }
 
 .assets-layout {
@@ -202,8 +221,17 @@ body {
 }
 
 .secondary-btn {
-    background: #eef2ff;
-    color: #4c5fd7;
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 100%);
+    color: #667eea;
+    border: 1px solid #d8def0;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.secondary-btn:hover {
+    background: linear-gradient(135deg, #e8ecff 0%, #dfe7ff 100%);
+    border-color: #667eea;
+    color: #5568d3;
 }
 
 .danger-btn {
@@ -462,31 +490,61 @@ body {
 .will-summary {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
 }
 
 .summary-item {
-    background: #f8faff;
-    padding: 1.5rem;
-    border-radius: 12px;
-    border-left: 4px solid #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1.75rem;
+    border-radius: 16px;
     text-align: center;
+    color: white;
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.summary-item::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: float 8s linear infinite;
+}
+
+.summary-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(102, 126, 234, 0.25);
 }
 
 .summary-item h4 {
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    font-weight: 600;
+    opacity: 0.95;
+    position: relative;
+    z-index: 1;
 }
 
 .summary-count {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #667eea;
+    font-size: 2.5rem;
+    font-weight: 700;
     margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
 }
 
 .will-details-container {
@@ -495,56 +553,145 @@ body {
 }
 
 .will-section {
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 1.25rem;
-    background: #f9fafb;
+    background: white;
+    border-radius: 14px;
+    padding: 1.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+    transition: box-shadow 0.2s ease;
+}
+
+.will-section:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .will-section h4 {
     margin-top: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
     color: #1f2937;
+    font-size: 1.1rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    font-weight: 600;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f0f0f0;
 }
 
 .will-section p {
     color: #6b7280;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.75rem 0;
     font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.will-section ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.will-section ul li {
+    margin-bottom: 0.5rem;
+    color: #6b7280;
 }
 
 .will-item {
-    background: white;
-    padding: 0.75rem;
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-    border-left: 3px solid #667eea;
+    background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    border-left: 4px solid #667eea;
+    transition: all 0.2s ease;
+}
+
+.will-item:hover {
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 100%);
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.1);
 }
 
 .will-item-name {
-    font-weight: 600;
+    font-weight: 700;
     color: #1f2937;
+    font-size: 0.95rem;
 }
 
 .will-item-meta {
     color: #6b7280;
     font-size: 0.9rem;
-    margin-top: 0.25rem;
+    margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.will-item-meta::before {
+    content: '•';
+    margin-right: 0.5rem;
+    color: #667eea;
 }
 
 .empty-state {
     text-align: center;
-    padding: 2rem;
-    color: #6b7280;
+    padding: 2.5rem;
+    color: #9ca3af;
+    background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+    border-radius: 10px;
+    border: 1px dashed #e5e7eb;
 }
 
 .empty-state-icon {
     font-size: 2.5rem;
     margin-bottom: 1rem;
-    opacity: 0.5;
+    opacity: 0.6;
+}
+
+/* Enhanced Button Styling */
+#generateWillBtn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    width: 100%;
+    margin-top: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#generateWillBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+#generateWillBtn:active {
+    transform: translateY(0);
+}
+
+#generateWillBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .will-summary {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .summary-item {
+        padding: 1.5rem;
+    }
+    
+    .summary-count {
+        font-size: 2rem;
+    }
 }
 
 /* Modal Styles */
