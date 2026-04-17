@@ -208,14 +208,18 @@
                 const response = await fetch(`${API_URL}/api/auth/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password })
+                    body: JSON.stringify({ full_name: name, email, password })
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify({
+                        id: data.data.userId,
+                        fullName: data.data.fullName,
+                        email: data.data.email
+                    }));
                     location.href = 'dashboard.html';
                 } else {
                     showError(data.message || 'Registration failed. Please try again.');
