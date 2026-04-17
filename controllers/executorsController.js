@@ -537,7 +537,7 @@ async function setupExecutorPassword(req, res) {
     }
 
     const executor = executorRows[0];
-    const passwordHash = hashPassword(password);
+    const passwordHash = await hashPassword(password);
 
     // Update executor with password and verification status
     const { rows: updatedRows } = await pool.query(
