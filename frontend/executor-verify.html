@@ -3,348 +3,291 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Executor Account - DIGIPASS</title>
+    <title>Executor Verification - DIGIPASS</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23102c26'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='%23f7e7ce'/%3E%3C/svg%3E">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary-dark: #102c26;
+            --primary-dark-hover: #081a16;
+            --bg-light: #f7e7ce;
+            --text-dark: #2d2d2d;
+            --text-muted: #6c757d;
+        }
+
+        html, body {
+            height: 100%;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            line-height: 1.6;
-            color: #2d2d2d;
-            background: #f7e7ce;
-            min-height: 100vh;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 1rem;
         }
 
         .verify-container {
             width: 100%;
             max-width: 500px;
             background: white;
-            padding: 2.5rem;
-            border-radius: 8px;
+            padding: 2rem;
+            border-radius: 12px;
             border: 1px solid #e8e0d0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
-        .verify-container h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #102c26;
-            margin-bottom: 0.5rem;
+        .verify-header {
             text-align: center;
-        }
-
-        .verify-container h2 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #102c26;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .verify-container > p {
-            text-align: center;
-            color: #555;
             margin-bottom: 2rem;
-            font-size: 0.95rem;
         }
 
-        .qr-box {
-            background: #f5f5f5;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 1.5rem 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 350px;
-        }
-
-        .qr-box img {
-            max-width: 300px;
-            height: auto;
-        }
-
-        .qr-instructions {
-            background: #dbeafe;
-            border-left: 4px solid #0369a1;
-            padding: 1rem;
-            margin: 1.5rem 0;
-            border-radius: 4px;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-
-        .qr-instructions strong {
-            color: #0369a1;
-            display: block;
-            margin-bottom: 0.75rem;
-        }
-
-        .qr-instructions ol {
-            margin-left: 1.5rem;
-            color: #0369a1;
-        }
-
-        .qr-instructions li {
-            margin-bottom: 0.5rem;
-        }
-
-        .qr-link {
-            background: #f5f5f5;
-            padding: 1rem;
-            border-radius: 4px;
-            margin: 1rem 0;
-            word-break: break-all;
-            font-size: 0.85rem;
-            color: #666;
-            border: 1px solid #e0e0e0;
-            font-family: monospace;
-        }
-
-        .verify-status {
-            padding: 1rem;
-            border-radius: 4px;
-            margin: 1.5rem 0;
+        .verify-header h1 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
             font-weight: 600;
-            font-size: 0.95rem;
+            margin-bottom: 1rem;
         }
 
-        .verify-status.success {
-            background: #dcfce7;
-            border: 1px solid #bbf7d0;
-            color: #166534;
+        .verify-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
 
-        .verify-status.error {
-            background: #fee2e2;
-            border: 1px solid #fecaca;
-            color: #991b1b;
+        .qr-display {
+            background-color: #f8f9fa;
+            border: 1px solid #e8e0d0;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        .verify-status.loading {
-            background: #fef3c7;
-            border: 1px solid #fde68a;
-            color: #92400e;
+        .qr-display img {
+            max-width: 100%;
+            border-radius: 6px;
+        }
+
+        .qr-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 1rem;
         }
 
         .divider {
-            margin: 2rem 0;
             text-align: center;
-            color: #ccc;
-            font-size: 0.9rem;
+            margin: 2rem 0;
+            position: relative;
         }
 
-        .form-group {
-            display: grid;
-            gap: 0.5rem;
-            margin: 1.5rem 0;
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #e8e0d0;
         }
 
-        .form-group label {
-            font-weight: 600;
-            color: #1f2937;
-            font-size: 0.95rem;
-        }
-
-        .form-group input {
-            padding: 0.75rem;
-            border: 1px solid #d8def0;
-            border-radius: 4px;
-            font-size: 0.95rem;
-            font-family: inherit;
-            background: #fbfcff;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #102c26;
+        .divider span {
             background: white;
+            padding: 0 1rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.9rem;
+            position: relative;
         }
 
-        .form-group small {
-            color: #999;
-            font-size: 0.85rem;
-            margin-top: 0.25rem;
+        .link-section {
+            margin-bottom: 2rem;
+        }
+
+        .link-section h3 {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .link-display {
+            background-color: #f8f9fa;
+            border: 1px solid #e8e0d0;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            word-break: break-all;
+            color: var(--primary-dark);
+            margin-bottom: 0.75rem;
+            max-height: 100px;
+            overflow-y: auto;
         }
 
         .button-group {
             display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .button-group button {
-            flex: 1;
-            padding: 0.85rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.2s;
+            gap: 0.75rem;
+            flex-wrap: wrap;
         }
 
         .btn-primary {
-            background: #102c26;
-            color: white;
-            width: 100%;
+            background-color: var(--primary-dark) !important;
+            border-color: var(--primary-dark) !important;
+            color: white !important;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 120px;
         }
 
         .btn-primary:hover {
-            background: #081a16;
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+            background-color: var(--primary-dark-hover) !important;
+            border-color: var(--primary-dark-hover) !important;
         }
 
         .btn-secondary {
-            background: white;
-            color: #102c26;
-            border: 1px solid #d8e0d5;
+            background-color: white !important;
+            color: var(--primary-dark) !important;
+            border: 1px solid #e8e0d0 !important;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 120px;
         }
 
         .btn-secondary:hover {
-            background: #f9f9f9;
-            border-color: #102c26;
+            border-color: var(--primary-dark) !important;
+            background-color: #fafbfc !important;
         }
 
-        .btn-back {
-            background: white;
-            color: #102c26;
-            border: 1px solid #d8e0d5;
-            margin-top: 1.5rem;
-            width: 100%;
-            padding: 0.85rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
+        .info-box {
+            background-color: #dbeafe;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #1e40af;
+            font-size: 0.9rem;
+            line-height: 1.6;
         }
 
-        .btn-back:hover {
-            border-color: #102c26;
-            background: #f9f9f9;
+        .info-box strong {
+            color: #1e3a8a;
         }
 
         @media (max-width: 480px) {
-            body { padding: 15px; }
-            .verify-container { padding: 1.5rem; max-width: 100%; }
-            .verify-container h1 { font-size: 1.1rem; }
-            .verify-container h2 { font-size: 1rem; }
-            .verify-container > p { font-size: 0.85rem; }
-            .qr-box { min-height: 280px; padding: 1rem; margin: 1rem 0; }
-            .qr-box img { max-width: 250px; }
-            .qr-instructions { padding: 0.75rem; font-size: 0.8rem; margin: 1rem 0; }
-            .qr-instructions strong { margin-bottom: 0.5rem; }
-            .qr-instructions ol { margin-left: 1.25rem; }
-            .qr-link { padding: 0.75rem; font-size: 0.75rem; margin: 0.75rem 0; }
-            .divider { margin: 1.5rem 0; font-size: 0.8rem; }
-            .form-group label { font-size: 0.9rem; }
-            .form-group input { font-size: 0.9rem; padding: 0.6rem; }
-            .form-group small { font-size: 0.75rem; }
-            .button-group { gap: 0.5rem; margin-top: 1rem; }
-            .button-group button { font-size: 0.85rem; padding: 0.65rem; }
-            .btn-back { padding: 0.65rem; font-size: 0.85rem; margin-top: 1rem; }
-            .verify-status { padding: 0.75rem; font-size: 0.85rem; margin: 1rem 0; }
-        }
+            .verify-container {
+                padding: 1.5rem;
+            }
 
-        @media (max-width: 768px) {
-            body { padding: 20px; }
-            .verify-container { padding: 2rem; }
-            .verify-container h1 { font-size: 1.3rem; }
-            .verify-container h2 { font-size: 1.1rem; }
-            .verify-container > p { font-size: 0.9rem; }
-            .qr-box { min-height: 320px; padding: 1.25rem; margin: 1.25rem 0; }
-            .qr-box img { max-width: 280px; }
-            .qr-instructions { padding: 1rem; font-size: 0.85rem; margin: 1.5rem 0; }
-            .qr-link { padding: 0.85rem; font-size: 0.8rem; margin: 0.85rem 0; }
-            .form-group label { font-size: 0.95rem; }
-            .form-group input { font-size: 0.95rem; padding: 0.7rem; }
-            .button-group { gap: 0.75rem; margin-top: 1.25rem; }
-            .button-group button { font-size: 0.9rem; padding: 0.75rem; }
-            .btn-back { padding: 0.75rem; font-size: 0.9rem; margin-top: 1.25rem; }
-        }
+            .verify-header h1 {
+                font-size: 1.3rem;
+            }
 
-        @media (max-width: 834px) {
-            .verify-container { max-width: 450px; }
-        }
+            .verify-icon {
+                font-size: 2.5rem;
+            }
 
-        @media (max-width: 1024px) {
-            .verify-container { max-width: 480px; }
-        }
+            .qr-display {
+                padding: 1.5rem;
+            }
 
-        @media (max-width: 1440px) {
-            .verify-container { max-width: 500px; }
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="verify-container">
-        <h1>DIGIPASS</h1>
-
-        <div id="qrContent" style="display: none;">
-            <h2>Verify Your Executor Account</h2>
-            <p>You've been registered as an executor. Verify your identity using the QR code below.</p>
-
-            <div class="qr-box">
-                <img id="qrImage" alt="Verification QR Code">
-            </div>
-
-            <div class="qr-instructions">
-                <strong>📱 How to verify:</strong>
-                <ol>
-                    <li>Use your phone camera or QR scanner app</li>
-                    <li>Scan the QR code above</li>
-                    <li>Click the verification link</li>
-                    <li>Your account will be activated instantly</li>
-                </ol>
-            </div>
-
-            <div class="divider">OR</div>
-
-            <p><strong>Use the verification link:</strong></p>
-            <div class="qr-link" id="verificationLink"></div>
-            <button class="btn-primary" onclick="openLink()">Open Verification Link</button>
+        <div class="verify-header">
+            <div class="verify-icon">✓</div>
+            <h1>You're Invited!</h1>
         </div>
 
-        <!-- Password Setup Form (shown after verification) -->
-        <div id="passwordSetupContent" style="display: none;">
-            <h2>Complete Your Setup</h2>
-            <p>Set a secure password to finish creating your executor account.</p>
-
-            <form id="passwordForm">
-                <div class="form-group">
-                    <label for="executorPassword">Password</label>
-                    <input type="password" id="executorPassword" placeholder="At least 8 characters" required>
-                    <small>Must include uppercase, lowercase, number, and symbol (@$!%*?&)</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
-                </div>
-
-                <button type="submit" class="btn-primary">Create Account</button>
-            </form>
-
-            <div id="passwordError" class="verify-status error" style="display: none;"></div>
+        <div class="info-box">
+            <strong>🔐 Executor Verification</strong><br>
+            You've been invited to be an executor for a digital estate. Complete your setup to access the assets assigned to you.
         </div>
 
-        <div id="verificationStatus"></div>
+        <div class="qr-display" id="qrCodeDisplay">
+            <p class="text-muted" id="qrLoading">Loading QR code...</p>
+            <img id="qrImage" style="display: none;" alt="Verification QR Code">
+        </div>
+        <p class="qr-text">Scan this code with your phone camera to verify</p>
 
-        <button class="btn-back" onclick="goBack()">Back to Home</button>
+        <div class="divider">
+            <span>or</span>
+        </div>
+
+        <div class="link-section">
+            <h3>Direct Link</h3>
+            <div class="link-display" id="verificationLink">Loading link...</div>
+            <div class="button-group">
+                <button onclick="copyLink()" class="btn btn-secondary btn-sm">Copy Link</button>
+                <button onclick="openLink()" class="btn btn-primary btn-sm">Open Link</button>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button onclick="location.href='executor-login.html'" class="btn btn-secondary">Already Verified?</button>
+            <button onclick="location.href='index.html'" class="btn btn-secondary">Back Home</button>
+        </div>
     </div>
 
-    <script src="js/executor-verify.js?v=2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode.js/1.5.0/qrcode.min.js"></script>
+    <script>
+        const API_URL = 'https://digipass-3l63.onrender.com';
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (token) {
+            // If token is in URL, set it and prepare form
+            localStorage.setItem('executorToken', token);
+            location.href = 'executor-register.html?token=' + token;
+        }
+
+        // Generate QR code with verification link
+        const verificationLink = `${window.location.origin}/executor-verify.html`;
+        const linkWithToken = token ? `${API_URL}/executor-verify?token=${token}` : verificationLink;
+
+        // Display verification link
+        document.getElementById('verificationLink').textContent = linkWithToken;
+
+        // Generate QR code
+        const qrContainer = document.getElementById('qrCodeDisplay');
+        qrContainer.innerHTML = '';
+        new QRCode({
+            text: linkWithToken,
+            width: 256,
+            height: 256,
+            colorDark: '#102c26',
+            colorLight: '#f7e7ce',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        function copyLink() {
+            const link = document.getElementById('verificationLink').textContent;
+            navigator.clipboard.writeText(link).then(() => {
+                alert('Link copied to clipboard!');
+            }).catch(() => {
+                alert('Failed to copy link');
+            });
+        }
+
+        function openLink() {
+            const link = document.getElementById('verificationLink').textContent;
+            window.open(link, '_blank');
+        }
+    </script>
 </body>
 </html>

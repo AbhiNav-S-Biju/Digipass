@@ -5,119 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - DIGIPASS</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23102c26'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='%23f7e7ce'/%3E%3C/svg%3E">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary-dark: #102c26;
+            --primary-dark-hover: #081a16;
+            --bg-light: #f7e7ce;
+            --text-dark: #2d2d2d;
+            --text-muted: #6c757d;
+            --border-light: #e9ecef;
         }
 
         body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
             font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            background-color: #f7e7ce;
-            color: #2d2d2d;
-            line-height: 1.6;
         }
 
-        /* Navbar */
+        /* Navbar Customization */
         .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            height: 60px;
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            align-items: center;
+            background-color: white !important;
+            border-bottom: 1px solid var(--border-light);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
-        .navbar .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .logo {
+        .navbar-brand {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #102c26;
-            text-decoration: none;
+            color: var(--primary-dark) !important;
+            letter-spacing: -0.5px;
         }
 
-        .nav-menu {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .nav-item {
-            color: #2d2d2d;
-            text-decoration: none;
-            padding: 0.5rem 0;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-size: 0.95rem;
+        .nav-link {
+            color: var(--text-dark) !important;
             font-weight: 400;
-            transition: color 0.2s;
-            border-bottom: 2px solid transparent;
-        }
-
-        .nav-item:hover {
-            color: #102c26;
-        }
-
-        .nav-item.active {
-            color: #102c26;
-            border-bottom-color: #102c26;
-        }
-
-        .nav-item.logout {
-            background: #102c26;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            border: none;
-            margin-left: 1rem;
-        }
-
-        .nav-item.logout:hover {
-            background: #081a16;
-        }
-
-        /* Container */
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* User Info */
-        .user-info {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .user-info p {
             font-size: 0.95rem;
-            color: #2d2d2d;
-            font-weight: 400;
+            padding: 0.5rem 0.75rem !important;
         }
 
-        .user-info span {
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-dark) !important;
+            border-bottom: 2px solid var(--primary-dark);
+        }
+
+        .btn-logout {
+            background-color: var(--primary-dark) !important;
+            color: white !important;
             font-weight: 600;
-            color: #102c26;
+            font-size: 0.95rem;
+            border-radius: 6px;
         }
 
-        /* Pages */
+        .btn-logout:hover {
+            background-color: var(--primary-dark-hover) !important;
+        }
+
+        /* Main Content */
         .page {
             display: none;
         }
@@ -132,331 +77,41 @@
             to { opacity: 1; }
         }
 
-        /* Page Headers */
-        .page-header {
-            margin-bottom: 2rem;
-        }
-
+        /* Page Header */
         .page-header h2 {
-            font-size: 1.75rem;
+            color: var(--primary-dark);
             font-weight: 600;
-            color: #102c26;
+            font-size: clamp(1.5rem, 5vw, 2rem);
             margin-bottom: 0.5rem;
         }
 
         .page-header p {
-            color: #6c757d;
+            color: var(--text-muted);
             font-size: 0.95rem;
-            font-weight: 400;
         }
 
-        /* Panels */
-        .panel {
-            background: white;
-            border: 1px solid #e9ecef;
+        /* Card Customization */
+        .card {
+            border: 1px solid var(--border-light);
             border-radius: 12px;
-            padding: 1.5rem;
-            transition: box-shadow 0.2s;
-        }
-
-        .panel:hover {
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
-        .panel h3 {
+        .card h3 {
+            color: var(--primary-dark);
+            font-weight: 600;
             font-size: 1.1rem;
-            font-weight: 600;
-            color: #102c26;
-            margin-bottom: 1.5rem;
         }
 
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid var(--border-light);
         }
 
-        .panel-header h3 {
-            margin-bottom: 0;
-        }
-
-        /* Layouts */
-        .assets-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            align-items: start;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-
-        /* Forms */
-        .asset-form {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .form-group {
-            display: grid;
-            gap: 0.5rem;
-        }
-
-        .form-group label {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #2d2d2d;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            font-size: 0.95rem;
-            padding: 0.75rem;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            background: white;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #102c26;
-            box-shadow: 0 0 0 3px rgba(16, 44, 38, 0.1);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 140px;
-        }
-
-        .form-group small {
-            font-size: 0.85rem;
-            color: #6c757d;
-        }
-
-        /* Buttons */
-        .primary-btn,
-        .secondary-btn,
-        .danger-btn {
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            padding: 0.75rem 1.25rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .primary-btn {
-            background: #102c26;
-            color: white;
-        }
-
-        .primary-btn:hover:not(:disabled) {
-            background: #081a16;
-        }
-
-        .secondary-btn {
-            background: white;
-            color: #102c26;
-            border: 1px solid #e9ecef;
-        }
-
-        .secondary-btn:hover:not(:disabled) {
-            border-color: #102c26;
-            background: #fafbfc;
-        }
-
-        .danger-btn {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .danger-btn:hover:not(:disabled) {
-            background: #fecaca;
-        }
-
-        .primary-btn:disabled,
-        .secondary-btn:disabled,
-        .danger-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        /* Status & Lists */
-        .assets-status {
-            color: #6c757d;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background: #f8f9fa;
-            border-left: 3px solid #102c26;
-            border-radius: 4px;
-        }
-
-        .assets-list {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .asset-card {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 1rem;
-            transition: box-shadow 0.2s;
-        }
-
-        .asset-card:hover {
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-        }
-
-        .asset-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .asset-card h4 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #102c26;
-            margin-bottom: 0.25rem;
-        }
-
-        .asset-type {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #6c757d;
-            text-transform: capitalize;
-        }
-
-        .asset-date {
-            font-size: 0.85rem;
-            color: #6c757d;
-            margin-top: 0.5rem;
-        }
-
-        .executor-meta {
-            font-size: 0.85rem;
-            color: #6c757d;
-            margin-top: 0.25rem;
-        }
-
-        .status-pill {
-            display: inline-block;
-            padding: 0.4rem 0.8rem;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: capitalize;
-        }
-
-        .status-pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .status-error {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .executor-actions {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-top: 0.75rem;
-        }
-
-        .access-btn,
-        .revoke-btn,
-        .success-btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .access-btn {
-            background: #dbeafe;
-            color: #0369a1;
-        }
-
-        .access-btn:hover:not(:disabled) {
-            background: #bfdbfe;
-        }
-
-        .revoke-btn {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .revoke-btn:hover:not(:disabled) {
-            background: #fecaca;
-        }
-
-        .success-btn {
-            background: #dcfce7;
-            color: #166534;
-            cursor: default;
-        }
-
-        .access-btn:disabled,
-        .revoke-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .executor-status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            padding: 0.3rem 0.75rem;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .status-invited {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-verified {
-            background: #dbeafe;
-            color: #0369a1;
-        }
-
-        .status-active {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        /* Stat Cards */
+        /* Stat Card */
         .stat-card {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
+            background-color: #f8f9fa;
+            border: 1px solid var(--border-light);
             border-radius: 8px;
             padding: 1.5rem;
             text-align: center;
@@ -469,51 +124,138 @@
 
         .stat-card h3 {
             font-size: 0.9rem;
-            font-weight: 600;
-            color: #6c757d;
-            margin-bottom: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
             text-transform: none;
-            letter-spacing: 0;
         }
 
         .stat-number,
         .stat-status {
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 8vw, 2.5rem);
             font-weight: 700;
-            color: #102c26;
+            color: var(--primary-dark);
             margin-bottom: 1rem;
         }
 
-        .stat-card a {
-            display: inline-block;
-            margin-top: 0.5rem;
-            padding: 0.6rem 1.25rem;
-            background: #102c26;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.9rem;
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-dark) !important;
+            border-color: var(--primary-dark) !important;
             font-weight: 600;
-            transition: background 0.2s;
+            border-radius: 6px;
         }
 
-        .stat-card a:hover {
-            background: #081a16;
+        .btn-primary:hover {
+            background-color: var(--primary-dark-hover) !important;
+            border-color: var(--primary-dark-hover) !important;
+        }
+
+        .btn-secondary {
+            background-color: white !important;
+            color: var(--primary-dark) !important;
+            border: 1px solid var(--border-light) !important;
+            font-weight: 600;
+            border-radius: 6px;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-dark) !important;
+            background-color: #fafbfc !important;
+        }
+
+        .btn-danger {
+            background-color: #fee2e2 !important;
+            color: #991b1b !important;
+            font-weight: 600;
+            border-radius: 6px;
+        }
+
+        /* Forms */
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control,
+        .form-select {
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            padding: 0.75rem;
+            background-color: white;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(16, 44, 38, 0.1);
+        }
+
+        /* Asset List */
+        .asset-card {
+            background-color: white;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 1rem;
+            transition: box-shadow 0.2s;
+        }
+
+        .asset-card:hover {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .asset-card h4 {
+            color: var(--primary-dark);
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .asset-type {
+            display: inline-block;
+            background-color: #f0e8e0;
+            color: var(--primary-dark);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: capitalize;
+            margin-bottom: 1rem;
+        }
+
+        /* Status Pills */
+        .status-pill {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-success {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-error {
+            background-color: #fee2e2;
+            color: #991b1b;
         }
 
         /* Will Summary */
-        .will-summary {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.75rem;
-            margin-bottom: 2rem;
-        }
-
         .summary-item {
-            background: white;
-            border: 1px solid #e9ecef;
+            background-color: white;
+            border: 1px solid var(--border-light);
             border-radius: 8px;
-            padding: 2rem;
+            padding: 2rem 1rem;
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -529,521 +271,427 @@
         .summary-item h4 {
             font-size: 0.9rem;
             font-weight: 600;
-            color: #6c757d;
+            color: var(--text-muted);
             margin-bottom: 1rem;
-            text-transform: none;
-            letter-spacing: 0;
         }
 
         .summary-count {
-            font-size: 2.5rem;
+            font-size: clamp(2rem, 8vw, 2.5rem);
             font-weight: 700;
-            color: #102c26;
+            color: var(--primary-dark);
             margin: 0;
         }
 
-        /* Will Details */
-        .will-details-container {
-            display: grid;
-            gap: 1.5rem;
-        }
-
-        .will-section {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 1.5rem;
-            transition: box-shadow 0.2s;
-        }
-
-        .will-section:hover {
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-
-        .will-section h4 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #102c26;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .will-section p {
-            color: #6c757d;
-            font-size: 0.95rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .will-section ul {
-            margin-left: 1.5rem;
-            color: #6c757d;
-            font-size: 0.95rem;
-        }
-
-        .will-section li {
-            margin-bottom: 0.5rem;
-        }
-
-        /* Modal */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
+        /* Modal Customization */
         .modal-content {
-            background: white;
             border-radius: 12px;
-            border: 1px solid #e9ecef;
-            width: 90%;
-            max-width: 500px;
+            border: 1px solid var(--border-light);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
         }
 
         .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid var(--border-light);
+            background-color: white;
         }
 
         .modal-header h2 {
-            font-size: 1.25rem;
+            color: var(--primary-dark);
             font-weight: 600;
-            color: #102c26;
-            margin: 0;
+            font-size: 1.25rem;
         }
 
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #6c757d;
-            cursor: pointer;
-            transition: color 0.2s;
-            padding: 0;
-            width: 2rem;
-            height: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .btn-close {
+            filter: invert(0.5);
         }
 
-        .modal-close:hover {
-            color: #102c26;
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        .modal-body p {
-            color: #6c757d;
-            margin-bottom: 1rem;
-            font-size: 0.95rem;
-        }
-
+        /* QR Display */
         .qr-display {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
+            background-color: #f8f9fa;
+            border: 1px solid var(--border-light);
             border-radius: 8px;
             padding: 1.5rem;
             display: flex;
             justify-content: center;
-            margin-bottom: 1rem;
         }
 
-        .qr-display img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .link-display {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .link-input {
-            flex: 1;
-            padding: 0.75rem;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 0.85rem;
-            background: #f8f9fa;
-        }
-
-        .copy-btn {
-            padding: 0.75rem 1.25rem;
-            background: #102c26;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .copy-btn:hover {
-            background: #081a16;
-        }
-
-        .modal-footer {
-            padding: 1.5rem;
-            border-top: 1px solid #e9ecef;
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-        }
-
-        /* Responsive */
-        /* Mobile (≤480px) */
-        @media (max-width: 480px) {
-            .navbar { height: 50px; }
-            .navbar .container { padding: 0 0.75rem; gap: 0.5rem; }
-            .logo { font-size: 1rem; }
-            .nav-menu { gap: 0.5rem; }
-            .nav-item { font-size: 0.8rem; padding: 0.3rem 0; }
-            .nav-item.logout { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
-            .container { padding: 1rem 0.75rem; }
-            .user-info { padding: 1rem; margin-bottom: 1.5rem; }
-            .user-info p { font-size: 0.85rem; }
-            .page-header { margin-bottom: 1.5rem; }
-            .page-header h2 { font-size: 1.3rem; }
-            .page-header p { font-size: 0.8rem; }
-            .stats-grid { grid-template-columns: 1fr; gap: 0.75rem; }
-            .stat-card { padding: 1rem; }
-            .stat-card h3 { font-size: 0.8rem; }
-            .stat-number, .stat-status { font-size: 1.5rem; }
-            .stat-card a { padding: 0.5rem 1rem; font-size: 0.8rem; }
-            .assets-layout { grid-template-columns: 1fr; gap: 1rem; }
-            .panel { padding: 1rem; }
-            .panel h3 { font-size: 1rem; }
-            .asset-form { gap: 0.75rem; }
-            .form-group label { font-size: 0.85rem; }
-            .form-group input, .form-group select, .form-group textarea { font-size: 0.9rem; padding: 0.6rem; }
-            .form-group textarea { min-height: 120px; }
-            .primary-btn, .secondary-btn, .danger-btn { font-size: 0.9rem; padding: 0.65rem 1rem; }
-            .will-summary { grid-template-columns: 1fr; gap: 1rem; }
-            .summary-item { padding: 1.5rem 1rem; min-height: 140px; }
-            .summary-item h4 { font-size: 0.8rem; }
-            .summary-count { font-size: 2rem; }
-            .asset-card { padding: 0.75rem; }
-            .asset-card h4 { font-size: 0.9rem; }
-            .executor-actions { gap: 0.4rem; }
-            .access-btn, .revoke-btn, .success-btn { padding: 0.4rem 0.8rem; font-size: 0.75rem; }
-            .will-section { padding: 1rem; }
-            .will-section h4 { font-size: 0.95rem; }
-            .modal-content { width: 90%; max-width: 100%; }
-            .modal-header { padding: 1.25rem; }
-            .modal-header h2 { font-size: 1.1rem; }
-            .modal-body { padding: 1.25rem; }
-            .qr-display { padding: 1rem; }
-            .link-input { font-size: 0.75rem; padding: 0.6rem; }
-            .copy-btn { padding: 0.6rem 1rem; font-size: 0.85rem; }
-        }
-
-        /* Mobile Landscape (≤768px) */
+        /* Responsive Adjustments */
         @media (max-width: 768px) {
-            .navbar .container { padding: 0 1rem; }
-            .logo { font-size: 1.1rem; }
-            .nav-menu { gap: 1rem; }
-            .nav-item { font-size: 0.9rem; }
-            .nav-item.logout { padding: 0.5rem 1rem; font-size: 0.9rem; }
-            .container { padding: 1.5rem 1rem; }
-            .user-info { padding: 1.25rem; margin-bottom: 1.75rem; }
-            .user-info p { font-size: 0.9rem; }
-            .page-header { margin-bottom: 1.75rem; }
-            .page-header h2 { font-size: 1.5rem; }
-            .page-header p { font-size: 0.9rem; }
-            .stats-grid { grid-template-columns: 1fr; gap: 1rem; }
-            .stat-card { padding: 1.25rem; }
-            .stat-card h3 { font-size: 0.9rem; }
-            .stat-number, .stat-status { font-size: 1.75rem; }
-            .stat-card a { padding: 0.6rem 1.25rem; font-size: 0.9rem; }
-            .assets-layout { grid-template-columns: 1fr; gap: 1.25rem; }
-            .panel { padding: 1.25rem; }
-            .panel h3 { font-size: 1rem; }
-            .asset-form { gap: 0.9rem; }
-            .form-group label { font-size: 0.9rem; }
-            .form-group input, .form-group select, .form-group textarea { font-size: 0.95rem; padding: 0.7rem; }
-            .form-group textarea { min-height: 130px; }
-            .will-summary { grid-template-columns: 1fr; gap: 1.25rem; }
-            .summary-item { padding: 1.75rem; min-height: 150px; }
-            .summary-count { font-size: 2.25rem; }
-            .modal-content { width: 95%; max-width: 450px; }
-            .modal-body p { font-size: 0.9rem; }
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+
+            .nav-link {
+                font-size: 0.9rem;
+                padding: 0.4rem 0.6rem !important;
+            }
+
+            .page-header h2 {
+                font-size: 1.3rem;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .stat-card h3 {
+                font-size: 0.8rem;
+            }
+
+            .summary-item {
+                padding: 1.5rem 1rem;
+                min-height: 140px;
+            }
+
+            .card {
+                margin-bottom: 1.5rem;
+            }
         }
 
-        /* Tablet (≤834px) */
-        @media (max-width: 834px) {
-            .navbar .container { padding: 0 1.5rem; }
-            .logo { font-size: 1.2rem; }
-            .nav-menu { gap: 1.25rem; }
-            .nav-item { font-size: 0.95rem; }
-            .container { padding: 1.75rem 1.5rem; }
-            .page-header h2 { font-size: 1.6rem; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
-            .assets-layout { grid-template-columns: 1fr; gap: 1.5rem; }
-            .will-summary { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-            .summary-item { min-height: 155px; }
-        }
+        @media (max-width: 480px) {
+            .navbar-brand {
+                font-size: 1rem;
+            }
 
-        /* Tablet Landscape (≤1024px) */
-        @media (max-width: 1024px) {
-            .container { max-width: 900px; padding: 1.75rem; }
-            .navbar .container { max-width: 900px; padding: 0 1.75rem; }
-            .page-header h2 { font-size: 1.65rem; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-            .assets-layout { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-            .will-summary { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-        }
+            .nav-link {
+                font-size: 0.8rem;
+            }
 
-        /* Laptop (≤1440px) */
-        @media (max-width: 1440px) {
-            .container { max-width: 1100px; }
-            .navbar .container { max-width: 1100px; }
+            .btn-logout {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem !important;
+            }
+
+            .page-header h2 {
+                font-size: 1.2rem;
+            }
+
+            .page-header p {
+                font-size: 0.85rem;
+            }
+
+            .stat-card {
+                padding: 0.75rem;
+            }
+
+            .stat-number, .stat-status {
+                font-size: 1.5rem;
+            }
+
+            .summary-item {
+                padding: 1rem;
+                min-height: 130px;
+            }
+
+            .summary-count {
+                font-size: 1.8rem;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container">
-            <div class="logo">DIGIPASS</div>
-            <div class="nav-menu">
-                <a href="#dashboard" class="nav-item active" data-page="dashboard">Dashboard</a>
-                <a href="#assets" class="nav-item" data-page="assets">Digital Assets</a>
-                <a href="#executors" class="nav-item" data-page="executors">Executors</a>
-                <a href="#will" class="nav-item" data-page="will">Digital Will</a>
-                <a href="#switch" class="nav-item" data-page="switch">Dead Man's Switch</a>
-                <button id="logoutBtn" class="nav-item logout">Logout</button>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container-fluid px-3 px-md-4">
+            <a class="navbar-brand" href="#dashboard">DIGIPASS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-page="dashboard" href="#dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-page="assets" href="#assets">Digital Assets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-page="executors" href="#executors">Executors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-page="will" href="#will">Digital Will</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-page="switch" href="#switch">Dead Man's Switch</a>
+                    </li>
+                    <li class="nav-item">
+                        <button id="logoutBtn" class="btn btn-logout btn-sm ms-2">Logout</button>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
-    <main class="container">
-        <div id="userInfo" class="user-info">
-            <p>Welcome, <span id="userName">User</span>!</p>
+    <!-- Main Content -->
+    <main class="container-fluid px-3 px-md-4 py-4">
+        <!-- User Info -->
+        <div id="userInfo" class="alert alert-light border mb-4">
+            <p class="mb-0">Welcome, <strong id="userName">User</strong>!</p>
         </div>
 
         <!-- Dashboard Page -->
         <section id="dashboardPage" class="page active">
-            <div class="page-header">
+            <div class="page-header mb-4">
                 <h2>Dashboard</h2>
                 <p>Overview of your digital estate</p>
             </div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>Digital Assets</h3>
-                    <p class="stat-number" id="assetCount">0</p>
-                    <a href="#assets">Manage Assets</a>
+            <div class="row g-3">
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="stat-card">
+                        <h3>Digital Assets</h3>
+                        <p class="stat-number" id="assetCount">0</p>
+                        <a href="#assets" class="btn btn-primary btn-sm">Manage Assets</a>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3>Executors</h3>
-                    <p class="stat-number" id="executorCount">0</p>
-                    <a href="#executors">Manage Executors</a>
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="stat-card">
+                        <h3>Executors</h3>
+                        <p class="stat-number" id="executorCount">0</p>
+                        <a href="#executors" class="btn btn-primary btn-sm">Manage Executors</a>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3>Digital Will</h3>
-                    <p class="stat-number" id="willCount">0</p>
-                    <a href="#will">Create Will</a>
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="stat-card">
+                        <h3>Digital Will</h3>
+                        <p class="stat-number" id="willCount">0</p>
+                        <a href="#will" class="btn btn-primary btn-sm">Create Will</a>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3>Dead Man's Switch</h3>
-                    <p class="stat-status" id="switchStatus">Inactive</p>
-                    <a href="#switch">Configure</a>
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="stat-card">
+                        <h3>Dead Man's Switch</h3>
+                        <p class="stat-status" id="switchStatus">Inactive</p>
+                        <a href="#switch" class="btn btn-primary btn-sm">Configure</a>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Assets Page -->
         <section id="assetsPage" class="page">
-            <div class="page-header">
+            <div class="page-header mb-4">
                 <h2>Digital Assets</h2>
                 <p>Manage and organize your digital properties</p>
             </div>
-            <div class="assets-layout">
-                <div class="panel">
-                    <h3>Add Asset</h3>
-                    <form id="assetForm" class="asset-form">
-                        <div class="form-group">
-                            <label for="assetName">Asset Name</label>
-                            <input type="text" id="assetName" name="assetName" placeholder="e.g. Gmail Account" required>
+            <div class="row g-4">
+                <!-- Add Asset Form -->
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title mb-3">Add Asset</h3>
+                            <form id="assetForm">
+                                <div class="mb-3">
+                                    <label for="assetName" class="form-label">Asset Name</label>
+                                    <input type="text" class="form-control" id="assetName" name="assetName" placeholder="e.g. Gmail Account" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="assetType" class="form-label">Asset Type</label>
+                                    <select class="form-select" id="assetType" name="assetType" required>
+                                        <option value="">Select asset type</option>
+                                        <option value="email">Email</option>
+                                        <option value="bank_account">Bank Account</option>
+                                        <option value="social_media">Social Media</option>
+                                        <option value="crypto">Crypto</option>
+                                        <option value="password_manager">Password Manager</option>
+                                        <option value="legal_doc">Legal Document</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="assetData" class="form-label">Asset Data</label>
+                                    <textarea class="form-control" id="assetData" name="assetData" rows="5" placeholder='{"username":"name@example.com","notes":"Recovery details"}' required></textarea>
+                                    <small class="text-muted d-block mt-2">Enter valid JSON. This data is encrypted before storage.</small>
+                                </div>
+                                <button type="submit" id="assetSubmitBtn" class="btn btn-primary w-100">Save Asset</button>
+                            </form>
                         </div>
-
-                        <div class="form-group">
-                            <label for="assetType">Asset Type</label>
-                            <select id="assetType" name="assetType" required>
-                                <option value="">Select asset type</option>
-                                <option value="email">Email</option>
-                                <option value="bank_account">Bank Account</option>
-                                <option value="social_media">Social Media</option>
-                                <option value="crypto">Crypto</option>
-                                <option value="password_manager">Password Manager</option>
-                                <option value="legal_doc">Legal Document</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="assetData">Asset Data</label>
-                            <textarea id="assetData" name="assetData" rows="7" placeholder='{"username":"name@example.com","notes":"Recovery details"}' required></textarea>
-                            <small>Enter valid JSON. This data is encrypted before storage.</small>
-                        </div>
-
-                        <button type="submit" id="assetSubmitBtn" class="primary-btn">Save Asset</button>
-                    </form>
+                    </div>
                 </div>
 
-                <div class="panel">
-                    <div class="panel-header">
-                        <h3>Your Assets</h3>
-                        <button type="button" id="refreshAssetsBtn" class="secondary-btn">Refresh</button>
+                <!-- Assets List -->
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h3 class="mb-0">Your Assets</h3>
+                            <button type="button" id="refreshAssetsBtn" class="btn btn-secondary btn-sm">Refresh</button>
+                        </div>
+                        <div class="card-body">
+                            <p id="assetsStatus" class="text-muted">Loading assets...</p>
+                            <div id="assetsList"></div>
+                        </div>
                     </div>
-                    <p id="assetsStatus" class="assets-status">Loading assets...</p>
-                    <div id="assetsList" class="assets-list"></div>
                 </div>
             </div>
         </section>
 
         <!-- Executors Page -->
         <section id="executorsPage" class="page">
-            <div class="page-header">
+            <div class="page-header mb-4">
                 <h2>Executors</h2>
                 <p>Designate people to manage your digital estate</p>
             </div>
-            <div class="assets-layout">
-                <div class="panel">
-                    <h3>Add Executor</h3>
-                    <form id="executorForm" class="asset-form">
-                        <div class="form-group">
-                            <label for="executorName">Full Name</label>
-                            <input type="text" id="executorName" name="executorName" placeholder="e.g. Priya Sharma" required>
+            <div class="row g-4">
+                <!-- Add Executor Form -->
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title mb-3">Add Executor</h3>
+                            <form id="executorForm">
+                                <div class="mb-3">
+                                    <label for="executorName" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="executorName" name="executorName" placeholder="e.g. Priya Sharma" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="executorEmail" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="executorEmail" name="executorEmail" placeholder="executor@example.com" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="executorPhone" class="form-label">Phone Number</label>
+                                    <input type="text" class="form-control" id="executorPhone" name="executorPhone" placeholder="+91 98765 43210">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="executorRelationship" class="form-label">Relationship</label>
+                                    <input type="text" class="form-control" id="executorRelationship" name="executorRelationship" placeholder="e.g. Sister, Lawyer, Friend">
+                                </div>
+                                <button type="submit" id="executorSubmitBtn" class="btn btn-primary w-100">Save Executor</button>
+                            </form>
                         </div>
-
-                        <div class="form-group">
-                            <label for="executorEmail">Email Address</label>
-                            <input type="email" id="executorEmail" name="executorEmail" placeholder="executor@example.com" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="executorPhone">Phone Number</label>
-                            <input type="text" id="executorPhone" name="executorPhone" placeholder="+91 98765 43210">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="executorRelationship">Relationship</label>
-                            <input type="text" id="executorRelationship" name="executorRelationship" placeholder="e.g. Sister, Lawyer, Friend">
-                        </div>
-
-                        <button type="submit" id="executorSubmitBtn" class="primary-btn">Save Executor</button>
-                    </form>
+                    </div>
                 </div>
 
-                <div class="panel">
-                    <div class="panel-header">
-                        <h3>Your Executors</h3>
-                        <button type="button" id="refreshExecutorsBtn" class="secondary-btn">Refresh</button>
+                <!-- Executors List -->
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h3 class="mb-0">Your Executors</h3>
+                            <button type="button" id="refreshExecutorsBtn" class="btn btn-secondary btn-sm">Refresh</button>
+                        </div>
+                        <div class="card-body">
+                            <p id="executorsStatus" class="text-muted">Loading executors...</p>
+                            <div id="executorsList"></div>
+                        </div>
                     </div>
-                    <p id="executorsStatus" class="assets-status">Loading executors...</p>
-                    <div id="executorsList" class="assets-list"></div>
                 </div>
             </div>
         </section>
 
         <!-- Will Page -->
         <section id="willPage" class="page">
-            <div class="page-header">
+            <div class="page-header mb-4">
                 <h2>Digital Will</h2>
                 <p>Create an official record of your digital assets and executors</p>
             </div>
-            <div class="assets-layout">
-                <div class="panel">
-                    <h3>Will Information</h3>
-                    <p style="color: #6c757d; margin-bottom: 1.5rem;">
-                        Your digital will is a comprehensive record of all your digital assets and designated executors. 
-                        Generate a PDF to create an official, downloadable document.
-                    </p>
-                    
-                    <div class="will-summary">
-                        <div class="summary-item">
-                            <h4>Assets</h4>
-                            <p class="summary-count" id="willAssetCount">0</p>
-                        </div>
-                        <div class="summary-item">
-                            <h4>Executors</h4>
-                            <p class="summary-count" id="willExecutorCount">0</p>
-                        </div>
-                        <div class="summary-item">
-                            <h4>Status</h4>
-                            <p id="willStatus" style="color: #102c26; font-weight: 700; margin: 0; font-size: 1.5rem;">Ready</p>
+            <div class="row g-4">
+                <!-- Will Information -->
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title mb-3">Will Information</h3>
+                            <p class="text-muted mb-4">
+                                Your digital will is a comprehensive record of all your digital assets and designated executors. 
+                                Generate a PDF to create an official, downloadable document.
+                            </p>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <div class="summary-item">
+                                        <h4>Assets</h4>
+                                        <p class="summary-count" id="willAssetCount">0</p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <div class="summary-item">
+                                        <h4>Executors</h4>
+                                        <p class="summary-count" id="willExecutorCount">0</p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <div class="summary-item">
+                                        <h4>Status</h4>
+                                        <p class="summary-count" id="willStatus">Ready</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" id="generateWillBtn" class="btn btn-primary w-100">
+                                Generate Digital Will (PDF)
+                            </button>
                         </div>
                     </div>
-
-                    <button type="button" id="generateWillBtn" class="primary-btn" style="width: 100%;">
-                        Generate Digital Will (PDF)
-                    </button>
                 </div>
 
-                <div class="panel">
-                    <div class="panel-header">
-                        <h3>Will Details</h3>
-                        <button type="button" id="refreshWillBtn" class="secondary-btn">Refresh</button>
+                <!-- Will Details -->
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h3 class="mb-0">Will Details</h3>
+                            <button type="button" id="refreshWillBtn" class="btn btn-secondary btn-sm">Refresh</button>
+                        </div>
+                        <div class="card-body">
+                            <p id="willDetails" class="text-muted">Loading will information...</p>
+                            <div id="willContent"></div>
+                        </div>
                     </div>
-                    <p id="willDetails" class="assets-status">Loading will information...</p>
-                    <div id="willContent" class="will-details-container"></div>
                 </div>
             </div>
         </section>
 
-        <!-- Switch Page -->
+        <!-- Dead Man's Switch Page -->
         <section id="switchPage" class="page">
-            <div class="page-header">
+            <div class="page-header mb-4">
                 <h2>Dead Man's Switch</h2>
-                <p>Coming soon...</p>
+                <p>Automated check-ins and executor notifications</p>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body text-center py-5">
+                            <h3 class="text-muted mb-3">Coming Soon</h3>
+                            <p class="text-muted">The Dead Man's Switch feature will allow you to set up automated check-ins. If you don't respond within the set timeframe, your designated executors will be notified automatically.</p>
+                            <div class="mt-4">
+                                <span class="badge bg-secondary">Feature in Development</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
 
     <!-- QR Code Modal -->
-    <div id="qrModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Share Verification QR Code</h2>
-                <button class="modal-close" onclick="closeQRModal()">×</button>
-            </div>
-            <div class="modal-body">
-                <p id="qrModalText"></p>
-                <div class="qr-display">
-                    <img id="qrModalImage" alt="Verification QR Code">
+    <div class="modal fade" id="qrModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Share Verification QR Code</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <p style="margin-top: 1rem; font-size: 0.9rem; color: #6c757d;">
-                    <strong>Or share this link:</strong>
-                </p>
-                <div class="link-display">
-                    <input type="text" id="qrModalLink" readonly class="link-input">
-                    <button onclick="copyVerificationLink()" class="copy-btn">Copy Link</button>
+                <div class="modal-body">
+                    <p id="qrModalText" class="text-muted"></p>
+                    <div class="qr-display mb-3">
+                        <img id="qrModalImage" alt="Verification QR Code">
+                    </div>
+                    <p class="small text-muted mb-2"><strong>Or share this link:</strong></p>
+                    <div class="input-group">
+                        <input type="text" id="qrModalLink" readonly class="form-control" style="font-family: monospace; font-size: 0.85rem;">
+                        <button onclick="copyVerificationLink()" class="btn btn-primary">Copy</button>
+                    </div>
+                    <p class="small text-muted mt-3">
+                        The executor can scan the QR code with their phone camera or click the link to verify their identity.
+                    </p>
                 </div>
-                <p style="margin-top: 1rem; font-size: 0.85rem; color: #6c757d;">
-                    The executor can scan the QR code with their phone camera or click the link to verify their identity.
-                </p>
-            </div>
-            <div class="modal-footer">
-                <button onclick="closeQRModal()" class="secondary-btn">Done</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Done</button>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/utils.js?v=4"></script>
     <script src="js/dashboard.js?v=4"></script>
 </body>

@@ -3,216 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executor Portal - DIGIPASS</title>
+    <title>Executor Sign In - DIGIPASS</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23102c26'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='%23f7e7ce'/%3E%3C/svg%3E">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary-dark: #102c26;
+            --primary-dark-hover: #081a16;
+            --bg-light: #f7e7ce;
+            --text-dark: #2d2d2d;
+            --text-muted: #6c757d;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            line-height: 1.6;
-            color: #2d2d2d;
-            background: #f7e7ce;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Navigation */
-        nav {
-            background: white;
-            border-bottom: 1px solid #e8e0d0;
-            padding: 1.5rem 0;
-        }
-
-        nav .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #102c26;
-        }
-
-        nav a {
-            color: #2d2d2d;
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-
-        nav a:hover {
-            color: #102c26;
-        }
-
-        /* Main Content */
-        main {
-            flex: 1;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px 20px;
+            min-height: 100vh;
+            padding: 1rem;
         }
 
         .auth-container {
             width: 100%;
             max-width: 400px;
             background: white;
-            padding: 2.5rem;
-            border-radius: 8px;
+            padding: 2rem;
+            border-radius: 12px;
             border: 1px solid #e8e0d0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
-        .auth-container h1 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #102c26;
-            margin-bottom: 0.5rem;
-            text-align: center;
-        }
-
-        .auth-container h2 {
-            font-size: 1.1rem;
-            color: #555;
+        .auth-header {
             text-align: center;
             margin-bottom: 2rem;
-            font-weight: 500;
         }
 
-        /* Message Box */
-        #message {
-            margin-bottom: 1.5rem;
-        }
-
-        .error-message {
-            background: #fee2e2;
-            border: 1px solid #fecaca;
-            color: #991b1b;
-            padding: 1rem;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .success-message {
-            background: #dcfce7;
-            border: 1px solid #bbf7d0;
-            color: #166534;
-            padding: 1rem;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-
-        .error-dismiss, .success-dismiss {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: inherit;
-        }
-
-        /* Forms */
-        form {
-            display: grid;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            display: grid;
-            gap: 0.5rem;
-        }
-
-        .form-group label {
+        .auth-header h1 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
             font-weight: 600;
-            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--text-muted);
             font-size: 0.95rem;
         }
 
-        .form-group input {
+        .auth-badge {
+            display: inline-block;
+            background-color: #f0e8e0;
+            color: var(--primary-dark);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border: 1px solid #e8e0d0;
+            border-radius: 6px;
             padding: 0.75rem;
-            border: 1px solid #d8def0;
-            border-radius: 4px;
             font-size: 0.95rem;
-            font-family: inherit;
-            background: #fbfcff;
-            transition: border-color 0.2s;
+            margin-bottom: 1rem;
         }
 
-        .form-group input:focus {
-            outline: none;
-            border-color: #102c26;
-            background: white;
+        .form-control:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(16, 44, 38, 0.1);
         }
 
-        .form-group input.input-error {
-            border-color: #dc2626;
-            background: #fef2f2;
-        }
-
-        .field-error {
-            color: #991b1b;
-            font-size: 0.85rem;
-            margin-top: 0.25rem;
-        }
-
-        /* Buttons */
         .btn-primary {
-            background: #102c26;
-            color: white;
-            padding: 0.85rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.95rem;
+            background-color: var(--primary-dark) !important;
+            border-color: var(--primary-dark) !important;
+            color: white !important;
             font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
+            padding: 0.75rem;
+            border-radius: 6px;
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
         }
 
         .btn-primary:hover {
-            background: #081a16;
+            background-color: var(--primary-dark-hover) !important;
+            border-color: var(--primary-dark-hover) !important;
         }
 
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 1em;
-            height: 1em;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.6s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Links */
         .auth-link {
             text-align: center;
-            margin-top: 1.5rem;
+            color: var(--text-muted);
             font-size: 0.9rem;
-            color: #555;
         }
 
         .auth-link a {
-            color: #102c26;
+            color: var(--primary-dark);
             text-decoration: none;
             font-weight: 600;
         }
@@ -221,108 +116,96 @@
             text-decoration: underline;
         }
 
-        /* Footer */
-        footer {
-            padding: 2rem 0;
-            border-top: 1px solid #e8e0d0;
-            background: white;
-            text-align: center;
-            color: #999;
-            font-size: 0.85rem;
-        }
-
-        footer .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 20px;
+        .alert {
+            border-radius: 6px;
+            border: 1px solid #fed7d7;
+            background-color: #fff5f5;
+            color: #742a2a;
         }
 
         @media (max-width: 480px) {
-            .auth-container { padding: 1.5rem; max-width: 100%; }
-            .auth-container h1 { font-size: 1.1rem; }
-            .auth-container h2 { font-size: 0.95rem; margin-bottom: 1.25rem; }
-            form { gap: 1rem; }
-            .form-group label { font-size: 0.9rem; }
-            .form-group input { font-size: 0.9rem; padding: 0.65rem; }
-            .btn-primary { font-size: 0.9rem; padding: 0.7rem; }
-            .auth-link { font-size: 0.8rem; margin-top: 1rem; }
-            .error-message, .success-message { font-size: 0.85rem; padding: 0.75rem; }
-            nav { padding: 1rem 0; }
-            nav .container { padding: 0 15px; }
-            .logo { font-size: 1rem; }
-            nav a { font-size: 0.85rem; }
-            main { padding: 30px 15px; }
-            footer { padding: 1.5rem 0; font-size: 0.75rem; }
-        }
+            .auth-container {
+                padding: 1.5rem;
+            }
 
-        @media (max-width: 768px) {
-            .auth-container { padding: 2rem; }
-            .auth-container h2 { margin-bottom: 1.5rem; }
-            form { gap: 1.25rem; }
-            nav { padding: 1.25rem 0; }
-            nav .container { padding: 0 20px; }
-            nav a { font-size: 0.9rem; }
-            main { padding: 40px 20px; }
-            footer { padding: 2rem 0; font-size: 0.8rem; }
-        }
+            .auth-header h1 {
+                font-size: 1.3rem;
+            }
 
-        @media (max-width: 834px) {
-            nav .container { max-width: 700px; }
-            footer .container { max-width: 700px; }
-        }
-
-        @media (max-width: 1024px) {
-            nav .container { max-width: 800px; }
-            footer .container { max-width: 800px; }
-        }
-
-        @media (max-width: 1440px) {
-            nav .container { max-width: 1000px; }
-            footer .container { max-width: 1000px; }
+            .auth-header p {
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
 <body>
-    <nav>
-        <div class="container">
-            <div class="logo">DIGIPASS</div>
-            <a href="index.html">Back to Home</a>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="auth-badge">Executor Portal</div>
+            <h1>Welcome, Executor</h1>
+            <p>Sign in to access digital assets</p>
         </div>
-    </nav>
 
-    <main>
-        <div class="auth-container">
-            <h1>DIGIPASS</h1>
-            <h2>Executor Portal</h2>
+        <div id="errorMsg" class="alert d-none"></div>
 
-            <div id="message"></div>
+        <form id="executorLoginForm">
+            <div>
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="your@email.com" required>
+            </div>
 
-            <form id="executorLoginForm">
-                <div class="form-group">
-                    <label for="executorEmail">Email</label>
-                    <input type="email" id="executorEmail" name="executorEmail" required>
-                </div>
+            <div>
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required>
+            </div>
 
-                <div class="form-group">
-                    <label for="executorPassword">Password</label>
-                    <input type="password" id="executorPassword" name="executorPassword" required>
-                </div>
+            <button type="submit" id="loginBtn" class="btn btn-primary">Sign In</button>
+        </form>
 
-                <button type="submit" class="btn-primary">Sign In</button>
-            </form>
-
-            <p class="auth-link">
-                Need to register? Check your verification email or <a href="index.html">go back home</a>
-            </p>
+        <div class="auth-link">
+            Don't have an account? <a href="executor-register.html">Verify here</a>
         </div>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 DIGIPASS. Keep your digital affairs in order.</p>
+        <div class="auth-link" style="margin-top: 1rem;">
+            <a href="index.html">← Back to home</a>
         </div>
-    </footer>
+    </div>
 
-    <script src="js/executor-login.js?v=3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_URL = 'https://digipass-3l63.onrender.com';
+
+        document.getElementById('executorLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/executor/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('executorToken', data.token);
+                    localStorage.setItem('executor', JSON.stringify(data.executor));
+                    location.href = 'executor-dashboard.html';
+                } else {
+                    showError(data.message || 'Login failed. Please try again.');
+                }
+            } catch (error) {
+                console.error(error);
+                showError('Unable to connect. Please try again later.');
+            }
+        });
+
+        function showError(message) {
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.textContent = message;
+            errorMsg.classList.remove('d-none');
+        }
+    </script>
 </body>
 </html>
