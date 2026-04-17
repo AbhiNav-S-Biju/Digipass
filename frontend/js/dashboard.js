@@ -235,25 +235,50 @@ async function handleGenerateWill() {
   try {
     const response = await apiCall('/generate-will', 'GET');
 
-    if (response.success && response.data && response.data.file_path) {
-      // Download the PDF
-      const link = document.createElement('a');
-      link.href = response.data.file_path;
-      link.download = 'digital-will.pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    if (response.success && response.data) {
+      // Use download URL from response
+      const downloadUrl = response.data.download_url;
+      
+      if (downloadUrl) {
+        // Download via the proper API endpoint
+        const token = localStorage.getItem('token');
+        
+        const downloadResponse = await fetch(downloadUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
 
-      showNotification('Digital will generated successfully!', 'success');
-      willStatus.textContent = 'Generated';
-      willStatus.style.color = '#10b981';
+        if (!downloadResponse.ok) {
+          throw new Error('Failed to download PDF');
+        }
+
+        // Create blob from response and download
+        const blob = await downloadResponse.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = `digital-will-${new Date().toISOString().split('T')[0]}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+
+        showNotification('Digital will generated and downloaded successfully!', 'success');
+        willStatus.textContent = '✓ Generated';
+        willStatus.style.color = '#10b981';
+      } else {
+        throw new Error('No download URL provided');
+      }
     } else {
       throw new Error(response.message || 'Failed to generate will');
     }
   } catch (error) {
-    willStatus.textContent = 'Error generating';
+    console.error('Will generation error:', error);
+    willStatus.textContent = '✗ Error';
     willStatus.style.color = '#ef4444';
-    showNotification(error.message || 'Failed to generate will', 'error');
+    showNotification(error.message || 'Failed to generate digital will', 'error');
   } finally {
     generateBtn.disabled = false;
     generateBtn.textContent = 'Generate Digital Will (PDF)';

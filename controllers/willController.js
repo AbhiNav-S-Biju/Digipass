@@ -48,9 +48,16 @@ async function ensureDigitalWillTable() {
   `);
 }
 
-async function generateWill(req, res) {
+async function generateWill(req, res, next) {
   try {
     const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
+    }
 
     const [userResult, assetsResult, executorsResult] = await Promise.all([
       pool.query(
@@ -113,11 +120,15 @@ async function generateWill(req, res) {
       [userId, storedFilePath]
     );
 
+    // Return download URL instead of file path
+    const downloadUrl = `${process.env.BACKEND_URL}/api/download-will/${rows[0].will_id}`;
+
     return res.status(200).json({
       success: true,
       message: 'Digital will generated successfully',
       data: {
         will_id: rows[0].will_id,
+        download_url: downloadUrl,
         file_path: rows[0].file_path,
         created_at: rows[0].created_at,
         summary: {
@@ -134,13 +145,77 @@ async function generateWill(req, res) {
     });
   } catch (error) {
     console.error('Generate Will Error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to generate digital will'
+    next(error);
+  }
+}
+
+async function downloadWill(req, res, next) {
+  try {
+    const userId = req.userId;
+    const willId = req.params.willId;
+
+    if (!userId || !willId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required parameters'
+      });
+    }
+
+    // Verify will exists and belongs to user
+    const { rows } = await pool.query(
+      `SELECT will_id, user_id, file_path
+       FROM digital_will
+       WHERE will_id = $1 AND user_id = $2`,
+      [willId, userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Will not found or access denied'
+      });
+    }
+
+    const filePath = path.join(process.cwd(), rows[0].file_path);
+
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      console.error(`File not found: ${filePath}`);
+      return res.status(404).json({
+        success: false,
+        message: 'PDF file not found'
+      });
+    }
+
+    // Send file as attachment with proper headers
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="digital-will.pdf"');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
+    const fileStream = fs.createReadStream(filePath);
+    
+    fileStream.on('error', (error) => {
+      console.error('File stream error:', error);
+      if (!res.headersSent) {
+        res.status(500).json({
+          success: false,
+          message: 'Error reading file'
+        });
+      } else {
+        res.end();
+      }
     });
+
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error('Download Will Error:', error);
+    next(error);
   }
 }
 
 module.exports = {
-  generateWill
+  generateWill,
+  downloadWill
 };
