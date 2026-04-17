@@ -124,25 +124,24 @@ body {
 
 .panel {
     background: white;
-    padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(54, 70, 128, 0.08);
-    border: 1px solid #f0f0f0;
+    padding: 2.5rem;
+    border-radius: 12px;
+    border: 1px solid #e8e0d0;
     transition: box-shadow 0.2s ease;
 }
 
 .panel:hover {
-    box-shadow: 0 8px 24px rgba(54, 70, 128, 0.12);
+    box-shadow: 0 2px 8px rgba(16, 44, 38, 0.05);
 }
 
 .panel h3 {
     margin-top: 0;
     margin-bottom: 1.5rem;
-    color: #1f2937;
-    font-size: 1.3rem;
+    color: #102c26;
+    font-size: 1.25rem;
     font-weight: 700;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 .assets-layout {
@@ -491,20 +490,24 @@ body {
 .will-summary {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem;
+    gap: 1.75rem;
     margin-bottom: 2rem;
 }
 
 .summary-item {
     background: white;
-    padding: 1.75rem;
-    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    border-radius: 12px;
     border: 1px solid #e8e0d0;
     text-align: center;
     color: #102c26;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 180px;
 }
 
 .summary-item::before {
@@ -517,22 +520,24 @@ body {
 }
 
 .summary-item h4 {
-    font-size: 0.85rem;
-    margin-bottom: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+    text-transform: none;
+    letter-spacing: 0;
     font-weight: 600;
-    opacity: 0.95;
+    opacity: 0.85;
     position: relative;
     z-index: 1;
+    color: #666;
 }
 
 .summary-count {
-    font-size: 2.5rem;
+    font-size: 2.75rem;
     font-weight: 700;
     margin: 0;
     position: relative;
     z-index: 1;
+    color: #102c26;
 }
 
 @keyframes float {
@@ -675,15 +680,16 @@ body {
 @media (max-width: 768px) {
     .will-summary {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 1.25rem;
     }
     
     .summary-item {
-        padding: 1.5rem;
+        padding: 2rem 1.5rem;
+        min-height: 160px;
     }
     
     .summary-count {
-        font-size: 2rem;
+        font-size: 2.25rem;
     }
 }
 
