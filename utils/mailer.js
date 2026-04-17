@@ -11,8 +11,9 @@ function createTransporter() {
     return null;
   }
 
-  const secure = String(process.env.SMTP_SECURE || 'false') === 'true';
-  const port = Number(process.env.SMTP_PORT || (secure ? 465 : 587));
+  // Use port 465 (SMTPS) for better reliability on cloud infrastructure
+  const secure = true;
+  const port = 465;
   const smtpUser = process.env.SMTP_USER.trim();
   const smtpPass = process.env.SMTP_PASS.replace(/\s+/g, '');
 
@@ -31,13 +32,16 @@ function createTransporter() {
       user: smtpUser,
       pass: smtpPass
     },
-    family: 4,  // Force IPv4 (Gmail has issues with IPv6 on some servers)
+    family: 4,  // Force IPv4
+    connectionTimeout: 10000,  // 10 second timeout
+    socketTimeout: 10000,  // 10 second socket timeout
+    pool: true,  // Use connection pooling
+    maxConnections: 3,
+    maxMessages: 100,
+    rateDelta: 1000,
+    rateLimit: 5,  // Rate limit to 5 emails per second
     logger: true,
-    debug: true,
-    requireTLS: !secure,
-    tls: {
-      minVersion: 'TLSv1.2'
-    }
+    debug: true
   });
 }
 
