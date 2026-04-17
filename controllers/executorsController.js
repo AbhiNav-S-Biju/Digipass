@@ -1,11 +1,4 @@
-const pool = require('../db');
-const {
-  generateVerificationToken,
-  hashVerificationToken,
-  getVerificationExpiryDate
-} = require('../utils/executorVerification');
-const { getExecutorVerificationUrl, sendExecutorVerificationEmail } = require('../utils/mailer');
-const { generateExecutorVerificationQR, getExecutorVerificationUrl: getQRUrl } = require('../utils/qrCode');
+const { hashPassword } = require('../utils/bcrypt');
 
 function buildExecutorResponse(executor) {
   return {
@@ -498,11 +491,103 @@ async function revokeAccess(req, res) {
   }
 }
 
-module.exports = {
+async function setupExecutorPassword(req, res) {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token and password are required'
+      });
+    }
+
+    // Validate password strength
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 8 characters with uppercase, lowercase, number, and symbol'
+      });
+    }
+
+    console.log('[Executor Controller] setupExecutorPassword called');
+    const tokenHash = hashVerificationToken(token);
+
+    // Find executor by verification token
+    const { rows: executorRows } = await pool.query(
+      `SELECT executor_id, executor_name, executor_email, verification_token_hash
+       FROM executors
+       WHERE verification_token_hash = $1
+         AND verification_token_expires_at IS NOT NULL
+         AND verification_token_expires_at > CURRENT_TIMESTAMP`,
+      [tokenHash]
+    );
+
+    if (executorRows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification token is invalid or has expired'
+      });
+    }
+
+    const executor = executorRows[0];
+    const passwordHash = hashPassword(password);
+
+    // Update executor with password and verification status
+    const { rows: updatedRows } = await pool.query(
+      `UPDATE executors
+       SET 
+         executor_password_hash = $1,
+         verification_status = 'verified',
+         verification_token_hash = NULL,
+         verification_token_expires_at = NULL,
+         updated_at = CURRENT_TIMESTAMP
+       WHERE executor_id = $2
+       RETURNING
+         executor_id,
+         executor_name,
+         executor_email,
+         executor_phone,
+         relationship,
+         verification_status,
+         access_granted,
+         created_at`,
+      [passwordHash, executor.executor_id]
+    );
+
+    const updatedExecutor = updatedRows[0];
+    console.log('[Executor Controller] Executor password set and verified');
+    console.log(`  - executor_id: ${executor.executor_id}`);
+    console.log(`  - verification_status: verified`);
+
+    // Generate JWT token for auto-login
+    const { generateToken } = require('../utils/jwt');
+    const jwtToken = generateToken(executor.executor_id);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password set successfully. Executor verified.',
+      data: {
+        ...buildExecutorResponse(updatedExecutor),
+        token: jwtToken
+      }
+    });
+  } catch (error) {
+    console.error('Setup Executor Password Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to set executor password'
+    });
+  }
+}
+
+
   addExecutor,
   getExecutors,
   resendExecutorVerification,
   verifyExecutorToken,
+  setupExecutorPassword,
   grantAccess,
   revokeAccess
 };

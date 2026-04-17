@@ -149,121 +149,34 @@
             <button class="btn-verify" onclick="openLink()">Open Verification Link</button>
         </div>
 
+        <!-- Password Setup Form (shown after verification) -->
+        <div id="passwordSetupContent" style="display: none;">
+            <h2>Set Your Password</h2>
+            <p>Welcome! Please set a password to complete your executor setup.</p>
+            
+            <form id="passwordForm">
+                <div class="form-group" style="margin: 20px 0; text-align: left;">
+                    <label for="executorPassword" style="display: block; margin-bottom: 5px; font-weight: bold;">Password</label>
+                    <input type="password" id="executorPassword" placeholder="At least 8 characters" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+                    <small style="color: #999; display: block; margin-top: 5px;">Must include uppercase, lowercase, number, and symbol (@$!%*?&)</small>
+                </div>
+
+                <div class="form-group" style="margin: 20px 0; text-align: left;">
+                    <label for="confirmPassword" style="display: block; margin-bottom: 5px; font-weight: bold;">Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+                </div>
+
+                <button type="submit" class="btn-verify" style="width: 100%; margin-top: 15px;">Set Password & Login</button>
+            </form>
+
+            <div id="passwordError" class="verify-status error" style="display: none; margin-top: 15px;"></div>
+        </div>
+
         <div id="verificationStatus"></div>
 
         <button class="btn-back" onclick="goBack()" style="margin-top: 20px;">Back to Dashboard</button>
     </div>
 
-    <script>
-        const API_BASE_URL = 'https://digipass-production.up.railway.app/api';
-        
-        async function loadQRCode() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('qr_code');
-            const executorId = urlParams.get('executor_id');
-
-            if (!token && !executorId) {
-                showStatus('No QR code or executor ID provided', 'error');
-                return;
-            }
-
-            try {
-                showStatus('Loading QR code...', 'loading');
-
-                // Fetch executor details with QR code
-                const endpoint = token 
-                    ? `${API_BASE_URL}/executors/verify?token=${token}`
-                    : `${API_BASE_URL}/executors/${executorId}/qr-code`;
-
-                const response = await fetch(endpoint);
-                const result = await response.json();
-
-                if (!result.success) {
-                    showStatus(result.message || 'Failed to load QR code', 'error');
-                    return;
-                }
-
-                const { data } = result;
-                
-                // Display QR code if available
-                if (data.verification_qr_code) {
-                    document.getElementById('qrImage').src = data.verification_qr_code;
-                }
-
-                // Display verification link
-                if (data.verification_link) {
-                    document.getElementById('verificationLink').textContent = data.verification_link;
-                }
-
-                // Display executor name
-                const heading = document.querySelector('.qr-container h1');
-                heading.textContent = `Verify as ${data.executor_name}`;
-
-                document.getElementById('qrContent').style.display = 'block';
-                document.getElementById('verificationStatus').innerHTML = '';
-
-            } catch (error) {
-                console.error('Error:', error);
-                showStatus('Failed to load QR code: ' + error.message, 'error');
-            }
-        }
-
-        async function verifyToken() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('token');
-
-            if (!token) {
-                showStatus('No verification token provided', 'error');
-                return;
-            }
-
-            try {
-                showStatus('Verifying your identity...', 'loading');
-
-                const response = await fetch(`${API_BASE_URL}/executors/verify?token=${token}`);
-                const result = await response.json();
-
-                if (result.success) {
-                    showStatus('✅ Verification successful! Your account has been verified.', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/executor-dashboard.html';
-                    }, 2000);
-                } else {
-                    showStatus('❌ ' + (result.message || 'Verification failed'), 'error');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showStatus('Verification error: ' + error.message, 'error');
-            }
-        }
-
-        function showStatus(message, type) {
-            const statusDiv = document.getElementById('verificationStatus');
-            statusDiv.innerHTML = `<div class="verify-status ${type}">${message}</div>`;
-        }
-
-        function openLink() {
-            const link = document.getElementById('verificationLink').textContent;
-            if (link) {
-                window.location.href = link;
-            }
-        }
-
-        function goBack() {
-            window.location.href = '/dashboard.html';
-        }
-
-        // Auto-verify if token is in URL
-        window.addEventListener('load', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('token');
-            
-            if (token) {
-                verifyToken();
-            } else {
-                loadQRCode();
-            }
-        });
-    </script>
+    <script src="js/executor-verify.js?v=1"></script>
 </body>
 </html>
