@@ -237,17 +237,54 @@
         }
 
         @media (max-width: 480px) {
-            .verify-container {
-                padding: 1.5rem;
-            }
+            body { padding: 15px; }
+            .verify-container { padding: 1.5rem; max-width: 100%; }
+            .verify-container h1 { font-size: 1.1rem; }
+            .verify-container h2 { font-size: 1rem; }
+            .verify-container > p { font-size: 0.85rem; }
+            .qr-box { min-height: 280px; padding: 1rem; margin: 1rem 0; }
+            .qr-box img { max-width: 250px; }
+            .qr-instructions { padding: 0.75rem; font-size: 0.8rem; margin: 1rem 0; }
+            .qr-instructions strong { margin-bottom: 0.5rem; }
+            .qr-instructions ol { margin-left: 1.25rem; }
+            .qr-link { padding: 0.75rem; font-size: 0.75rem; margin: 0.75rem 0; }
+            .divider { margin: 1.5rem 0; font-size: 0.8rem; }
+            .form-group label { font-size: 0.9rem; }
+            .form-group input { font-size: 0.9rem; padding: 0.6rem; }
+            .form-group small { font-size: 0.75rem; }
+            .button-group { gap: 0.5rem; margin-top: 1rem; }
+            .button-group button { font-size: 0.85rem; padding: 0.65rem; }
+            .btn-back { padding: 0.65rem; font-size: 0.85rem; margin-top: 1rem; }
+            .verify-status { padding: 0.75rem; font-size: 0.85rem; margin: 1rem 0; }
+        }
 
-            .qr-box {
-                min-height: 280px;
-            }
+        @media (max-width: 768px) {
+            body { padding: 20px; }
+            .verify-container { padding: 2rem; }
+            .verify-container h1 { font-size: 1.3rem; }
+            .verify-container h2 { font-size: 1.1rem; }
+            .verify-container > p { font-size: 0.9rem; }
+            .qr-box { min-height: 320px; padding: 1.25rem; margin: 1.25rem 0; }
+            .qr-box img { max-width: 280px; }
+            .qr-instructions { padding: 1rem; font-size: 0.85rem; margin: 1.5rem 0; }
+            .qr-link { padding: 0.85rem; font-size: 0.8rem; margin: 0.85rem 0; }
+            .form-group label { font-size: 0.95rem; }
+            .form-group input { font-size: 0.95rem; padding: 0.7rem; }
+            .button-group { gap: 0.75rem; margin-top: 1.25rem; }
+            .button-group button { font-size: 0.9rem; padding: 0.75rem; }
+            .btn-back { padding: 0.75rem; font-size: 0.9rem; margin-top: 1.25rem; }
+        }
 
-            .button-group {
-                flex-direction: column;
-            }
+        @media (max-width: 834px) {
+            .verify-container { max-width: 450px; }
+        }
+
+        @media (max-width: 1024px) {
+            .verify-container { max-width: 480px; }
+        }
+
+        @media (max-width: 1440px) {
+            .verify-container { max-width: 500px; }
         }
     </style>
 </head>

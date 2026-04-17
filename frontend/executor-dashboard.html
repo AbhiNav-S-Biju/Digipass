@@ -224,23 +224,62 @@
         }
 
         /* Responsive */
+        @media (max-width: 480px) {
+            nav { padding: 0.75rem 0; }
+            nav .container { padding: 0 15px; }
+            .logo { font-size: 1rem; }
+            nav button { padding: 0.5rem 0.8rem; font-size: 0.8rem; }
+            .container { padding: 20px 15px; }
+            .user-info { padding: 1rem; margin-bottom: 1.5rem; }
+            .user-info p { font-size: 0.85rem; }
+            .page h2 { font-size: 1.2rem; }
+            .assets-status { font-size: 0.9rem; padding: 0.75rem; margin-bottom: 1rem; }
+            .asset-card { padding: 0.75rem; margin-bottom: 0.75rem; }
+            .asset-card h3 { font-size: 0.95rem; }
+            .asset-card p { font-size: 0.85rem; margin-bottom: 0.5rem; }
+            .asset-type { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+            .asset-actions { gap: 0.5rem; margin-top: 0.75rem; }
+            .btn { padding: 0.55rem 1rem; font-size: 0.8rem; }
+            .btn-primary, .btn-secondary { flex: 1; min-width: 120px; }
+            footer { padding: 1.5rem 0; font-size: 0.75rem; }
+        }
+
         @media (max-width: 768px) {
-            .container {
-                padding: 20px 15px;
-            }
+            nav { padding: 1rem 0; }
+            nav .container { padding: 0 20px; }
+            .logo { font-size: 1.15rem; }
+            nav button { padding: 0.6rem 1rem; font-size: 0.9rem; }
+            .container { padding: 25px 20px; }
+            .user-info { padding: 1.25rem; margin-bottom: 1.75rem; }
+            .user-info p { font-size: 0.9rem; }
+            .page h2 { font-size: 1.4rem; }
+            .assets-status { font-size: 0.95rem; padding: 1rem; margin-bottom: 1.25rem; }
+            .assets-list { gap: 1rem; }
+            .asset-card { padding: 1rem; }
+            .asset-card h3 { font-size: 1rem; }
+            .asset-card p { font-size: 0.9rem; }
+            .asset-type { padding: 0.35rem 0.75rem; font-size: 0.85rem; }
+            .asset-actions { gap: 0.75rem; flex-wrap: wrap; }
+            .btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+            footer { padding: 2rem 0; font-size: 0.8rem; }
+        }
 
-            .page h2 {
-                font-size: 1.4rem;
-            }
+        @media (max-width: 834px) {
+            nav .container { max-width: 700px; }
+            .container { max-width: 700px; }
+            footer .container { max-width: 700px; }
+        }
 
-            .asset-actions {
-                flex-wrap: wrap;
-            }
+        @media (max-width: 1024px) {
+            nav .container { max-width: 800px; }
+            .container { max-width: 800px; }
+            footer .container { max-width: 800px; }
+        }
 
-            .btn {
-                flex: 1;
-                min-width: 150px;
-            }
+        @media (max-width: 1440px) {
+            nav .container { max-width: 1200px; }
+            .container { max-width: 1200px; }
+            footer .container { max-width: 1200px; }
         }
     </style>
 </head>

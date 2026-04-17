@@ -239,17 +239,47 @@
         }
 
         @media (max-width: 480px) {
-            .auth-container {
-                padding: 2rem;
-            }
+            .auth-container { padding: 1.5rem; max-width: 100%; }
+            .auth-container h1 { font-size: 1.1rem; }
+            .auth-container h2 { font-size: 0.95rem; margin-bottom: 1.25rem; }
+            form { gap: 1rem; }
+            .form-group label { font-size: 0.9rem; }
+            .form-group input { font-size: 0.9rem; padding: 0.65rem; }
+            .btn-primary { font-size: 0.9rem; padding: 0.7rem; }
+            .auth-link { font-size: 0.8rem; margin-top: 1rem; }
+            .error-message, .success-message { font-size: 0.85rem; padding: 0.75rem; }
+            nav { padding: 1rem 0; }
+            nav .container { padding: 0 15px; }
+            .logo { font-size: 1rem; }
+            nav a { font-size: 0.85rem; }
+            main { padding: 30px 15px; }
+            footer { padding: 1.5rem 0; font-size: 0.75rem; }
+        }
 
-            .auth-container h2 {
-                margin-bottom: 1.5rem;
-            }
+        @media (max-width: 768px) {
+            .auth-container { padding: 2rem; }
+            .auth-container h2 { margin-bottom: 1.5rem; }
+            form { gap: 1.25rem; }
+            nav { padding: 1.25rem 0; }
+            nav .container { padding: 0 20px; }
+            nav a { font-size: 0.9rem; }
+            main { padding: 40px 20px; }
+            footer { padding: 2rem 0; font-size: 0.8rem; }
+        }
 
-            form {
-                gap: 1rem;
-            }
+        @media (max-width: 834px) {
+            nav .container { max-width: 700px; }
+            footer .container { max-width: 700px; }
+        }
+
+        @media (max-width: 1024px) {
+            nav .container { max-width: 800px; }
+            footer .container { max-width: 800px; }
+        }
+
+        @media (max-width: 1440px) {
+            nav .container { max-width: 1000px; }
+            footer .container { max-width: 1000px; }
         }
     </style>
 </head>
