@@ -45,12 +45,18 @@ async function loadExecutorAssets() {
   const status = document.getElementById('executorAssetsStatus');
   const list = document.getElementById('executorAssetsList');
 
+  console.log('[Executor Dashboard] loadExecutorAssets called');
+  console.log('[Executor Dashboard] Token exists:', !!token);
+  console.log('[Executor Dashboard] Token value:', token ? token.substring(0, 50) + '...' : 'none');
+
   if (!token) {
+    console.log('[Executor Dashboard] No token found, logging out');
     logoutExecutor();
     return;
   }
 
   try {
+    console.log('[Executor Dashboard] Fetching assets from API...');
     const response = await fetch(`${API_URL}/executor/assets`, {
       method: 'GET',
       headers: {
@@ -58,10 +64,17 @@ async function loadExecutorAssets() {
       }
     });
 
+    console.log('[Executor Dashboard] API response status:', response.status);
+    console.log('[Executor Dashboard] API response ok:', response.ok);
+
     const data = await response.json();
+    
+    console.log('[Executor Dashboard] API response data:', data);
 
     if (!response.ok) {
+      console.log('[Executor Dashboard] API response not ok');
       if (response.status === 401 || response.status === 403) {
+        console.log('[Executor Dashboard] Unauthorized/Forbidden, logging out');
         logoutExecutor();
         return;
       }
@@ -69,6 +82,7 @@ async function loadExecutorAssets() {
       throw new Error(data.message || 'Failed to load executor assets');
     }
 
+    console.log('[Executor Dashboard] Assets loaded successfully');
     document.getElementById('ownerName').textContent = `${data.data.owner.full_name} (${data.data.owner.email})`;
     status.textContent = `${data.data.count} asset(s) available to this executor`;
 
@@ -90,7 +104,7 @@ async function loadExecutorAssets() {
       </article>
     `).join('');
   } catch (error) {
-    console.error('Executor assets error:', error);
+    console.error('[Executor Dashboard] Assets error:', error);
     status.textContent = 'Unable to load executor assets right now.';
   }
 }
