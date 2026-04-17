@@ -26,21 +26,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Initialize dashboard page navigation
 function initDashboard() {
-  // Get all navigation items
-  const navItems = document.querySelectorAll('.nav-item[data-page]');
+  // Get all navigation links with data-page attribute
+  const navLinks = document.querySelectorAll('a[data-page]');
   const pages = document.querySelectorAll('.page');
 
-  navItems.forEach(item => {
-    item.addEventListener('click', (e) => {
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
       e.preventDefault();
-      const pageName = item.dataset.page;
+      const pageName = link.dataset.page;
       
-      // Remove active class from all
-      navItems.forEach(i => i.classList.remove('active'));
+      // Remove active class from all links
+      navLinks.forEach(l => l.classList.remove('active'));
       pages.forEach(p => p.classList.remove('active'));
 
-      // Add active class to clicked item and corresponding page
-      item.classList.add('active');
+      // Add active class to clicked link and corresponding page
+      link.classList.add('active');
       document.getElementById(`${pageName}Page`).classList.add('active');
 
       // Load page data
