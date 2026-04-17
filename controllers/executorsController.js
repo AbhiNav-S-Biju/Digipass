@@ -1,6 +1,6 @@
 const pool = require('../db');
 const { hashPassword, comparePassword } = require('../utils/bcrypt');
-const { generateToken } = require('../utils/jwt');
+const { generateToken, generateExecutorToken } = require('../utils/jwt');
 const { generateVerificationToken, hashVerificationToken, getVerificationExpiryDate } = require('../utils/executorVerification');
 const { generateExecutorVerificationQR, getExecutorVerificationUrl } = require('../utils/qrCode');
 const { sendExecutorVerificationEmail } = require('../utils/mailer');
@@ -567,7 +567,7 @@ async function setupExecutorPassword(req, res) {
     console.log(`  - verification_status: verified`);
 
     // Generate JWT token for auto-login
-    const jwtToken = generateToken(executor.executor_id);
+    const jwtToken = generateExecutorToken(updatedExecutor);
 
     return res.status(200).json({
       success: true,
@@ -649,8 +649,8 @@ async function executorLogin(req, res) {
     console.log('[Executor Controller] Executor login successful');
     console.log(`  - executor_id: ${executor.executor_id}`);
 
-    // Generate JWT token
-    const token = generateToken(executor.executor_id);
+    // Generate JWT token for executor (includes type: 'executor' for middleware authentication)
+    const token = generateExecutorToken(executor);
 
     return res.status(200).json({
       success: true,
