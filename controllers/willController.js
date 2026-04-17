@@ -1,0 +1,146 @@
+const fs = require('fs');
+const path = require('path');
+const pool = require('../db');
+const { generateWillPdf } = require('../utils/willPdf');
+
+function buildActions(user, assets, executors) {
+  const actions = [];
+
+  actions.push(`Review and manage ${assets.length} digital asset(s) listed in this will.`);
+
+  if (executors.length === 0) {
+    actions.push('No executor has been assigned yet. Add an executor to enable estate handoff planning.');
+  } else {
+    executors.forEach((executor) => {
+      actions.push(
+        `Executor ${executor.executor_name} is currently ${executor.verification_status} and access is ${executor.access_granted ? 'granted' : 'not granted'}.`
+      );
+    });
+  }
+
+  if (assets.length === 0) {
+    actions.push('No digital assets are currently recorded. Add assets so they can be referenced in future will exports.');
+  } else {
+    const assetTypes = [...new Set(assets.map((asset) => asset.asset_type))];
+    actions.push(`Asset categories covered: ${assetTypes.join(', ')}.`);
+  }
+
+  actions.push(`This digital will was generated for ${user.full_name} (${user.email}).`);
+
+  return actions;
+}
+
+async function ensureDigitalWillTable() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS digital_will (
+      will_id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      file_path TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    )
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_digital_will_user_id
+    ON digital_will(user_id)
+  `);
+}
+
+async function generateWill(req, res) {
+  try {
+    const userId = req.userId;
+
+    const [userResult, assetsResult, executorsResult] = await Promise.all([
+      pool.query(
+        `SELECT user_id, full_name, email
+         FROM users
+         WHERE user_id = $1`,
+        [userId]
+      ),
+      pool.query(
+        `SELECT asset_id, asset_name, asset_type, created_at
+         FROM digital_assets
+         WHERE user_id = $1
+         ORDER BY created_at DESC`,
+        [userId]
+      ),
+      pool.query(
+        `SELECT executor_id, executor_name, executor_email, executor_phone, relationship, verification_status, access_granted, created_at
+         FROM executors
+         WHERE user_id = $1
+         ORDER BY created_at DESC`,
+        [userId]
+      )
+    ]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    const user = userResult.rows[0];
+    const assets = assetsResult.rows;
+    const executors = executorsResult.rows;
+    const actions = buildActions(user, assets, executors);
+
+    const willDirectory = path.join(process.cwd(), 'generated-wills');
+    if (!fs.existsSync(willDirectory)) {
+      fs.mkdirSync(willDirectory, { recursive: true });
+    }
+
+    const fileName = `digital-will-user-${userId}-${Date.now()}.pdf`;
+    const absoluteFilePath = path.join(willDirectory, fileName);
+    const storedFilePath = path.join('generated-wills', fileName).replace(/\\/g, '/');
+
+    await generateWillPdf({
+      outputPath: absoluteFilePath,
+      user,
+      assets,
+      executors,
+      actions
+    });
+
+    await ensureDigitalWillTable();
+
+    const { rows } = await pool.query(
+      `INSERT INTO digital_will (user_id, file_path, created_at, updated_at)
+       VALUES ($1, $2, NOW(), NOW())
+       RETURNING will_id, file_path, created_at`,
+      [userId, storedFilePath]
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: 'Digital will generated successfully',
+      data: {
+        will_id: rows[0].will_id,
+        file_path: rows[0].file_path,
+        created_at: rows[0].created_at,
+        summary: {
+          user: {
+            user_id: user.user_id,
+            full_name: user.full_name,
+            email: user.email
+          },
+          asset_count: assets.length,
+          executor_count: executors.length,
+          actions
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Generate Will Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to generate digital will'
+    });
+  }
+}
+
+module.exports = {
+  generateWill
+};

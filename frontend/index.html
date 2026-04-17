@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIGIPASS - Digital Estate Management</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d6efd'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='white'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">DIGIPASS</div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="login.html" id="loginBtn">Login</a>
+                <a href="register.html" id="registerBtn">Register</a>
+                <a href="#" id="dashboardBtn" style="display:none;">Dashboard</a>
+                <button id="logoutBtn" style="display:none;">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Secure Your Digital Legacy</h1>
+                <p>Manage your digital assets, create your digital will, and protect your digital estate</p>
+                <div class="cta-buttons">
+                    <button class="btn btn-primary" onclick="location.href='register.html'">Get Started</button>
+                    <button class="btn btn-secondary" onclick="location.href='login.html'">Sign In</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <h2>Features</h2>
+                <div class="feature-grid">
+                    <div class="feature">
+                        <h3>Digital Assets</h3>
+                        <p>Securely store information about your digital accounts and assets</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Digital Will</h3>
+                        <p>Create and manage your digital will with PDF export</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Executors</h3>
+                        <p>Assign executors who will manage your digital estate</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Dead Man's Switch</h3>
+                        <p>Automatic notifications if you become inactive</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 DIGIPASS. All rights reserved.</p>
+    </footer>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executor Dashboard - DIGIPASS</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d6efd'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='white'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">DIGIPASS Executor Portal</div>
+            <div class="nav-menu">
+                <button id="executorLogoutBtn" class="nav-item logout">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="user-info">
+            <p>Executor: <span id="executorName">Executor</span></p>
+            <p>Owner: <span id="ownerName">Loading...</span></p>
+        </div>
+
+        <section class="page active">
+            <h2>Accessible Digital Assets</h2>
+            <p id="executorAssetsStatus" class="assets-status">Loading assets...</p>
+            <div id="executorAssetsList" class="assets-list"></div>
+        </section>
+    </main>
+
+    <script src="js/executor-dashboard.js"></script>
+</body>
+</html>

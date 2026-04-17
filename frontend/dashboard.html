@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - DIGIPASS</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d6efd'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='white'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">DIGIPASS</div>
+            <div class="nav-menu">
+                <a href="#dashboard" class="nav-item active" data-page="dashboard">Dashboard</a>
+                <a href="#assets" class="nav-item" data-page="assets">Digital Assets</a>
+                <a href="#executors" class="nav-item" data-page="executors">Executors</a>
+                <a href="#will" class="nav-item" data-page="will">Digital Will</a>
+                <a href="#switch" class="nav-item" data-page="switch">Dead Man's Switch</a>
+                <button id="logoutBtn" class="nav-item logout">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div id="userInfo" class="user-info">
+            <p>Welcome, <span id="userName">User</span>!</p>
+        </div>
+
+        <!-- Dashboard Page -->
+        <section id="dashboardPage" class="page active">
+            <h1>Welcome to DIGIPASS</h1>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Digital Assets</h3>
+                    <p class="stat-number" id="assetCount">0</p>
+                    <a href="#assets">Manage Assets</a>
+                </div>
+                <div class="stat-card">
+                    <h3>Executors</h3>
+                    <p class="stat-number" id="executorCount">0</p>
+                    <a href="#executors">Manage Executors</a>
+                </div>
+                <div class="stat-card">
+                    <h3>Digital Will</h3>
+                    <p class="stat-number" id="willCount">0</p>
+                    <a href="#will">Create Will</a>
+                </div>
+                <div class="stat-card">
+                    <h3>Dead Man's Switch</h3>
+                    <p class="stat-status" id="switchStatus">Inactive</p>
+                    <a href="#switch">Configure</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Assets Page -->
+        <section id="assetsPage" class="page">
+            <h2>Digital Assets Management</h2>
+            <div class="assets-layout">
+                <div class="panel">
+                    <h3>Add Asset</h3>
+                    <form id="assetForm" class="asset-form">
+                        <div class="form-group">
+                            <label for="assetName">Asset Name</label>
+                            <input type="text" id="assetName" name="assetName" placeholder="e.g. Gmail Account" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="assetType">Asset Type</label>
+                            <select id="assetType" name="assetType" required>
+                                <option value="">Select asset type</option>
+                                <option value="email">Email</option>
+                                <option value="bank_account">Bank Account</option>
+                                <option value="social_media">Social Media</option>
+                                <option value="crypto">Crypto</option>
+                                <option value="password_manager">Password Manager</option>
+                                <option value="legal_doc">Legal Document</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="assetData">Asset Data</label>
+                            <textarea id="assetData" name="assetData" rows="7" placeholder='{"username":"name@example.com","notes":"Recovery details"}' required></textarea>
+                            <small>Enter valid JSON. This data is encrypted before storage.</small>
+                        </div>
+
+                        <button type="submit" id="assetSubmitBtn" class="primary-btn">Save Asset</button>
+                    </form>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Your Assets</h3>
+                        <button type="button" id="refreshAssetsBtn" class="secondary-btn">Refresh</button>
+                    </div>
+                    <p id="assetsStatus" class="assets-status">Loading assets...</p>
+                    <div id="assetsList" class="assets-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Executors Page -->
+        <section id="executorsPage" class="page">
+            <h2>Executors Management</h2>
+            <div class="assets-layout">
+                <div class="panel">
+                    <h3>Add Executor</h3>
+                    <form id="executorForm" class="asset-form">
+                        <div class="form-group">
+                            <label for="executorName">Full Name</label>
+                            <input type="text" id="executorName" name="executorName" placeholder="e.g. Priya Sharma" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="executorEmail">Email Address</label>
+                            <input type="email" id="executorEmail" name="executorEmail" placeholder="executor@example.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="executorPhone">Phone Number</label>
+                            <input type="text" id="executorPhone" name="executorPhone" placeholder="+91 98765 43210">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="executorRelationship">Relationship</label>
+                            <input type="text" id="executorRelationship" name="executorRelationship" placeholder="e.g. Sister, Lawyer, Friend">
+                        </div>
+
+                        <button type="submit" id="executorSubmitBtn" class="primary-btn">Save Executor</button>
+                    </form>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Your Executors</h3>
+                        <button type="button" id="refreshExecutorsBtn" class="secondary-btn">Refresh</button>
+                    </div>
+                    <p id="executorsStatus" class="assets-status">Loading executors...</p>
+                    <div id="executorsList" class="assets-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Will Page -->
+        <section id="willPage" class="page">
+            <h2>Digital Will</h2>
+            <div class="assets-layout">
+                <div class="panel">
+                    <h3>Will Information</h3>
+                    <p style="color: #666; margin-bottom: 1.5rem;">
+                        Your digital will includes all your assets and assigned executors. 
+                        Generate a PDF to create an official record.
+                    </p>
+                    
+                    <div class="will-summary">
+                        <div class="summary-item">
+                            <h4>Registered Assets</h4>
+                            <p class="summary-count" id="willAssetCount">0</p>
+                        </div>
+                        <div class="summary-item">
+                            <h4>Assigned Executors</h4>
+                            <p class="summary-count" id="willExecutorCount">0</p>
+                        </div>
+                        <div class="summary-item">
+                            <h4>Status</h4>
+                            <p id="willStatus" style="color: #667eea; font-weight: 600;">Ready</p>
+                        </div>
+                    </div>
+
+                    <button type="button" id="generateWillBtn" class="primary-btn" style="width: 100%; margin-top: 2rem;">
+                        Generate Digital Will (PDF)
+                    </button>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Will Details</h3>
+                        <button type="button" id="refreshWillBtn" class="secondary-btn">Refresh</button>
+                    </div>
+                    <p id="willDetails" class="assets-status">Loading will information...</p>
+                    <div id="willContent" class="will-details-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Switch Page -->
+        <section id="switchPage" class="page">
+            <h2>Dead Man's Switch</h2>
+            <p>Coming soon...</p>
+        </section>
+    </main>
+
+    <script src="js/utils.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

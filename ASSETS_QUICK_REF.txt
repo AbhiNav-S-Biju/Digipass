@@ -1,0 +1,223 @@
+# Digital Assets Module - Quick Reference
+
+## Module Summary
+Secure encrypted storage for digital assets (accounts, credentials, documents).
+
+## Setup
+```bash
+node migrate-assets-table.js  # Create/recreate table
+npm start                      # Start server
+.\Test-Assets.ps1             # Run tests
+```
+
+## Endpoints (All require JWT token)
+
+### POST /api/assets - Add Asset
+```
+Headers:
+  Authorization: Bearer {token}
+  Content-Type: application/json
+
+Body:
+{
+  "asset_name": "String (e.g., 'Gmail')",
+  "asset_type": "email|bank_account|social_media|crypto|password_manager|legal_doc|other",
+  "asset_data": {
+    "username": "user@example.com",
+    "password": "SecurePassword",
+    "any_other_fields": "..."
+  }
+}
+
+Response (201):
+{
+  "success": true,
+  "data": {
+    "asset_id": 1,
+    "asset_name": "Gmail",
+    "asset_type": "email",
+    "created_at": "2026-04-12T..."
+  }
+}
+```
+
+### GET /api/assets - List Assets
+```
+Headers:
+  Authorization: Bearer {token}
+
+Response (200):
+{
+  "success": true,
+  "data": [
+    {
+      "asset_id": 1,
+      "asset_name": "Gmail",
+      "asset_type": "email",
+      "created_at": "2026-04-12T..."
+    }
+  ],
+  "count": 1
+}
+
+Note: encrypted_data is NOT returned (security)
+```
+
+### DELETE /api/assets/:id - Delete Asset
+```
+URL:
+  /api/assets/1
+
+Headers:
+  Authorization: Bearer {token}
+
+Response (200):
+{
+  "success": true,
+  "data": {
+    "asset_id": 1,
+    "asset_name": "Gmail"
+  }
+}
+```
+
+## Security
+
+| Feature | Details |
+|---------|---------|
+| Encryption | AES-256-GCM (authenticated) |
+| Key Derivation | SCRYPT (32-byte key from env var) |
+| IV | Random 16 bytes per asset |
+| Auth Tag | Prevents tampering |
+| Access Control | Users only see own assets |
+| No Decryption | Encrypted data never sent to client |
+
+## Database
+
+```
+Table: digital_assets
+Columns:
+  asset_id (INT, PK)
+  user_id (INT, FK → users)
+  asset_name (VARCHAR 255)
+  asset_type (VARCHAR 50)
+  encrypted_data (TEXT) - JSON: {encrypted, iv, authTag}
+  created_at (TIMESTAMP)
+  updated_at (TIMESTAMP)
+
+Indexes:
+  idx_digital_assets_user_id
+  idx_digital_assets_created_at
+```
+
+## Error Codes
+
+| Code | Meaning |
+|------|---------|
+| 201 | Asset created |
+| 200 | Success |
+| 400 | Bad request (validation failed) |
+| 401 | No token |
+| 403 | Invalid token |
+| 404 | Asset not found |
+| 500 | Server error |
+
+## Files
+
+```
+controllers/assetsController.js   - Business logic
+routes/assetsRoutes.js           - Route definitions
+utils/crypto.js                  - Encryption/decryption
+utils/dbInit.js                  - Table initialization
+migrate-assets-table.js          - Migration utility
+Test-Assets.ps1                  - Test suite
+ASSETS_API.md                    - Full documentation
+```
+
+## Testing Quick Commands
+
+```powershell
+# Run all asset tests
+.\Test-Assets.ps1
+
+# Check table schema
+node check-assets-schema.js
+
+# Recreate table (drops existing)
+node migrate-assets-table.js
+```
+
+## Example Curl Commands
+
+### Add Asset
+```bash
+curl -X POST http://localhost:3000/api/assets \
+  -H "Authorization: Bearer eyJhbGc..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "asset_name":"Gmail",
+    "asset_type":"email",
+    "asset_data":{"username":"user@gmail.com","password":"pass123"}
+  }'
+```
+
+### List Assets
+```bash
+curl -X GET http://localhost:3000/api/assets \
+  -H "Authorization: Bearer eyJhbGc..."
+```
+
+### Delete Asset
+```bash
+curl -X DELETE http://localhost:3000/api/assets/1 \
+  -H "Authorization: Bearer eyJhbGc..."
+```
+
+## Asset Types Reference
+
+| Type | Use For | Example Data |
+|------|---------|--------------|
+| `email` | Email accounts | username, password, recovery_email |
+| `bank_account` | Banking | username, password, account_number |
+| `social_media` | Social media | username, password, security_questions |
+| `crypto` | Blockchain wallets | address, private_key, recovery_phrase |
+| `password_manager` | Password vaults | vault_username, master_password |
+| `legal_doc` | Legal documents | document_title, document_url, notary_info |
+| `other` | Miscellaneous | any fields |
+
+## Production Checklist
+
+- [ ] Set ENCRYPTION_KEY environment variable
+- [ ] Use HTTPS for all API calls
+- [ ] Implement rate limiting
+- [ ] Add audit logging for asset access
+- [ ] Set up database backups
+- [ ] Configure key rotation policy
+- [ ] Use AWS KMS / Azure Key Vault for key management
+- [ ] Enable database encryption at rest
+- [ ] Monitor for unauthorized access attempts
+- [ ] Document data retention policy
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| "column asset_name does not exist" | Run: `node migrate-assets-table.js` |
+| "No token provided" | Include Authorization header with JWT |
+| "Asset not found" | Verify asset_id and user ownership |
+| "Invalid asset type" | Use one of: email, bank_account, social_media, crypto, password_manager, legal_doc, other |
+| "Encryption failed" | Check ENCRYPTION_KEY environment variable |
+
+## Performance Notes
+
+- Indexes on user_id and created_at for fast queries
+- Assets sorted by creation date (newest first)
+- No pagination needed for typical user (< 100 assets)
+- Encryption/decryption runs synchronously (fast for typical data size)
+- Consider pagination if users have 1000+ assets
+
+---
+
+**Documentation Version:** 1.0  
+**Last Updated:** 2026-04-12  
+**Status:** Production Ready ✅

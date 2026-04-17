@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executor Registration - DIGIPASS</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d6efd'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='white'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <h1>DIGIPASS</h1>
+            <h2>Executor Registration</h2>
+
+            <div id="message"></div>
+            <p id="executorInviteInfo" class="auth-link" style="margin-top:0;margin-bottom:20px;"></p>
+
+            <form id="executorRegisterForm">
+                <div class="form-group">
+                    <label for="executorRegisterPassword">Create Password</label>
+                    <input type="password" id="executorRegisterPassword" name="executorRegisterPassword" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="executorRegisterConfirmPassword">Confirm Password</label>
+                    <input type="password" id="executorRegisterConfirmPassword" name="executorRegisterConfirmPassword" required>
+                </div>
+
+                <button type="submit" class="btn-primary">Verify And Register</button>
+            </form>
+
+            <p class="auth-link">
+                Already registered? <a href="executor-login.html">Executor login</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="js/executor-register.js"></script>
+</body>
+</html>

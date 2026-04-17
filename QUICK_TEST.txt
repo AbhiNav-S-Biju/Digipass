@@ -1,0 +1,276 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║           🧪 DIGIPASS AUTHENTICATION - QUICK TESTING REFERENCE 🧪             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 🚀 START SERVER                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Terminal:                                                                    │
+│   cd c:\Users\Abhinav\Desktop\Digipass                                      │
+│   npm install                                                               │
+│   npm start                                                                 │
+│                                                                              │
+│ Expected: ✅ DIGIPASS API running on port 3000                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 📋 ENDPOINTS AVAILABLE                                                       │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ 1. ✅ POST   /api/auth/register        (Public)                             │
+│ 2. ✅ POST   /api/auth/login           (Public)                             │
+│ 3. ✅ GET    /api/auth/me              (Protected - needs token)             │
+│ 4. ✅ GET    /api/auth/dashboard-test  (Protected - needs token)             │
+│ 5. ✅ GET    /api/health               (Public)                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ OPTION 1: QUICK CURL TESTS (Copy & Paste)                                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📌 TEST 1: Health Check
+─────────────────────────────────────────────────────────────────────────────
+curl http://localhost:3000/api/health
+
+Expected: {"success":true,"message":"DIGIPASS API Running"...}
+
+📌 TEST 2: Register User
+─────────────────────────────────────────────────────────────────────────────
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d "{\"full_name\":\"Test User\",\"email\":\"test@example.com\",\"password\":\"Test123456\"}"
+
+Expected: 201 Created + token
+⚠️ SAVE THE TOKEN FOR NEXT TESTS!
+
+📌 TEST 3: Login User
+─────────────────────────────────────────────────────────────────────────────
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d "{\"email\":\"test@example.com\",\"password\":\"Test123456\"}"
+
+Expected: 200 OK + token
+⚠️ SAVE THE TOKEN!
+
+📌 TEST 4: Protected Route - Get User (requires token)
+─────────────────────────────────────────────────────────────────────────────
+curl -X GET http://localhost:3000/api/auth/me \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+
+Replace YOUR_TOKEN_HERE with token from Test 2 or Test 3
+Expected: 200 OK + user data
+
+📌 TEST 5: Protected Route - Dashboard Test (requires token)
+─────────────────────────────────────────────────────────────────────────────
+curl -X GET http://localhost:3000/api/auth/dashboard-test \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+
+Expected: 200 OK + dashboard test data
+
+📌 TEST 6: No Token (Should Fail)
+─────────────────────────────────────────────────────────────────────────────
+curl -X GET http://localhost:3000/api/auth/me
+
+Expected: 401 Unauthorized + "No token provided"
+
+📌 TEST 7: Invalid Token (Should Fail)
+─────────────────────────────────────────────────────────────────────────────
+curl -X GET http://localhost:3000/api/auth/me \
+  -H "Authorization: Bearer invalid_token_here"
+
+Expected: 403 Forbidden + "Invalid or expired token"
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ OPTION 2: POSTMAN QUICK SETUP                                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Step 1: Open Postman
+Step 2: Create new request
+Step 3: Copy/paste values below
+
+Request 1: REGISTER
+├─ Method: POST
+├─ URL: http://localhost:3000/api/auth/register
+├─ Headers: Content-Type: application/json
+└─ Body (raw JSON):
+   {
+     "full_name": "John Doe",
+     "email": "john@example.com",
+     "password": "SecurePass123"
+   }
+
+Request 2: LOGIN
+├─ Method: POST
+├─ URL: http://localhost:3000/api/auth/login
+├─ Headers: Content-Type: application/json
+└─ Body (raw JSON):
+   {
+     "email": "john@example.com",
+     "password": "SecurePass123"
+   }
+
+Request 3: GET USER (Protected)
+├─ Method: GET
+├─ URL: http://localhost:3000/api/auth/me
+└─ Headers: Authorization: Bearer {{token}}
+
+Request 4: DASHBOARD TEST (Protected)
+├─ Method: GET
+├─ URL: http://localhost:3000/api/auth/dashboard-test
+└─ Headers: Authorization: Bearer {{token}}
+
+💡 AUTO-SAVE TOKEN IN POSTMAN:
+After Login or Register request, click "Tests" tab and paste:
+───────────────────────────────────────────────────────────
+var jsonData = pm.response.json();
+pm.environment.set("token", jsonData.data.token);
+console.log('✅ Token saved!');
+───────────────────────────────────────────────────────────
+Token will be saved to {{token}} variable automatically!
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ TEST RESULTS SUMMARY                                                         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Test #  Endpoint                    Method  Auth   Expected Status  
+─────────────────────────────────────────────────────────────────────
+  1.   /api/health                 GET     No     200 ✅
+  2.   /api/auth/register          POST    No     201 ✅
+  3.   /api/auth/login             POST    No     200 ✅
+  4.   /api/auth/me                GET     Yes    200 ✅
+  5.   /api/auth/dashboard-test    GET     Yes    200 ✅
+  6.   /api/auth/me (no token)     GET     No     401 ✅
+  7.   /api/auth/me (bad token)    GET     Yes    403 ✅
+
+If all 7 tests pass → ✅ AUTHENTICATION SYSTEM WORKING PERFECTLY!
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ SAMPLE TEST DATA                                                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+User A:
+  Full Name: Alice Wonder
+  Email:     alice.wonder@test.com
+  Password:  AliceTest123
+
+User B:
+  Full Name: Bob Builder
+  Email:     bob.builder@test.com
+  Password:  BobTest456
+
+User C:
+  Full Name: Charlie Brown
+  Email:     charlie.brown@test.com
+  Password:  CharlieTest789
+
+💡 Tip: Each user registration creates unique user in database
+        Try registering multiple users and test separately
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ POSTMAN ENVIRONMENT VARIABLES                                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Create Environment called "DIGIPASS":
+
+Variable Name   Initial Value   Type
+───────────────────────────────────────────────────────────
+token          (leave empty)   string
+userId         (leave empty)   string
+
+After login, token and userId auto-fill via test script!
+
+Use in requests as:
+  Header: Authorization: Bearer {{token}}
+  Body:   "userId": {{userId}}
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ TROUBLESHOOTING QUICK FIXES                                                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+❌ Connection refused
+   → npm start not run
+   → Run in correct folder: c:\Users\Abhinav\Desktop\Digipass
+
+❌ "Cannot find module"
+   → npm install not run
+   → Run: npm install
+
+❌ "Email already registered"
+   → Email exists in database
+   → Use different email
+
+❌ Unauthorized / No token
+   → Missing Authorization header
+   → Must add: Authorization: Bearer TOKEN
+
+❌ Invalid token / Forbidden
+   → Token copied wrong or expired
+   → Get fresh token from /login endpoint
+
+❌ Database connection error
+   → PostgreSQL not running
+   → Ensure "Digipass" database exists
+   → Check credentials in db.js
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ RESPONSE EXAMPLES                                                            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+✅ SUCCESS - Register/Login (201/200):
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "userId": 1,
+    "fullName": "John Doe",
+    "email": "john@example.com",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+
+✅ SUCCESS - Get User (200):
+{
+  "success": true,
+  "data": {
+    "userId": 1,
+    "fullName": "John Doe",
+    "email": "john@example.com"
+  }
+}
+
+✅ SUCCESS - Dashboard Test (200):
+{
+  "success": true,
+  "message": "Protected route accessed successfully!",
+  "userId": 1,
+  "timestamp": "2025-04-12T10:35:22.456Z",
+  "testData": {
+    "dashboard": "This is a test protected endpoint",
+    "authenticated": true
+  }
+}
+
+❌ ERROR - No Token (401):
+{
+  "success": false,
+  "message": "No token provided. Please login."
+}
+
+❌ ERROR - Invalid Token (403):
+{
+  "success": false,
+  "message": "Invalid or expired token"
+}
+
+❌ ERROR - Email Exists (409):
+{
+  "success": false,
+  "message": "Email already registered"
+}
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ ✅ VERIFICATION COMPLETE!                                                    ║
+║                                                                              ║
+║ After all 7 tests pass, authentication is PRODUCTION READY! 🎉              ║
+║                                                                              ║
+║ Next: Build Digital Assets Management Module                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
