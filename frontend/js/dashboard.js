@@ -467,7 +467,10 @@ function renderExecutors() {
 }
 
 function getExecutorStatus(executor) {
-  if (executor.access_granted) {
+  // Handle both boolean and string values
+  const accessGranted = executor.access_granted === true || executor.access_granted === 'true';
+  
+  if (accessGranted) {
     return 'Active';
   }
   if (executor.verification_status === 'verified') {
@@ -477,7 +480,10 @@ function getExecutorStatus(executor) {
 }
 
 function getExecutorStatusBadgeClass(executor) {
-  if (executor.access_granted) {
+  // Handle both boolean and string values
+  const accessGranted = executor.access_granted === true || executor.access_granted === 'true';
+  
+  if (accessGranted) {
     return 'status-active';
   }
   if (executor.verification_status === 'verified') {
@@ -492,7 +498,10 @@ function getExecutorActionButtons(executor) {
     return '<p class="executor-meta"><em>Waiting for verification...</em></p>';
   }
 
-  if (executor.access_granted) {
+  // Ensure access_granted is treated as boolean
+  const accessGranted = executor.access_granted === true || executor.access_granted === 'true';
+  
+  if (accessGranted) {
     return `
       <div class="executor-actions">
         <button class="success-btn" disabled>✓ Access Granted</button>
