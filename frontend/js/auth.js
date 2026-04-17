@@ -1,5 +1,5 @@
-// API configuration
-const API_BASE_URL = 'http://localhost:3000/api';
+// API configuration - works on both localhost and production
+const API_BASE_URL = window.location.origin + '/api';
 
 // Check if user is logged in
 function checkAuth() {
