@@ -97,11 +97,19 @@ async function loadExecutorAssets() {
 
 document.addEventListener('DOMContentLoaded', () => {
   const profile = getExecutorProfile();
-  if (!profile || !getExecutorToken()) {
+  const token = getExecutorToken();
+  
+  console.log('[Executor Dashboard] DOMContentLoaded');
+  console.log('[Executor Dashboard] Profile exists:', !!profile);
+  console.log('[Executor Dashboard] Token exists:', !!token);
+  
+  if (!profile || !token) {
+    console.log('[Executor Dashboard] Missing profile or token, redirecting to login');
     logoutExecutor();
     return;
   }
 
+  console.log('[Executor Dashboard] Loading dashboard for:', profile.executor_name);
   document.getElementById('executorName').textContent = `${profile.executor_name} (${profile.executor_email})`;
   document.getElementById('executorLogoutBtn').addEventListener('click', logoutExecutor);
   loadExecutorAssets();

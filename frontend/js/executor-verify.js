@@ -96,16 +96,21 @@ async function handlePasswordSetup(event) {
     const result = await response.json();
 
     if (result.success) {
-      showStatus('✅ Password set successfully! Redirecting to login...', 'success');
+      showStatus('✅ Password set successfully! Logging in...', 'success');
       
-      // Store executor token if provided (for auto-login)
+      // Store executor token and profile for auto-login
       if (result.data && result.data.token) {
         localStorage.setItem('executorToken', result.data.token);
+        
+        // Store executor profile (without token field)
+        const profile = { ...result.data };
+        delete profile.token;
+        localStorage.setItem('executorProfile', JSON.stringify(profile));
       }
 
       setTimeout(() => {
-        window.location.href = '/executor-login.html';
-      }, 2000);
+        window.location.href = '/executor-dashboard.html';
+      }, 1500);
     } else {
       showPasswordError(result.message || 'Failed to set password');
       button.disabled = false;
