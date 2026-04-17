@@ -2,6 +2,14 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { startDeadMansSwitchScheduler } = require('./utils/deadMansSwitchScheduler');
+const {
+  initializeUsersTable,
+  initializeUserActivityColumns,
+  initializeDigitalAssetsTable,
+  initializeExecutorsTable,
+  initializeDeadMansSwitchTable,
+  initializeDigitalWillTable
+} = require('./utils/dbInit');
 
 const app = express();
 const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:8080,http://localhost:3000')
@@ -81,8 +89,31 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Initialize database tables
+const initializeDatabase = async () => {
+  try {
+    console.log('Initializing database tables...');
+    await initializeUsersTable();
+    await initializeUserActivityColumns();
+    await initializeDigitalAssetsTable();
+    await initializeExecutorsTable();
+    await initializeDeadMansSwitchTable();
+    await initializeDigitalWillTable();
+    console.log('✓ Database initialization complete');
+    return true;
+  } catch (err) {
+    console.error('Database initialization failed:', err.message);
+    return false;
+  }
+};
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+
+// Start server with database initialization
+(async () => {
+  await initializeDatabase();
+  
+  app.listen(PORT, () => {
   console.log(`✅ DIGIPASS API running on port ${PORT}`);
   console.log('[SMTP Debug] Environment loaded:');
   console.log(`  - APP_BASE_URL: ${process.env.APP_BASE_URL || '(missing)'}`);
@@ -117,4 +148,5 @@ app.listen(PORT, () => {
       console.error('[DeadMansSwitch] Failed to start scheduler:', err.message);
     }
   });
-});
+  });
+})();
