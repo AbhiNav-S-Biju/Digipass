@@ -3,6 +3,9 @@ const cors = require('cors');
 require('dotenv').config();
 const { startDeadMansSwitchScheduler } = require('./utils/deadMansSwitchScheduler');
 const { initResend } = require('./utils/mailer');
+const { errorHandler } = require('./utils/errorHandler');
+const { logApiRequest } = require('./utils/logger');
+const { createApiRateLimiter, createAuthRateLimiter } = require('./utils/rateLimiter');
 const {
   initializeUsersTable,
   initializeUserActivityColumns,
@@ -30,8 +33,25 @@ app.use(cors({
   },
   credentials: true
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Request logging middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    logApiRequest(req.method, req.path, res.statusCode, duration, {
+      userId: req.user?.id
+    });
+  });
+  next();
+});
+
+// Rate limiting
+app.use('/api/auth/login', createAuthRateLimiter());
+app.use('/api/auth/register', createAuthRateLimiter());
+app.use('/api', createApiRateLimiter());
 
 // Database initialization middleware (runs once on first request)
 let dbInitialized = false;
@@ -98,19 +118,13 @@ app.use('/api', willRoutes);
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Route not found'
+    message: 'Route not found',
+    path: req.path
   });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('Server Error:', err);
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || 'Internal Server Error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
-});
+// Error handling middleware (must be last)
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 

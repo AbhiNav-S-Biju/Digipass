@@ -4,6 +4,9 @@ const { generateToken, generateExecutorToken } = require('../utils/jwt');
 const { generateVerificationToken, hashVerificationToken, getVerificationExpiryDate } = require('../utils/executorVerification');
 const { generateExecutorVerificationQR, getExecutorVerificationUrl } = require('../utils/qrCode');
 const { sendExecutorVerificationEmail } = require('../utils/mailer');
+const { errors } = require('../utils/errorHandler');
+const { validateEmail, validateName, validatePassword, validatePhone } = require('../utils/validation');
+const { logExecutorAction, logError } = require('../utils/logger');
 
 function buildExecutorResponse(executor) {
   return {
@@ -18,7 +21,7 @@ function buildExecutorResponse(executor) {
   };
 }
 
-async function addExecutor(req, res) {
+async function addExecutor(req, res, next) {
   try {
     const userId = req.userId;
     const {
@@ -28,17 +31,24 @@ async function addExecutor(req, res) {
       relationship = null
     } = req.body;
 
-    if (!executor_name || !executor_email) {
-      return res.status(400).json({
-        success: false,
-        message: 'executor_name and executor_email are required'
-      });
+    // Validation
+    if (!validateName(executor_name)) {
+      throw errors.validationError('Executor name must be between 2 and 100 characters');
     }
 
-    console.log('[Executor Controller] addExecutor called');
-    console.log(`  - userId: ${userId}`);
-    console.log(`  - executor_name: ${executor_name}`);
-    console.log(`  - executor_email: ${executor_email}`);
+    if (!validateEmail(executor_email)) {
+      throw errors.validationError('Invalid email format');
+    }
+
+    if (executor_phone && !validatePhone(executor_phone)) {
+      throw errors.validationError('Invalid phone number format');
+    }
+
+    logExecutorAction('EXECUTOR_ADDED', null, {
+      userId,
+      executorName: executor_name,
+      executorEmail: executor_email
+    });
 
     const verificationToken = generateVerificationToken();
     const verificationTokenHash = hashVerificationToken(verificationToken);
