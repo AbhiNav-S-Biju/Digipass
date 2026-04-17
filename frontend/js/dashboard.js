@@ -534,17 +534,23 @@ async function handleGrantAccess(button) {
   try {
     const response = await apiCall(`/executors/${executorId}/grant-access`, 'PATCH');
 
+    console.log('[Dashboard] Grant Access Response:', response);
+    console.log('[Dashboard] Response data:', response.data);
+    console.log('[Dashboard] Access granted:', response.data?.access_granted);
+
     // Update state
     const executorIndex = executorsState.items.findIndex(
       (e) => String(e.executor_id) === String(executorId)
     );
     if (executorIndex !== -1) {
       executorsState.items[executorIndex] = response.data;
+      console.log('[Dashboard] Updated executor in state:', executorsState.items[executorIndex]);
     }
 
     renderExecutors();
     showNotification('Access granted successfully!', 'success');
   } catch (error) {
+    console.error('[Dashboard] Grant access error:', error);
     button.disabled = false;
     button.textContent = 'Grant Access';
     showNotification(error.message || 'Failed to grant access', 'error');
