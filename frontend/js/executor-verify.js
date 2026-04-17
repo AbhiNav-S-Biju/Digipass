@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://digipass-production.up.railway.app/api';
+const API_BASE_URL = 'https://digipass-3l63.onrender.com/api';
 let executorData = null;
 
 async function verifyToken() {

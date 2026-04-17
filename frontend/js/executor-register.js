@@ -1,4 +1,4 @@
-const API_URL = 'https://digipass-production.up.railway.app/api';
+const API_URL = 'https://digipass-3l63.onrender.com/api';
 
 function showMessage(message, type = 'info') {
   const messageDiv = document.getElementById('message');
