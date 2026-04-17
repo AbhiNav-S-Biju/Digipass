@@ -176,14 +176,14 @@
 
         document.getElementById('executorLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
+            const executorEmail = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
             try {
                 const response = await fetch(`${API_URL}/api/executor/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ executor_email: executorEmail, password })
                 });
 
                 const data = await response.json();

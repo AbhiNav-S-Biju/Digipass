@@ -253,20 +253,20 @@
             }
 
             try {
-                const response = await fetch(`${API_URL}/api/executor/verify`, {
+                const response = await fetch(`${API_URL}/api/executor/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token, password })
+                    body: JSON.stringify({ token, password, confirm_password: confirmPassword })
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    localStorage.setItem('executorToken', data.token);
-                    localStorage.setItem('executor', JSON.stringify(data.executor));
-                    location.href = 'executor-dashboard.html';
+                    // Registration successful, redirect to login
+                    alert('Registration successful! Please sign in with your email and password.');
+                    location.href = 'executor-login.html';
                 } else {
-                    showError(data.message || 'Verification failed. Please check your token.');
+                    showError(data.message || 'Registration failed. Please check your token.');
                 }
             } catch (error) {
                 console.error(error);
