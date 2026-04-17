@@ -192,6 +192,35 @@
         </section>
     </main>
 
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Share Verification QR Code</h2>
+                <button class="modal-close" onclick="closeQRModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p id="qrModalText"></p>
+                <div class="qr-display">
+                    <img id="qrModalImage" alt="Verification QR Code" style="max-width: 300px;">
+                </div>
+                <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                    <strong>Or share this link:</strong>
+                </p>
+                <div class="link-display">
+                    <input type="text" id="qrModalLink" readonly class="link-input">
+                    <button onclick="copyVerificationLink()" class="copy-btn">Copy Link</button>
+                </div>
+                <p style="margin-top: 15px; font-size: 13px; color: #999;">
+                    The executor can scan the QR code with their phone camera or click the link to verify their identity.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeQRModal()" class="secondary-btn">Done</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/utils.js?v=3"></script>
     <script src="js/dashboard.js?v=3"></script>
 </body>

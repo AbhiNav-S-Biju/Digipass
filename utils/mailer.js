@@ -4,7 +4,7 @@ let resend = null;
 
 function getExecutorVerificationUrl(token) {
   const baseUrl = process.env.APP_BASE_URL || 'http://localhost:8080';
-  return `${baseUrl}/executor-register.html?token=${encodeURIComponent(token)}`;
+  return `${baseUrl}/executor-verify.html?token=${encodeURIComponent(token)}`;
 }
 
 function initResend() {

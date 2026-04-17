@@ -5,6 +5,7 @@ const {
   getVerificationExpiryDate
 } = require('../utils/executorVerification');
 const { getExecutorVerificationUrl, sendExecutorVerificationEmail } = require('../utils/mailer');
+const { generateExecutorVerificationQR, getExecutorVerificationUrl: getQRUrl } = require('../utils/qrCode');
 
 function buildExecutorResponse(executor) {
   return {
@@ -86,7 +87,18 @@ async function addExecutor(req, res) {
     console.log(`  - executor_id: ${executor.executor_id}`);
     console.log(`  - verification link will be sent to: ${executor.executor_email}`);
     
-    const fallbackVerificationUrl = getExecutorVerificationUrl(verificationToken);
+    const fallbackVerificationUrl = getQRUrl(verificationToken);
+
+    // Generate QR code for verification
+    let qrCodeDataUrl = null;
+    try {
+      console.log('[Executor Controller] Generating QR code...');
+      qrCodeDataUrl = await generateExecutorVerificationQR(verificationToken);
+      console.log('[Executor Controller] QR code generated successfully');
+    } catch (qrError) {
+      console.warn('[Executor Controller] QR code generation failed (non-critical)');
+      console.warn(`  - error: ${qrError.message}`);
+    }
 
     // Send email asynchronously (non-blocking)
     // If email fails, executor is still created - they can use the fallback URL
@@ -117,11 +129,12 @@ async function addExecutor(req, res) {
 
     return res.status(201).json({
       success: true,
-      message: 'Executor added successfully. Verification email will be sent shortly.',
+      message: 'Executor added successfully. Share the QR code below.',
       data: {
         ...buildExecutorResponse(executor),
-        verification_email_sent: 'pending',
-        verification_preview_url: process.env.NODE_ENV === 'development' ? fallbackVerificationUrl : undefined
+        verification_qr_code: qrCodeDataUrl,
+        verification_link: fallbackVerificationUrl,
+        verification_email_sent: 'pending'
       }
     });
   } catch (error) {

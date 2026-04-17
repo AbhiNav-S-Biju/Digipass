@@ -418,6 +418,9 @@ async function handleExecutorSubmit(event) {
 
     event.target.reset();
     showNotification('Executor added successfully.', 'success');
+    
+    // Show QR code modal
+    showQRModal(response.data);
   } catch (error) {
     showNotification(error.message || 'Failed to add executor', 'error');
   } finally {
@@ -622,6 +625,61 @@ function getStatusClass(status) {
       return 'status-pending';
   }
 }
+
+// QR Code Modal Functions
+function showQRModal(executorData) {
+  const modal = document.getElementById('qrModal');
+  const qrText = document.getElementById('qrModalText');
+  const qrImage = document.getElementById('qrModalImage');
+  const qrLink = document.getElementById('qrModalLink');
+
+  // Set modal content
+  qrText.textContent = `Verification QR Code for ${escapeHtml(executorData.executor_name)}`;
+
+  if (executorData.verification_qr_code) {
+    qrImage.src = executorData.verification_qr_code;
+    qrImage.style.display = 'block';
+  } else {
+    qrImage.style.display = 'none';
+  }
+
+  if (executorData.verification_link) {
+    qrLink.value = executorData.verification_link;
+  }
+
+  // Show modal
+  modal.style.display = 'flex';
+}
+
+function closeQRModal() {
+  const modal = document.getElementById('qrModal');
+  modal.style.display = 'none';
+}
+
+function copyVerificationLink() {
+  const linkInput = document.getElementById('qrModalLink');
+  const copyBtn = event.target;
+
+  linkInput.select();
+  document.execCommand('copy');
+
+  const originalText = copyBtn.textContent;
+  copyBtn.textContent = 'Copied!';
+  copyBtn.style.background = '#10b981';
+
+  setTimeout(() => {
+    copyBtn.textContent = originalText;
+    copyBtn.style.background = '#667eea';
+  }, 2000);
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', (event) => {
+  const modal = document.getElementById('qrModal');
+  if (event.target === modal) {
+    closeQRModal();
+  }
+});
 
 // Logout functionality
 document.getElementById('logoutBtn').addEventListener('click', logout);
