@@ -521,7 +521,7 @@ async function setupExecutorPassword(req, res) {
 
     // Find executor by verification token
     const { rows: executorRows } = await pool.query(
-      `SELECT executor_id, executor_name, executor_email, verification_token_hash
+      `SELECT executor_id, user_id, executor_name, executor_email, verification_token_hash
        FROM executors
        WHERE verification_token_hash = $1
          AND verification_token_expires_at IS NOT NULL
@@ -551,6 +551,7 @@ async function setupExecutorPassword(req, res) {
        WHERE executor_id = $2
        RETURNING
          executor_id,
+         user_id,
          executor_name,
          executor_email,
          executor_phone,
@@ -604,6 +605,7 @@ async function executorLogin(req, res) {
     const { rows: executorRows } = await pool.query(
       `SELECT
         executor_id,
+        user_id,
         executor_name,
         executor_email,
         executor_phone,
