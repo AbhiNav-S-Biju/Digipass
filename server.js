@@ -108,5 +108,9 @@ app.listen(PORT, () => {
   console.log(`  - POST   /api/executor/register (public token-based registration)`);
   console.log(`  - GET    /api/executor/assets (executor protected)`);
   console.log(`  - GET    /api/generate-will (protected)`);
-  startDeadMansSwitchScheduler();
+  
+  // Start dead man's switch scheduler asynchronously (non-blocking)
+  setImmediate(() => {
+    startDeadMansSwitchScheduler();
+  });
 });
