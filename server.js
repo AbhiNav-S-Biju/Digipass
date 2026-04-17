@@ -32,6 +32,28 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Database initialization middleware (runs once on first request)
+let dbInitialized = false;
+app.use(async (req, res, next) => {
+  if (!dbInitialized) {
+    try {
+      console.log('[DB] Initializing database tables...');
+      await initializeUsersTable();
+      await initializeUserActivityColumns();
+      await initializeDigitalAssetsTable();
+      await initializeExecutorsTable();
+      await initializeDeadMansSwitchTable();
+      await initializeDigitalWillTable();
+      console.log('[DB] ✓ Database initialization complete');
+      dbInitialized = true;
+    } catch (err) {
+      console.error('[DB] Initialization failed:', err.message);
+      dbInitialized = true; // Mark as attempted to prevent retry loop
+    }
+  }
+  next();
+});
+
 // Serve static files (frontend)
 app.use(express.static('frontend'));
 
@@ -89,31 +111,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Initialize database tables
-const initializeDatabase = async () => {
-  try {
-    console.log('Initializing database tables...');
-    await initializeUsersTable();
-    await initializeUserActivityColumns();
-    await initializeDigitalAssetsTable();
-    await initializeExecutorsTable();
-    await initializeDeadMansSwitchTable();
-    await initializeDigitalWillTable();
-    console.log('✓ Database initialization complete');
-    return true;
-  } catch (err) {
-    console.error('Database initialization failed:', err.message);
-    return false;
-  }
-};
-
 const PORT = process.env.PORT || 3000;
 
-// Start server with database initialization
-(async () => {
-  await initializeDatabase();
-  
-  app.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`✅ DIGIPASS API running on port ${PORT}`);
   console.log('[SMTP Debug] Environment loaded:');
   console.log(`  - APP_BASE_URL: ${process.env.APP_BASE_URL || '(missing)'}`);
@@ -148,5 +148,4 @@ const PORT = process.env.PORT || 3000;
       console.error('[DeadMansSwitch] Failed to start scheduler:', err.message);
     }
   });
-  });
-})();
+});
