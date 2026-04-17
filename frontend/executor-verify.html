@@ -3,26 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executor Verification - DigiPass</title>
-    <link rel="stylesheet" href="css/auth.css">
+    <title>Verify Executor Account - DIGIPASS</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23102c26'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='%23f7e7ce'/%3E%3C/svg%3E">
     <style>
-        .qr-container {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #2d2d2d;
+            background: #f7e7ce;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .verify-container {
+            width: 100%;
             max-width: 500px;
-            margin: 40px auto;
-            padding: 30px;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+            border-radius: 8px;
+            border: 1px solid #e8e0d0;
+        }
+
+        .verify-container h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #102c26;
+            margin-bottom: 0.5rem;
             text-align: center;
+        }
+
+        .verify-container h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #102c26;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .verify-container > p {
+            text-align: center;
+            color: #555;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
         }
 
         .qr-box {
             background: #f5f5f5;
-            padding: 20px;
+            padding: 1.5rem;
             border-radius: 8px;
-            margin: 20px 0;
+            margin: 1.5rem 0;
             display: flex;
             justify-content: center;
+            align-items: center;
+            min-height: 350px;
         }
 
         .qr-box img {
@@ -31,103 +73,192 @@
         }
 
         .qr-instructions {
-            background: #e3f2fd;
-            border-left: 4px solid #2196F3;
-            padding: 15px;
-            margin: 20px 0;
+            background: #dbeafe;
+            border-left: 4px solid #0369a1;
+            padding: 1rem;
+            margin: 1.5rem 0;
             border-radius: 4px;
             text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .qr-instructions strong {
+            color: #0369a1;
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+
+        .qr-instructions ol {
+            margin-left: 1.5rem;
+            color: #0369a1;
+        }
+
+        .qr-instructions li {
+            margin-bottom: 0.5rem;
         }
 
         .qr-link {
-            background: #f0f0f0;
-            padding: 15px;
+            background: #f5f5f5;
+            padding: 1rem;
             border-radius: 4px;
-            margin: 15px 0;
+            margin: 1rem 0;
             word-break: break-all;
-            font-size: 12px;
+            font-size: 0.85rem;
             color: #666;
+            border: 1px solid #e0e0e0;
+            font-family: monospace;
         }
 
         .verify-status {
-            padding: 15px;
+            padding: 1rem;
             border-radius: 4px;
-            margin: 15px 0;
-            font-weight: bold;
+            margin: 1.5rem 0;
+            font-weight: 600;
+            font-size: 0.95rem;
         }
 
         .verify-status.success {
-            background: #c8e6c9;
-            color: #2e7d32;
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #166534;
         }
 
         .verify-status.error {
-            background: #ffcdd2;
-            color: #c62828;
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
         }
 
         .verify-status.loading {
-            background: #fff3cd;
-            color: #856404;
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+
+        .divider {
+            margin: 2rem 0;
+            text-align: center;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            padding: 0.75rem;
+            border: 1px solid #d8def0;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: #fbfcff;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #102c26;
+            background: white;
+        }
+
+        .form-group small {
+            color: #999;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
         }
 
         .button-group {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
 
         .button-group button {
             flex: 1;
-            padding: 10px 15px;
+            padding: 0.85rem;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
         }
 
-        .btn-verify {
-            background: #2196F3;
+        .btn-primary {
+            background: #102c26;
             color: white;
+            width: 100%;
         }
 
-        .btn-verify:hover {
-            background: #1976D2;
+        .btn-primary:hover {
+            background: #081a16;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #102c26;
+            border: 1px solid #d8e0d5;
+        }
+
+        .btn-secondary:hover {
+            background: #f9f9f9;
+            border-color: #102c26;
         }
 
         .btn-back {
-            background: #757575;
-            color: white;
+            background: white;
+            color: #102c26;
+            border: 1px solid #d8e0d5;
+            margin-top: 1.5rem;
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
         }
 
         .btn-back:hover {
-            background: #616161;
+            border-color: #102c26;
+            background: #f9f9f9;
         }
 
-        .divider {
-            margin: 20px 0;
-            text-align: center;
-            color: #999;
-        }
+        @media (max-width: 480px) {
+            .verify-container {
+                padding: 1.5rem;
+            }
 
-        .token-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin: 10px 0;
-            font-family: monospace;
-            font-size: 12px;
+            .qr-box {
+                min-height: 280px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="qr-container">
-        <h1>Executor Verification</h1>
-        
+    <div class="verify-container">
+        <h1>DIGIPASS</h1>
+
         <div id="qrContent" style="display: none;">
-            <p>You have been registered as an executor. Scan the QR code to verify your identity.</p>
-            
+            <h2>Verify Your Executor Account</h2>
+            <p>You've been registered as an executor. Verify your identity using the QR code below.</p>
+
             <div class="qr-box">
                 <img id="qrImage" alt="Verification QR Code">
             </div>
@@ -138,43 +269,43 @@
                     <li>Use your phone camera or QR scanner app</li>
                     <li>Scan the QR code above</li>
                     <li>Click the verification link</li>
-                    <li>Your account will be verified instantly</li>
+                    <li>Your account will be activated instantly</li>
                 </ol>
             </div>
 
             <div class="divider">OR</div>
 
-            <p><strong>Click the link below:</strong></p>
+            <p><strong>Use the verification link:</strong></p>
             <div class="qr-link" id="verificationLink"></div>
-            <button class="btn-verify" onclick="openLink()">Open Verification Link</button>
+            <button class="btn-primary" onclick="openLink()">Open Verification Link</button>
         </div>
 
         <!-- Password Setup Form (shown after verification) -->
         <div id="passwordSetupContent" style="display: none;">
-            <h2>Set Your Password</h2>
-            <p>Welcome! Please set a password to complete your executor setup.</p>
-            
+            <h2>Complete Your Setup</h2>
+            <p>Set a secure password to finish creating your executor account.</p>
+
             <form id="passwordForm">
-                <div class="form-group" style="margin: 20px 0; text-align: left;">
-                    <label for="executorPassword" style="display: block; margin-bottom: 5px; font-weight: bold;">Password</label>
-                    <input type="password" id="executorPassword" placeholder="At least 8 characters" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
-                    <small style="color: #999; display: block; margin-top: 5px;">Must include uppercase, lowercase, number, and symbol (@$!%*?&)</small>
+                <div class="form-group">
+                    <label for="executorPassword">Password</label>
+                    <input type="password" id="executorPassword" placeholder="At least 8 characters" required>
+                    <small>Must include uppercase, lowercase, number, and symbol (@$!%*?&)</small>
                 </div>
 
-                <div class="form-group" style="margin: 20px 0; text-align: left;">
-                    <label for="confirmPassword" style="display: block; margin-bottom: 5px; font-weight: bold;">Confirm Password</label>
-                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
                 </div>
 
-                <button type="submit" class="btn-verify" style="width: 100%; margin-top: 15px;">Set Password & Login</button>
+                <button type="submit" class="btn-primary">Create Account</button>
             </form>
 
-            <div id="passwordError" class="verify-status error" style="display: none; margin-top: 15px;"></div>
+            <div id="passwordError" class="verify-status error" style="display: none;"></div>
         </div>
 
         <div id="verificationStatus"></div>
 
-        <button class="btn-back" onclick="goBack()" style="margin-top: 20px;">Back to Dashboard</button>
+        <button class="btn-back" onclick="goBack()">Back to Home</button>
     </div>
 
     <script src="js/executor-verify.js?v=2"></script>
