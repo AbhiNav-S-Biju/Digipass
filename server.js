@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { startDeadMansSwitchScheduler } = require('./utils/deadMansSwitchScheduler');
+const { initSendGrid } = require('./utils/mailer');
 const {
   initializeUsersTable,
   initializeUserActivityColumns,
@@ -115,13 +116,13 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`✅ DIGIPASS API running on port ${PORT}`);
+  
+  // Initialize SendGrid for email
+  initSendGrid();
+  
   console.log('[SMTP Debug] Environment loaded:');
   console.log(`  - APP_BASE_URL: ${process.env.APP_BASE_URL || '(missing)'}`);
-  console.log(`  - SMTP_HOST: ${process.env.SMTP_HOST || '(missing)'}`);
-  console.log(`  - SMTP_PORT: ${process.env.SMTP_PORT || '(missing)'}`);
-  console.log(`  - SMTP_SECURE: ${process.env.SMTP_SECURE || '(missing)'}`);
-  console.log(`  - SMTP_USER: ${process.env.SMTP_USER ? 'loaded' : '(missing)'}`);
-  console.log(`  - SMTP_PASS: ${process.env.SMTP_PASS ? 'loaded' : '(missing)'}`);
+  console.log(`  - SENDGRID_API_KEY: ${process.env.SENDGRID_API_KEY ? 'loaded' : '(missing)'}`);
   console.log(`  - EMAIL_FROM: ${process.env.EMAIL_FROM || '(missing)'}`);
   console.log(`Available endpoints:`);
   console.log(`  - POST   /api/auth/register (public)`);
