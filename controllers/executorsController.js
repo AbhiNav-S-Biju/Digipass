@@ -89,6 +89,7 @@ async function addExecutor(req, res) {
     const fallbackVerificationUrl = getExecutorVerificationUrl(verificationToken);
 
     // Send email asynchronously (non-blocking)
+    // If email fails, executor is still created - they can use the fallback URL
     console.log('[Executor Controller] Queuing email to send in background...');
     setImmediate(async () => {
       try {
@@ -103,12 +104,14 @@ async function addExecutor(req, res) {
         console.log(`  - delivered: ${delivery.delivered}`);
         console.log(`  - messageId: ${delivery.messageId || '(none)'}`);
       } catch (mailError) {
-        console.error('[Executor Controller] [Background] Email sending failed');
-        console.error(`  - executor_id: ${executor.executor_id}`);
-        console.error(`  - executor_email: ${executor.executor_email}`);
-        console.error(`  - message: ${mailError.message}`);
-        console.error(`  - code: ${mailError.code || '(none)'}`);
-        // Email error logged but doesn't affect the response
+        // Email failed but executor was created successfully
+        // This is not a critical error - the verification link is still valid
+        console.warn('[Executor Controller] [Background] Email sending failed (non-critical)');
+        console.warn(`  - executor_id: ${executor.executor_id}`);
+        console.warn(`  - executor_email: ${executor.executor_email}`);
+        console.warn(`  - message: ${mailError.message}`);
+        console.warn(`  - code: ${mailError.code || '(none)'}`);
+        console.warn(`  - fallback: verification URL is logged above and available via API response`);
       }
     });
 
@@ -226,6 +229,7 @@ async function resendExecutorVerification(req, res) {
     const fallbackVerificationUrl = getExecutorVerificationUrl(verificationToken);
 
     // Send email asynchronously (non-blocking)
+    // If email fails, executor token is still updated - they can still use the link
     console.log('[Executor Controller] Queuing resend verification email to send in background...');
     setImmediate(async () => {
       try {
@@ -240,12 +244,14 @@ async function resendExecutorVerification(req, res) {
         console.log(`  - delivered: ${delivery.delivered}`);
         console.log(`  - messageId: ${delivery.messageId || '(none)'}`);
       } catch (mailError) {
-        console.error('[Executor Controller] [Background] Resend email failed');
-        console.error(`  - executor_id: ${executor.executor_id}`);
-        console.error(`  - executor_email: ${executor.executor_email}`);
-        console.error(`  - message: ${mailError.message}`);
-        console.error(`  - code: ${mailError.code || '(none)'}`);
-        // Email error logged but doesn't affect the response
+        // Email failed but executor token was updated successfully
+        // This is not a critical error - the verification link is still valid
+        console.warn('[Executor Controller] [Background] Resend email failed (non-critical)');
+        console.warn(`  - executor_id: ${executor.executor_id}`);
+        console.warn(`  - executor_email: ${executor.executor_email}`);
+        console.warn(`  - message: ${mailError.message}`);
+        console.warn(`  - code: ${mailError.code || '(none)'}`);
+        console.warn(`  - fallback: verification URL is logged above and available via API response`);
       }
     });
 
