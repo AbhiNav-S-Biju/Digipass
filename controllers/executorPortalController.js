@@ -206,30 +206,36 @@ async function getExecutorAssets(req, res) {
     }
 
     // Transform assets to ensure consistency
-    const transformedAssets = assetsResult.rows.map(asset => {
-      // If new columns exist
-      if (asset.platform_name) {
-        return {
-          asset_id: asset.asset_id,
-          platform_name: asset.platform_name,
-          category: asset.category,
-          account_identifier: asset.account_identifier,
-          action_type: asset.action_type,
-          last_message: asset.last_message,
-          created_at: asset.created_at
-        };
-      }
-      // If old columns only
-      return {
-        asset_id: asset.asset_id,
-        platform_name: asset.asset_name,
-        category: asset.asset_type,
-        account_identifier: null,
-        action_type: 'pass',
-        last_message: null,
-        created_at: asset.created_at
-      };
-    });
+    const transformedAssets = assetsResult.rows
+      .map(asset => {
+        // If new columns exist
+        if (asset.platform_name) {
+          return {
+            asset_id: asset.asset_id,
+            platform_name: asset.platform_name,
+            category: asset.category,
+            account_identifier: asset.account_identifier,
+            action_type: asset.action_type,
+            last_message: asset.last_message,
+            created_at: asset.created_at
+          };
+        }
+        // If old columns only
+        if (asset.asset_name) {
+          return {
+            asset_id: asset.asset_id,
+            platform_name: asset.asset_name,
+            category: asset.asset_type,
+            account_identifier: null,
+            action_type: 'pass',
+            last_message: null,
+            created_at: asset.created_at
+          };
+        }
+        // Skip completely empty assets
+        return null;
+      })
+      .filter(asset => asset !== null);
 
     return res.status(200).json({
       success: true,
