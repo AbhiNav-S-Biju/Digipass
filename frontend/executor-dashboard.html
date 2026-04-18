@@ -754,43 +754,44 @@
 
             <!-- Step Content -->
             <div class="workflow-content">
+                <!-- Login Credentials Section (at top) -->
+                <div id="credentialsSection" class="credentials-section" style="display: none;">
+                    <div class="credentials-header">
+                        <i class="fas fa-key"></i> Login Credentials
+                    </div>
+                    <div class="credentials-body">
+                        <div class="credential-item">
+                            <label>Username/Email</label>
+                            <div class="credential-input-group">
+                                <input type="text" class="credential-input" id="credUsername" readonly>
+                                <button class="credential-btn" onclick="copyCredential('credUsername')" title="Copy">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="credential-item">
+                            <label>Password</label>
+                            <div class="credential-input-group">
+                                <input type="password" class="credential-input" id="credPassword" readonly>
+                                <button class="credential-btn" onclick="togglePasswordVisibility('credPassword')" title="Show/Hide">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="credential-btn" onclick="copyCredential('credPassword')" title="Copy">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step container -->
                 <div id="stepContainer" class="step-container">
+                    <h6 class="steps-heading"><i class="fas fa-list-check"></i> Steps to Follow</h6>
                     <div class="step-badge" id="stepNumber">1</div>
                     <div class="step-body">
                         <h6 id="stepTitle" class="step-title">Step Title</h6>
                         <p id="stepDescription" class="step-description">Step description goes here</p>
                         <p id="stepAction" class="step-action"><strong>Action:</strong> What to do</p>
-                        
-                        <!-- Login Credentials Section -->
-                        <div id="credentialsSection" class="credentials-section" style="display: none;">
-                            <div class="credentials-header">
-                                <i class="fas fa-key"></i> Login Credentials
-                            </div>
-                            <div class="credentials-body">
-                                <div class="credential-item">
-                                    <label>Username/Email</label>
-                                    <div class="credential-input-group">
-                                        <input type="text" class="credential-input" id="credUsername" readonly>
-                                        <button class="credential-btn" onclick="copyCredential('credUsername')" title="Copy">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="credential-item">
-                                    <label>Password</label>
-                                    <div class="credential-input-group">
-                                        <input type="password" class="credential-input" id="credPassword" readonly>
-                                        <button class="credential-btn" onclick="togglePasswordVisibility('credPassword')" title="Show/Hide">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="credential-btn" onclick="copyCredential('credPassword')" title="Copy">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <div id="stepLinks" class="step-links"></div>
                     </div>
                 </div>
@@ -836,13 +837,13 @@
             top: 20px;
             right: 20px;
             z-index: 99999;  /* Ensure always on top */
-            width: 380px;
-            max-height: 85vh;
+            width: 400px;
+            max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             border-radius: 8px;
             animation: slideInRight 0.3s ease-out;
-            background-color: white;
+            background-color: #f7e7ce;
             border: 2px solid #102c26;
         }
         
@@ -875,7 +876,7 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            padding: 16px;
+            padding: 16px 20px;
             border-bottom: 2px solid #102c26;
             background-color: #f7e7ce;
             cursor: grab;
@@ -888,24 +889,14 @@
             background-color: #e8d5ba;
         }
 
-        .workflow-header::before {
-            content: '⋮⋮';
-            position: absolute;
-            left: 8px;
-            color: #102c26;
-            opacity: 0.5;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-        }
-
         .workflow-title-section {
             flex: 1;
-            padding-left: 8px;
+            padding-left: 0;
         }
 
         .workflow-title {
-            font-size: 1.1rem;
-            font-weight: bold;
+            font-size: 1.2rem;
+            font-weight: 600;
             margin-bottom: 4px;
             color: #102c26;
         }
@@ -919,7 +910,7 @@
         .workflow-close-btn {
             background: none;
             border: none;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             cursor: pointer;
             color: #102c26;
             padding: 0;
@@ -965,28 +956,29 @@
         /* Step Content */
         .workflow-content {
             flex: 1;
-            padding: 16px;
+            padding: 16px 20px;
             overflow-y: auto;
         }
 
         .step-container {
             display: flex;
-            gap: 12px;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .steps-heading {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #102c26;
+            margin-bottom: 12px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .step-badge {
-            min-width: 36px;
-            width: 36px;
-            height: 36px;
-            background-color: #102c26;
-            color: #f7e7ce;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.9rem;
-            flex-shrink: 0;
+            display: none;
         }
 
         .step-body {
@@ -994,8 +986,8 @@
         }
 
         .step-title {
-            font-size: 1rem;
-            font-weight: bold;
+            font-size: 1.05rem;
+            font-weight: 600;
             margin-bottom: 8px;
             color: #102c26;
         }
@@ -1010,29 +1002,31 @@
         .step-action {
             font-size: 0.85rem;
             color: #102c26;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             padding: 8px;
-            background-color: rgba(16, 44, 38, 0.05);
-            border-left: 3px solid #102c26;
+            background-color: #f9f6f1;
             border-radius: 3px;
         }
 
         .step-links {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
+            margin-bottom: 12px;
         }
 
         .step-links a {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
-            padding: 8px 10px;
+            padding: 10px 12px;
             background-color: #102c26;
             color: #f7e7ce;
             border-radius: 4px;
             text-decoration: none;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            font-weight: 500;
             transition: background-color 0.2s;
         }
 
@@ -1043,18 +1037,18 @@
 
         /* Credentials Section */
         .credentials-section {
-            margin-top: 12px;
-            padding: 10px;
+            margin-bottom: 16px;
+            padding: 14px;
             background-color: rgba(16, 44, 38, 0.08);
-            border: 1px solid #102c26;
-            border-radius: 4px;
+            border: 2px solid #102c26;
+            border-radius: 6px;
         }
 
         .credentials-header {
-            font-size: 0.85rem;
-            font-weight: bold;
+            font-size: 0.95rem;
+            font-weight: 600;
             color: #102c26;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -1063,7 +1057,7 @@
         .credentials-body {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
         .credential-item {
@@ -1073,9 +1067,9 @@
         }
 
         .credential-item label {
-            font-size: 0.8rem;
-            color: #555;
-            font-weight: 500;
+            font-size: 0.85rem;
+            color: #102c26;
+            font-weight: 600;
             margin: 0;
         }
 
@@ -1092,6 +1086,7 @@
             font-size: 0.85rem;
             color: #102c26;
             background-color: white;
+            font-family: 'Courier New', monospace;
         }
 
         .credential-input:focus {
@@ -1124,9 +1119,9 @@
 
         /* Checklist */
         .workflow-checklist {
-            padding: 12px 16px;
+            padding: 12px 20px;
             border-top: 1px solid #e0d4c0;
-            border-bottom: 1px solid #e0d4c0;
+            background-color: white;
         }
 
         .workflow-checklist .form-check-input {
@@ -1148,8 +1143,9 @@
         .workflow-controls {
             display: flex;
             gap: 10px;
-            padding: 12px 16px;
+            padding: 12px 20px;
             border-top: 1px solid #e0d4c0;
+            background-color: white;
         }
 
         .nav-spacer {
@@ -1158,10 +1154,10 @@
 
         .btn-nav {
             flex: 1;
-            padding: 8px 12px;
+            padding: 10px 12px;
             border: none;
             border-radius: 4px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 500;
             cursor: pointer;
             display: flex;
@@ -1199,14 +1195,14 @@
 
         /* Complete Button */
         .btn-complete {
-            width: calc(100% - 32px);
-            margin: 12px 16px;
+            width: calc(100% - 40px);
+            margin: 12px 20px;
             padding: 12px;
             background-color: #102c26;
             color: #f7e7ce;
             border: none;
             border-radius: 4px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
