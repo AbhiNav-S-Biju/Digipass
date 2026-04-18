@@ -8,6 +8,40 @@ let executorsState = {
   loaded: false
 };
 
+// Platform icon mapping
+const PLATFORM_ICONS = {
+  'Instagram': 'fab fa-instagram',
+  'Facebook': 'fab fa-facebook',
+  'Twitter': 'fab fa-twitter',
+  'LinkedIn': 'fab fa-linkedin',
+  'TikTok': 'fab fa-tiktok',
+  'Snapchat': 'fab fa-snapchat',
+  'Discord': 'fab fa-discord',
+  'Gmail': 'fas fa-envelope',
+  'Outlook': 'fas fa-envelope',
+  'Yahoo Mail': 'fas fa-envelope',
+  'ProtonMail': 'fas fa-envelope',
+  'Apple Mail': 'fas fa-envelope',
+  'PayPal': 'fab fa-paypal',
+  'Amazon': 'fab fa-amazon',
+  'Banking App': 'fas fa-university',
+  'Stripe': 'fab fa-stripe-s',
+  'Square': 'fas fa-square',
+  'Google Drive': 'fab fa-google-drive',
+  'Dropbox': 'fab fa-dropbox',
+  'OneDrive': 'fas fa-cloud',
+  'iCloud': 'fas fa-cloud',
+  'Netflix': 'fas fa-tv',
+  'Spotify': 'fab fa-spotify',
+  'Disney+': 'fas fa-play-circle',
+  'Hulu': 'fas fa-play-circle',
+  'Other': 'fas fa-lock'
+};
+
+function getPlatformIcon(platformName) {
+  return PLATFORM_ICONS[platformName] || 'fas fa-lock';
+}
+
 // Check authentication on page load
 document.addEventListener('DOMContentLoaded', () => {
   if (!checkAuth()) return;
@@ -457,13 +491,20 @@ function renderAssets() {
       'last_message': 'Final Message'
     }[asset.action_type] || asset.action_type;
 
+    const platformIcon = getPlatformIcon(asset.platform_name);
+
     return `
     <article class="asset-card mb-3">
       <div class="asset-card-header d-flex justify-content-between align-items-start mb-2">
-        <div>
-          <h4 class="mb-1">${escapeHtml(asset.platform_name)}</h4>
-          <p class="text-muted small mb-2">${escapeHtml(asset.account_identifier)}</p>
-          <span class="badge bg-secondary">${asset.category}</span>
+        <div class="d-flex gap-2 align-items-start flex-grow-1">
+          <div style="font-size: 1.5rem; color: #102c26; width: 40px; text-align: center;">
+            <i class="${platformIcon}"></i>
+          </div>
+          <div>
+            <h4 class="mb-1">${escapeHtml(asset.platform_name)}</h4>
+            <p class="text-muted small mb-2">${escapeHtml(asset.account_identifier)}</p>
+            <span class="badge bg-secondary">${asset.category}</span>
+          </div>
         </div>
         <button type="button" class="btn btn-sm btn-outline-danger" data-delete-id="${asset.asset_id}">Delete</button>
       </div>
