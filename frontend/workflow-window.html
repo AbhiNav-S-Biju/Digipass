@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIGIPASS - Workflow Instructions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #f7e7ce;
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .workflow-container {
+            display: flex;
+            height: 100vh;
+            gap: 0;
+        }
+        
+        .instructions-panel {
+            width: 50%;
+            background-color: #f7e7ce;
+            color: #102c26;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 3px solid #102c26;
+        }
+        
+        .platform-panel {
+            width: 50%;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .instructions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #102c26;
+        }
+        
+        .instructions-header h4 {
+            margin: 0;
+            color: #102c26;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #102c26;
+        }
+        
+        .close-btn:hover {
+            color: #0a1f1a;
+        }
+        
+        .credentials-box {
+            background-color: rgba(16, 44, 38, 0.08);
+            border: 2px solid #102c26;
+            border-radius: 6px;
+            padding: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .credentials-box h5 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #102c26;
+            margin-bottom: 10px;
+        }
+        
+        .credential-field {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .credential-field strong {
+            color: #102c26;
+            display: block;
+            margin-bottom: 3px;
+        }
+        
+        .credential-value {
+            background: white;
+            padding: 6px 8px;
+            border-radius: 3px;
+            border: 1px solid #102c26;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .steps-container {
+            margin-top: 20px;
+        }
+        
+        .steps-container h5 {
+            color: #102c26;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+        
+        .step-item {
+            background: white;
+            border: 1px solid #e0d4c0;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .step-number {
+            background: #102c26;
+            color: #f7e7ce;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            color: #102c26;
+            margin: 0;
+        }
+        
+        .step-description {
+            font-size: 0.9rem;
+            color: #555;
+            margin: 6px 0;
+            line-height: 1.4;
+        }
+        
+        .step-action {
+            font-size: 0.85rem;
+            color: #102c26;
+            background: #f9f6f1;
+            padding: 6px;
+            border-radius: 3px;
+            margin: 0;
+        }
+        
+        .platform-panel h3 {
+            color: #102c26;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .open-platform-btn {
+            background-color: #102c26;
+            color: #f7e7ce;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .open-platform-btn:hover {
+            background-color: #0a1f1a;
+            color: #f7e7ce;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #102c26;
+        }
+        
+        .error-msg {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 12px 0;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="workflow-container">
+        <!-- LEFT: Instructions -->
+        <div class="instructions-panel">
+            <div class="instructions-header">
+                <h4><i class="fas fa-tasks"></i> <span id="platformName">Instructions</span></h4>
+                <button class="close-btn" onclick="window.close()" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="content">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Loading instructions...
+                </div>
+            </div>
+        </div>
+        
+        <!-- RIGHT: Platform Link -->
+        <div class="platform-panel">
+            <h3>Ready to get started?</h3>
+            <p style="text-align: center; color: #555; margin-bottom: 30px;">
+                Click the button below to open <span id="platformNameRight" style="font-weight: 600; color: #102c26;">Platform</span> in a new tab
+            </p>
+            <button class="open-platform-btn" id="openPlatformBtn" onclick="openPlatform()">
+                <i class="fas fa-external-link-alt"></i> 
+                <span id="buttonText">Open Platform</span>
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'https://digipass-3l63.onrender.com/api';
+        let platformUrl = '';
+        let platformName = '';
+        
+        async function loadInstructions() {
+            try {
+                const assetId = sessionStorage.getItem('digipass_asset_id');
+                const token = sessionStorage.getItem('digipass_token');
+                const url = sessionStorage.getItem('digipass_platform_url');
+                platformName = sessionStorage.getItem('digipass_platform_name') || 'Platform';
+                platformUrl = url;
+                
+                document.getElementById('platformName').textContent = platformName;
+                document.getElementById('platformNameRight').textContent = platformName;
+                document.getElementById('buttonText').textContent = `Open ${platformName}`;
+                
+                if (!assetId || !token) {
+                    document.getElementById('content').innerHTML = '<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: Missing asset or token. Please close and try again.</div>';
+                    return;
+                }
+                
+                const response = await fetch(`${API_URL}/executor/asset-instructions/${assetId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load instructions');
+                }
+                
+                const data = await response.json();
+                const asset = data.data.asset;
+                const instructions = data.data.instructions;
+                
+                let html = '';
+                
+                // Add credentials if available
+                if (asset.account_password) {
+                    html += `
+                        <div class="credentials-box">
+                            <h5><i class="fas fa-key"></i> Login Credentials</h5>
+                            <div class="credential-field">
+                                <strong>Username / Email</strong>
+                                <div class="credential-value">${escapeHtml(asset.account_identifier)}</div>
+                            </div>
+                            <div class="credential-field">
+                                <strong>Password</strong>
+                                <div class="credential-value">${escapeHtml(asset.account_password)}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Add instructions
+                html += '<div class="steps-container"><h5><i class="fas fa-list"></i> Steps to Follow</h5>';
+                instructions.forEach((step, i) => {
+                    html += `
+                        <div class="step-item">
+                            <div class="step-header">
+                                <div class="step-number">${i + 1}</div>
+                                <h6 class="step-title">${escapeHtml(step.title)}</h6>
+                            </div>
+                            <p class="step-description">${escapeHtml(step.description)}</p>
+                            <p class="step-action"><strong>Action:</strong> ${escapeHtml(step.action)}</p>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                
+                document.getElementById('content').innerHTML = html;
+                
+            } catch (e) {
+                console.error('Error:', e);
+                document.getElementById('content').innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: ${e.message}</div>`;
+            }
+        }
+        
+        function openPlatform() {
+            if (platformUrl) {
+                window.open(platformUrl, '_blank', 'noopener,noreferrer');
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Load when page opens
+        setTimeout(loadInstructions, 500);
+    </script>
+</body>
+</html>
