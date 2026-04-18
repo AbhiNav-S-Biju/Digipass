@@ -6,7 +6,7 @@ const {
   updateInterval,
   getExecutorNotifications
 } = require('../controllers/deadMansSwitchController');
-const { authenticateUser } = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
 
 /**
  * Dead Man's Switch Routes
@@ -14,15 +14,15 @@ const { authenticateUser } = require('../middleware/auth');
  */
 
 // Get current dead man's switch status
-router.get('/status', authenticateUser, getStatus);
+router.get('/status', authenticateToken, getStatus);
 
 // Manual check-in
-router.post('/check-in', authenticateUser, checkIn);
+router.post('/check-in', authenticateToken, checkIn);
 
 // Update check interval
-router.put('/interval', authenticateUser, updateInterval);
+router.put('/interval', authenticateToken, updateInterval);
 
 // Get executor notifications/access status
-router.get('/executor-notifications', authenticateUser, getExecutorNotifications);
+router.get('/executor-notifications', authenticateToken, getExecutorNotifications);
 
 module.exports = router;

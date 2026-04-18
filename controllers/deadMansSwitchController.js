@@ -7,7 +7,7 @@ const { DEFAULT_CHECK_INTERVAL_DAYS } = require('../utils/deadMansSwitchSchedule
  */
 const getStatus = async (req, res) => {
   try {
-    const userId = req.user.user_id;
+    const userId = req.userId;
 
     const { rows } = await pool.query(
       `SELECT 
@@ -65,7 +65,7 @@ const getStatus = async (req, res) => {
  */
 const checkIn = async (req, res) => {
   try {
-    const userId = req.user.user_id;
+    const userId = req.userId;
 
     // Update the check-in timestamp and reset status to active
     const { rows } = await pool.query(
@@ -118,7 +118,7 @@ const checkIn = async (req, res) => {
  */
 const updateInterval = async (req, res) => {
   try {
-    const userId = req.user.user_id;
+    const userId = req.userId;
     const { check_interval_days } = req.body;
 
     // Validate input
@@ -172,7 +172,7 @@ const updateInterval = async (req, res) => {
  */
 const getExecutorNotifications = async (req, res) => {
   try {
-    const userId = req.user.user_id;
+    const userId = req.userId;
 
     const { rows } = await pool.query(
       `SELECT 
