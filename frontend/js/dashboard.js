@@ -68,32 +68,43 @@ function initDashboard() {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const pageName = link.dataset.page;
-      
-      // Remove active class from all links and pages
-      navLinks.forEach(l => l.classList.remove('active'));
-      pages.forEach(p => p.classList.remove('active'));
-
-      // Add active class to clicked link and corresponding page
-      link.classList.add('active');
-      const targetPage = document.getElementById(`${pageName}Page`);
-      if (targetPage) {
-        targetPage.classList.add('active');
-      }
-
-      // Close navbar menu on mobile using Bootstrap method
-      const navbarToggler = document.querySelector('.navbar-toggler');
-      const navbarCollapse = document.getElementById('navbarNav');
-      
-      // Check if navbar is shown (mobile view) and close it
-      if (navbarToggler && navbarCollapse && navbarCollapse.classList.contains('show')) {
-        // Click the toggler to close the menu
-        navbarToggler.click();
-      }
-
-      // Load page data
-      loadPageData(pageName);
+      navigateToPage(pageName);
     });
   });
+}
+
+// Navigate to a specific page
+function navigateToPage(pageName) {
+  const navLinks = document.querySelectorAll('a[data-page]');
+  const pages = document.querySelectorAll('.page');
+
+  // Remove active class from all links and pages
+  navLinks.forEach(l => l.classList.remove('active'));
+  pages.forEach(p => p.classList.remove('active'));
+
+  // Find and activate the link and page for this pageName
+  const activeLink = document.querySelector(`a[data-page="${pageName}"]`);
+  if (activeLink) {
+    activeLink.classList.add('active');
+  }
+
+  const targetPage = document.getElementById(`${pageName}Page`);
+  if (targetPage) {
+    targetPage.classList.add('active');
+  }
+
+  // Close navbar menu on mobile using Bootstrap method
+  const navbarToggler = document.querySelector('.navbar-toggler');
+  const navbarCollapse = document.getElementById('navbarNav');
+  
+  // Check if navbar is shown (mobile view) and close it
+  if (navbarToggler && navbarCollapse && navbarCollapse.classList.contains('show')) {
+    // Click the toggler to close the menu
+    navbarToggler.click();
+  }
+
+  // Load page data
+  loadPageData(pageName);
 }
 
 // Load page data
