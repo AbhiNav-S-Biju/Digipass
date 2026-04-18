@@ -1,21 +1,25 @@
 const pool = require('../db');
-const { encryptData } = require('../utils/crypto');
 
-const VALID_ASSET_TYPES = [
-  'email',
-  'bank_account',
-  'social_media',
-  'crypto',
-  'password_manager',
-  'legal_doc',
-  'other'
-];
+// Valid platforms mapped to categories
+const PLATFORM_CATEGORIES = {
+  social: ['Instagram', 'Facebook', 'Twitter', 'LinkedIn', 'TikTok', 'Snapchat', 'Discord'],
+  email: ['Gmail', 'Outlook', 'Yahoo Mail', 'ProtonMail', 'Apple Mail'],
+  finance: ['PayPal', 'Amazon', 'Banking App', 'Stripe', 'Square'],
+  storage: ['Google Drive', 'Dropbox', 'OneDrive', 'iCloud'],
+  entertainment: ['Netflix', 'Spotify', 'Disney+', 'Hulu'],
+  other: ['Other']
+};
+
+const ACTION_TYPES = ['pass', 'delete', 'last_message'];
 
 function buildAssetResponse(asset) {
   return {
     asset_id: asset.asset_id,
-    asset_name: asset.asset_name,
-    asset_type: asset.asset_type,
+    platform_name: asset.platform_name,
+    category: asset.category,
+    account_identifier: asset.account_identifier,
+    action_type: asset.action_type,
+    last_message: asset.last_message,
     created_at: asset.created_at
   };
 }
@@ -24,32 +28,43 @@ function getAuthenticatedUserId(req) {
   return req.userId;
 }
 
+// Validate platform exists in categories
+function getValidPlatforms() {
+  return Object.values(PLATFORM_CATEGORIES).flat();
+}
+
 async function addAsset(req, res) {
   try {
     const userId = getAuthenticatedUserId(req);
-    const { asset_name, asset_type, asset_data } = req.body;
+    const { platform_name, category, account_identifier, action_type, last_message } = req.body;
 
-    if (!asset_name || !asset_type || asset_data === undefined) {
+    // Validation
+    if (!platform_name || !category || !account_identifier || !action_type) {
       return res.status(400).json({
         success: false,
-        message: 'asset_name, asset_type, and asset_data are required'
+        message: 'platform_name, category, account_identifier, and action_type are required'
       });
     }
 
-    if (!VALID_ASSET_TYPES.includes(asset_type)) {
+    if (!ACTION_TYPES.includes(action_type)) {
       return res.status(400).json({
         success: false,
-        message: `Invalid asset_type. Valid values: ${VALID_ASSET_TYPES.join(', ')}`
+        message: `Invalid action_type. Valid values: ${ACTION_TYPES.join(', ')}`
       });
     }
 
-    const encrypted_data = JSON.stringify(encryptData(asset_data));
+    if (action_type === 'last_message' && !last_message) {
+      return res.status(400).json({
+        success: false,
+        message: 'last_message is required when action_type is "last_message"'
+      });
+    }
 
     const { rows } = await pool.query(
-      `INSERT INTO digital_assets (user_id, asset_name, asset_type, encrypted_data, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, NOW(), NOW())
-       RETURNING asset_id, asset_name, asset_type, created_at`,
-      [userId, asset_name.trim(), asset_type, encrypted_data]
+      `INSERT INTO digital_assets (user_id, platform_name, category, account_identifier, action_type, last_message, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+       RETURNING asset_id, platform_name, category, account_identifier, action_type, last_message, created_at`,
+      [userId, platform_name.trim(), category, account_identifier.trim(), action_type, last_message || null]
     );
 
     return res.status(201).json({
@@ -71,7 +86,7 @@ async function getAssets(req, res) {
     const userId = getAuthenticatedUserId(req);
 
     const { rows } = await pool.query(
-      `SELECT asset_id, asset_name, asset_type, created_at
+      `SELECT asset_id, platform_name, category, account_identifier, action_type, last_message, created_at
        FROM digital_assets
        WHERE user_id = $1
        ORDER BY created_at DESC`,
@@ -137,5 +152,7 @@ module.exports = {
   addAsset,
   getAssets,
   deleteAsset,
-  VALID_ASSET_TYPES
+  PLATFORM_CATEGORIES,
+  ACTION_TYPES,
+  getValidPlatforms
 };

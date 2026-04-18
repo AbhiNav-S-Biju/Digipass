@@ -182,6 +182,12 @@ function renderWillContent(assets, executors) {
   const willContent = document.getElementById('willContent');
   let content = '';
 
+  const actionLabels = {
+    'pass': 'Pass to Executor',
+    'delete': 'Delete Account',
+    'last_message': 'Final Message'
+  };
+
   // Assets Section
   content += '<div class="will-section">';
   content += '<h4>📋 Digital Assets (' + assets.length + ')</h4>';
@@ -191,8 +197,12 @@ function renderWillContent(assets, executors) {
   } else {
     assets.forEach(asset => {
       content += '<div class="will-item">';
-      content += '<div class="will-item-name">' + escapeHtml(asset.asset_name) + '</div>';
-      content += '<div class="will-item-meta">Type: ' + formatAssetType(asset.asset_type) + '</div>';
+      content += '<div class="will-item-name">' + escapeHtml(asset.platform_name || 'Unknown') + '</div>';
+      content += '<div class="will-item-meta">Account: ' + escapeHtml(asset.account_identifier || 'N/A') + '</div>';
+      content += '<div class="will-item-meta">Action: ' + (actionLabels[asset.action_type] || asset.action_type) + '</div>';
+      if (asset.last_message) {
+        content += '<div class="will-item-meta small">Message: ' + escapeHtml(asset.last_message.substring(0, 75)) + (asset.last_message.length > 75 ? '...' : '') + '</div>';
+      }
       content += '<div class="will-item-meta">Added: ' + formatAssetDate(asset.created_at) + '</div>';
       content += '</div>';
     });
@@ -306,10 +316,23 @@ function loadSwitchData() {
 function bindAssetActions() {
   const assetForm = document.getElementById('assetForm');
   const refreshAssetsBtn = document.getElementById('refreshAssetsBtn');
+  const messageContainer = document.getElementById('messageContainer');
+  const actionTypeRadios = document.querySelectorAll('input[name="actionType"]');
 
   assetForm.addEventListener('submit', handleAssetSubmit);
   refreshAssetsBtn.addEventListener('click', () => {
     loadAssetsData();
+  });
+
+  // Show/hide message field based on action type selection
+  actionTypeRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      if (e.target.value === 'last_message') {
+        messageContainer.style.display = 'block';
+      } else {
+        messageContainer.style.display = 'none';
+      }
+    });
   });
 
   document.getElementById('assetsList').addEventListener('click', handleAssetDelete);
@@ -329,20 +352,18 @@ async function handleAssetSubmit(event) {
   event.preventDefault();
 
   const submitButton = document.getElementById('assetSubmitBtn');
-  const assetName = document.getElementById('assetName').value.trim();
-  const assetType = document.getElementById('assetType').value;
-  const assetDataInput = document.getElementById('assetData').value.trim();
+  const platformName = document.getElementById('platformName').value.trim();
+  const accountIdentifier = document.getElementById('accountIdentifier').value.trim();
+  const actionType = document.querySelector('input[name="actionType"]:checked')?.value;
+  const lastMessage = document.getElementById('lastMessage').value.trim();
 
-  if (!assetName || !assetType || !assetDataInput) {
-    showNotification('Please fill in all asset fields.', 'error');
+  if (!platformName || !accountIdentifier || !actionType) {
+    showNotification('Please fill in all required fields.', 'error');
     return;
   }
 
-  let assetData;
-  try {
-    assetData = JSON.parse(assetDataInput);
-  } catch (error) {
-    showNotification('Asset data must be valid JSON.', 'error');
+  if (actionType === 'last_message' && !lastMessage) {
+    showNotification('Please write your final message.', 'error');
     return;
   }
 
@@ -350,10 +371,25 @@ async function handleAssetSubmit(event) {
   submitButton.textContent = 'Saving...';
 
   try {
+    // Determine category based on platform
+    const categoryMap = {
+      'Instagram': 'social', 'Facebook': 'social', 'Twitter': 'social', 'LinkedIn': 'social',
+      'TikTok': 'social', 'Snapchat': 'social', 'Discord': 'social',
+      'Gmail': 'email', 'Outlook': 'email', 'Yahoo Mail': 'email', 'ProtonMail': 'email', 'Apple Mail': 'email',
+      'PayPal': 'finance', 'Amazon': 'finance', 'Banking App': 'finance', 'Stripe': 'finance', 'Square': 'finance',
+      'Google Drive': 'storage', 'Dropbox': 'storage', 'OneDrive': 'storage', 'iCloud': 'storage',
+      'Netflix': 'entertainment', 'Spotify': 'entertainment', 'Disney+': 'entertainment', 'Hulu': 'entertainment',
+      'Other': 'other'
+    };
+
+    const category = categoryMap[platformName] || 'other';
+
     const response = await apiCall('/assets', 'POST', {
-      asset_name: assetName,
-      asset_type: assetType,
-      asset_data: assetData
+      platform_name: platformName,
+      category: category,
+      account_identifier: accountIdentifier,
+      action_type: actionType,
+      last_message: actionType === 'last_message' ? lastMessage : null
     });
 
     assetsState.items.unshift(response.data);
@@ -362,12 +398,13 @@ async function handleAssetSubmit(event) {
     updateAssetCount();
 
     event.target.reset();
+    document.getElementById('messageContainer').style.display = 'none';
     showNotification('Asset added successfully.', 'success');
   } catch (error) {
     showNotification(error.message || 'Failed to add asset', 'error');
   } finally {
     submitButton.disabled = false;
-    submitButton.textContent = 'Save Asset';
+    submitButton.textContent = 'Add Asset';
   }
 }
 
@@ -406,18 +443,39 @@ function renderAssets() {
   }
 
   assetsStatus.textContent = `${assetsState.items.length} asset(s) saved`;
-  assetsList.innerHTML = assetsState.items.map((asset) => `
-    <article class="asset-card">
-      <div class="asset-card-header">
+  
+  const actionEmojis = {
+    'pass': '📤',
+    'delete': '🗑️',
+    'last_message': '💬'
+  };
+
+  assetsList.innerHTML = assetsState.items.map((asset) => {
+    const actionLabel = {
+      'pass': 'Pass to Executor',
+      'delete': 'Delete Account',
+      'last_message': 'Final Message'
+    }[asset.action_type] || asset.action_type;
+
+    return `
+    <article class="asset-card mb-3">
+      <div class="asset-card-header d-flex justify-content-between align-items-start mb-2">
         <div>
-          <h4>${escapeHtml(asset.asset_name)}</h4>
-          <p class="asset-type">${formatAssetType(asset.asset_type)}</p>
+          <h4 class="mb-1">${escapeHtml(asset.platform_name)}</h4>
+          <p class="text-muted small mb-2">${escapeHtml(asset.account_identifier)}</p>
+          <span class="badge bg-secondary">${asset.category}</span>
         </div>
-        <button type="button" class="danger-btn" data-delete-id="${asset.asset_id}">Delete</button>
+        <button type="button" class="btn btn-sm btn-outline-danger" data-delete-id="${asset.asset_id}">Delete</button>
       </div>
-      <p class="asset-date">Added ${formatAssetDate(asset.created_at)}</p>
+      <div class="d-flex align-items-center gap-2 mt-2">
+        <span>${actionEmojis[asset.action_type] || '📋'}</span>
+        <span class="fw-500">${actionLabel}</span>
+      </div>
+      ${asset.last_message ? `<div class="alert alert-info small mt-2 mb-0"><strong>Message:</strong> ${escapeHtml(asset.last_message.substring(0, 100))}${asset.last_message.length > 100 ? '...' : ''}</div>` : ''}
+      <p class="small text-muted mt-2 mb-0">Added ${formatAssetDate(asset.created_at)}</p>
     </article>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function updateAssetCount() {

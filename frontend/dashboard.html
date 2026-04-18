@@ -474,38 +474,96 @@
         <section id="assetsPage" class="page">
             <div class="page-header mb-4">
                 <h2>Digital Assets</h2>
-                <p>Manage and organize your digital properties</p>
+                <p>Manage accounts and decide what happens to them after you</p>
             </div>
             <div class="row g-4">
                 <!-- Add Asset Form -->
                 <div class="col-12 col-lg-6">
                     <div class="card">
                         <div class="card-body">
-                            <h3 class="card-title mb-3">Add Asset</h3>
+                            <h3 class="card-title mb-3">Add Digital Asset</h3>
                             <form id="assetForm">
+                                <!-- Platform Selection -->
                                 <div class="mb-3">
-                                    <label for="assetName" class="form-label">Asset Name</label>
-                                    <input type="text" class="form-control" id="assetName" name="assetName" placeholder="e.g. Gmail Account" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="assetType" class="form-label">Asset Type</label>
-                                    <select class="form-select" id="assetType" name="assetType" required>
-                                        <option value="">Select asset type</option>
-                                        <option value="email">Email</option>
-                                        <option value="bank_account">Bank Account</option>
-                                        <option value="social_media">Social Media</option>
-                                        <option value="crypto">Crypto</option>
-                                        <option value="password_manager">Password Manager</option>
-                                        <option value="legal_doc">Legal Document</option>
-                                        <option value="other">Other</option>
+                                    <label for="platformName" class="form-label">Platform/Service</label>
+                                    <select class="form-select" id="platformName" name="platformName" required>
+                                        <option value="">Choose a platform...</option>
+                                        <optgroup label="Social Media">
+                                            <option value="Instagram">Instagram</option>
+                                            <option value="Facebook">Facebook</option>
+                                            <option value="Twitter">Twitter (X)</option>
+                                            <option value="LinkedIn">LinkedIn</option>
+                                            <option value="TikTok">TikTok</option>
+                                            <option value="Snapchat">Snapchat</option>
+                                            <option value="Discord">Discord</option>
+                                        </optgroup>
+                                        <optgroup label="Email">
+                                            <option value="Gmail">Gmail</option>
+                                            <option value="Outlook">Outlook</option>
+                                            <option value="Yahoo Mail">Yahoo Mail</option>
+                                            <option value="ProtonMail">ProtonMail</option>
+                                            <option value="Apple Mail">Apple Mail</option>
+                                        </optgroup>
+                                        <optgroup label="Finance & Shopping">
+                                            <option value="PayPal">PayPal</option>
+                                            <option value="Amazon">Amazon</option>
+                                            <option value="Banking App">Banking App</option>
+                                            <option value="Stripe">Stripe</option>
+                                            <option value="Square">Square</option>
+                                        </optgroup>
+                                        <optgroup label="Storage & Cloud">
+                                            <option value="Google Drive">Google Drive</option>
+                                            <option value="Dropbox">Dropbox</option>
+                                            <option value="OneDrive">OneDrive</option>
+                                            <option value="iCloud">iCloud</option>
+                                        </optgroup>
+                                        <optgroup label="Entertainment">
+                                            <option value="Netflix">Netflix</option>
+                                            <option value="Spotify">Spotify</option>
+                                            <option value="Disney+">Disney+</option>
+                                            <option value="Hulu">Hulu</option>
+                                        </optgroup>
+                                        <optgroup label="Other">
+                                            <option value="Other">Other Service</option>
+                                        </optgroup>
                                     </select>
                                 </div>
+
+                                <!-- Account Identifier -->
                                 <div class="mb-3">
-                                    <label for="assetData" class="form-label">Asset Data</label>
-                                    <textarea class="form-control" id="assetData" name="assetData" rows="5" placeholder='{"username":"name@example.com","notes":"Recovery details"}' required></textarea>
-                                    <small class="text-muted d-block mt-2">Enter valid JSON. This data is encrypted before storage.</small>
+                                    <label for="accountIdentifier" class="form-label">Email or Username</label>
+                                    <input type="text" class="form-control" id="accountIdentifier" name="accountIdentifier" placeholder="your@email.com or username" required>
                                 </div>
-                                <button type="submit" id="assetSubmitBtn" class="btn btn-primary w-100">Save Asset</button>
+
+                                <!-- Action Type Selection -->
+                                <div class="mb-3">
+                                    <label class="form-label">After You: What Should Happen?</label>
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="actionType" id="actionPass" value="pass" required>
+                                        <label class="btn btn-outline-primary" for="actionPass">
+                                            📤 Pass to Executor
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="actionType" id="actionDelete" value="delete" required>
+                                        <label class="btn btn-outline-primary" for="actionDelete">
+                                            🗑️ Delete Account
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="actionType" id="actionMessage" value="last_message" required>
+                                        <label class="btn btn-outline-primary" for="actionMessage">
+                                            💬 Final Message
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Conditional Message Field -->
+                                <div class="mb-3" id="messageContainer" style="display: none;">
+                                    <label for="lastMessage" class="form-label">Your Final Message (optional)</label>
+                                    <textarea class="form-control" id="lastMessage" name="lastMessage" rows="3" placeholder="Write a final message to your loved ones..."></textarea>
+                                    <small class="text-muted d-block mt-2">This message will be shared with executors or account heirs.</small>
+                                </div>
+
+                                <button type="submit" id="assetSubmitBtn" class="btn btn-primary w-100">Add Asset</button>
                             </form>
                         </div>
                     </div>
