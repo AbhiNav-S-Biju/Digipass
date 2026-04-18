@@ -325,6 +325,10 @@
                 const assets = data.assets || (data.data && data.data.assets) || [];
                 console.log('[Executor Dashboard] Assets to render:', assets);
                 console.log('[Executor Dashboard] Assets count:', assets.length);
+                if (assets.length > 0) {
+                    console.log('[Executor Dashboard] First asset object:', JSON.stringify(assets[0], null, 2));
+                    console.log('[Executor Dashboard] Asset keys:', Object.keys(assets[0]));
+                }
 
                 if (assets && assets.length > 0) {
                     const assetsList = document.getElementById('assetsList');
@@ -364,6 +368,9 @@
                             </div>
                         `;
                     }).join('');
+                    console.log('[Executor Dashboard] HTML inserted into assetsList, innerHTML length:', assetsList.innerHTML.length);
+                    console.log('[Executor Dashboard] assetsList element exists?', !!assetsList);
+                    console.log('[Executor Dashboard] assetsList children count after render:', assetsList.children.length);
                     document.getElementById('emptyState').classList.add('d-none');
                 } else {
                     console.log('[Executor Dashboard] No assets found, showing empty state');
