@@ -262,6 +262,8 @@
         </div>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
         const API_URL = 'https://digipass-3l63.onrender.com/api';
         let platformUrl = '';
@@ -276,28 +278,19 @@
         
         async function loadInstructions() {
             try {
-                // Get session data
                 const assetId = sessionStorage.getItem('digipass_asset_id');
                 const token = sessionStorage.getItem('digipass_token');
                 const url = sessionStorage.getItem('digipass_platform_url');
                 platformName = sessionStorage.getItem('digipass_platform_name') || 'Platform';
                 platformUrl = url;
                 
-                // Safely set title - check element exists
-                try {
-                    const titleEl = document.getElementById('platformName');
-                    if (titleEl) {
-                        titleEl.textContent = platformName;
-                    }
-                } catch (e) {
-                    console.warn('Could not set title:', e);
-                }
+                // Safely set title
+                const titleEl = document.getElementById('platformName');
+                if (titleEl) titleEl.textContent = platformName;
                 
                 if (!assetId || !token) {
                     const contentEl = document.getElementById('content');
-                    if (contentEl) {
-                        contentEl.innerHTML = '<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: Missing asset or token. Please close and try again.</div>';
-                    }
+                    if (contentEl) contentEl.innerHTML = '<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: Missing asset or token.</div>';
                     return;
                 }
                 
@@ -305,41 +298,29 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
-                // Handle 304 Not Modified
                 if (response.status === 304) {
-                    throw new Error('Cached response - please try again or refresh the page');
+                    throw new Error('Cached response - refresh and try again');
                 }
                 
                 if (!response.ok) {
-                    const errorData = await response.text();
-                    console.error('API Error:', response.status, errorData);
-                    throw new Error(`Failed to load instructions (${response.status}): ${errorData}`);
+                    throw new Error(`API Error ${response.status}`);
                 }
                 
                 const data = await response.json();
-                console.log('API Response:', data);
-                
-                // Validate response structure
                 if (!data.success || !data.data || !data.data.instructions) {
-                    console.error('Invalid response structure:', data);
-                    throw new Error('Invalid response structure from server');
+                    throw new Error('Invalid response from server');
                 }
                 
                 const asset = data.data.asset;
                 const instructionsObj = data.data.instructions;
-                
-                // Instructions is an object with steps property
                 let instructions = instructionsObj.steps || instructionsObj;
                 
-                // Additional validation
                 if (!Array.isArray(instructions)) {
-                    console.error('Instructions is not an array:', instructions, 'Full object:', instructionsObj);
-                    throw new Error('Instructions data is invalid - expected array');
+                    throw new Error('Instructions data is invalid');
                 }
                 
                 let html = '';
                 
-                // Add credentials if available
                 if (asset && asset.account_password) {
                     html += `
                         <div class="credentials-box">
@@ -356,7 +337,6 @@
                     `;
                 }
                 
-                // Add instructions
                 html += '<div class="steps-container"><h5><i class="fas fa-list"></i> Steps to Follow</h5>';
                 instructions.forEach((step, i) => {
                     html += `
@@ -373,30 +353,17 @@
                 html += '</div>';
                 
                 const contentEl = document.getElementById('content');
-                if (contentEl) {
-                    contentEl.innerHTML = html;
-                }
+                if (contentEl) contentEl.innerHTML = html;
                 
             } catch (e) {
-                console.error('Full error:', e);
-                try {
-                    const contentEl = document.getElementById('content');
-                    if (contentEl) {
-                        contentEl.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: ${escapeHtml(e.message)}</div>`;
-                    }
-                } catch (displayError) {
-                    console.error('Could not display error:', displayError);
-                }
+                console.error('Error:', e);
+                const contentEl = document.getElementById('content');
+                if (contentEl) contentEl.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> ${escapeHtml(e.message)}</div>`;
             }
         }
         
-        // Load when document is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadInstructions);
-        } else {
-            // DOM already loaded
-            setTimeout(loadInstructions, 200);
-        }
+        // Run immediately since this script is at the end of body
+        loadInstructions();
     </script>
 </body>
 </html>
