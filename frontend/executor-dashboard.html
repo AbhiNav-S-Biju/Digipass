@@ -909,11 +909,20 @@
             return text.replace(/[&<>"']/g, m => map[m]);
         }
 
+        // Global state for workflow steps
+        let workflowState = {
+            currentStep: 0,
+            steps: [],
+            assetId: null,
+            asset: null,
+            user: null,
+            instructions: null
+        };
+
         // Open asset instructions in workflow popup
         async function openAssetInstructions(assetId) {
             const popup = document.getElementById('workflowPopup');
             const stepContainer = document.getElementById('stepContainer');
-            const credentialsSection = document.getElementById('credentialsSection');
             
             // Show loading state
             popup.style.display = 'block';
@@ -946,101 +955,148 @@
                 document.getElementById('workflowTitle').textContent = asset.platform_name;
                 document.getElementById('workflowAccount').textContent = `Account: ${escapeHtml(asset.account_identifier)}`;
 
-                // Build step content
-                let stepHTML = '';
-                
-                // First step - overview
-                stepHTML += `
-                    <div class="step-header-section">
-                        <div class="step-badge">1</div>
-                        <div style="flex: 1;">
-                            <h6 class="step-title">Account Overview</h6>
-                            <p class="step-description">Here's what you need to know about this account</p>
-                        </div>
-                    </div>
-                    <div style="background-color: var(--sand); padding: 14px; border-radius: 10px; margin-bottom: 16px;">
-                        <p style="font-size: 12.5px; color: var(--text-dark); margin: 0 0 8px 0;"><strong>Platform:</strong> ${escapeHtml(asset.platform_name)}</p>
-                        <p style="font-size: 12.5px; color: var(--text-dark); margin: 0 0 8px 0;"><strong>Username/Email:</strong> ${escapeHtml(asset.account_identifier)}</p>
-                        <p style="font-size: 12.5px; color: var(--text-dark); margin: 0 0 8px 0;"><strong>Registered Email:</strong> ${escapeHtml(user.email)}</p>
-                        <p style="font-size: 12.5px; color: var(--text-dark); margin: 0;"><strong>Action:</strong> ${instructions.overview.action}</p>
-                    </div>
-                `;
+                // Build steps array
+                workflowState.steps = [];
+                workflowState.assetId = assetId;
+                workflowState.asset = asset;
+                workflowState.user = user;
+                workflowState.instructions = instructions;
+                workflowState.currentStep = 0;
 
-                // Credentials section
+                // Step 1 - Overview
+                workflowState.steps.push({
+                    title: 'Account Overview',
+                    description: 'Here\'s what you need to know about this account',
+                    content: `
+                        <div style="background-color: var(--sand); padding: 14px; border-radius: 10px; margin-bottom: 16px;">
+                            <p style="font-size: 12.5px; color: var(--text-dark); margin: 0 0 8px 0;"><strong>Platform:</strong> ${escapeHtml(asset.platform_name)}</p>
+                            <p style="font-size: 12.5px; color: var(--text-dark); margin: 0 0 8px 0;"><strong>Username/Email:</strong> ${escapeHtml(asset.account_identifier)}</p>
+                            <p style="font-size: 12.5px; color: var(--text-dark); margin: 0 0 8px 0;"><strong>Registered Email:</strong> ${escapeHtml(user.email)}</p>
+                            <p style="font-size: 12.5px; color: var(--text-dark); margin: 0;"><strong>Action:</strong> ${instructions.overview.action}</p>
+                        </div>
+                    `
+                });
+
+                // Step 2 - Credentials
                 if (asset.account_password) {
-                    stepHTML += `
-                        <div class="credentials-section" style="display: block !important;">
-                            <div class="credentials-header">🔐 Login Credentials</div>
-                            <div class="credentials-body">
-                                <div class="credential-item">
-                                    <label>Username / Email</label>
-                                    <div class="credential-input-group">
-                                        <input type="text" class="credential-input" id="username-${assetId}" readonly value="${escapeHtml(asset.account_identifier)}">
-                                        <button class="credential-btn" onclick="copyCredential('username-${assetId}')" title="Copy" style="background: var(--forest-deep); color: var(--cream-light); border: none; border-radius: 7px; padding: 8px 10px; cursor: pointer; font-size: 12px;">
-                                            📋
-                                        </button>
+                    workflowState.steps.push({
+                        title: 'Login Credentials',
+                        description: 'Your login information for this account',
+                        content: `
+                            <div class="credentials-section" style="display: block !important;">
+                                <div class="credentials-header">🔐 Login Credentials</div>
+                                <div class="credentials-body">
+                                    <div class="credential-item">
+                                        <label>Username / Email</label>
+                                        <div class="credential-input-group">
+                                            <input type="text" class="credential-input" id="username-${assetId}" readonly value="${escapeHtml(asset.account_identifier)}">
+                                            <button class="credential-btn" onclick="copyCredential('username-${assetId}')" title="Copy" style="background: var(--forest-deep); color: var(--cream-light); border: none; border-radius: 7px; padding: 8px 10px; cursor: pointer; font-size: 12px;">
+                                                📋
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="credential-item">
-                                    <label>Password</label>
-                                    <div class="credential-input-group">
-                                        <input type="password" class="credential-input" id="password-${assetId}" readonly value="${escapeHtml(asset.account_password)}">
-                                        <button class="credential-btn" onclick="togglePasswordVisibility('password-${assetId}')" title="Show/Hide" style="background: var(--forest-deep); color: var(--cream-light); border: none; border-radius: 7px; padding: 8px 10px; cursor: pointer; font-size: 12px;">
-                                            👁️
-                                        </button>
-                                        <button class="credential-btn" onclick="copyCredential('password-${assetId}')" title="Copy" style="background: var(--forest-deep); color: var(--cream-light); border: none; border-radius: 7px; padding: 8px 10px; cursor: pointer; font-size: 12px;">
-                                            📋
-                                        </button>
+                                    <div class="credential-item">
+                                        <label>Password</label>
+                                        <div class="credential-input-group">
+                                            <input type="password" class="credential-input" id="password-${assetId}" readonly value="${escapeHtml(asset.account_password)}">
+                                            <button class="credential-btn" onclick="togglePasswordVisibility('password-${assetId}')" title="Show/Hide" style="background: var(--forest-deep); color: var(--cream-light); border: none; border-radius: 7px; padding: 8px 10px; cursor: pointer; font-size: 12px;">
+                                                👁️
+                                            </button>
+                                            <button class="credential-btn" onclick="copyCredential('password-${assetId}')" title="Copy" style="background: var(--forest-deep); color: var(--cream-light); border: none; border-radius: 7px; padding: 8px 10px; cursor: pointer; font-size: 12px;">
+                                                📋
+                                            </button>
+                                        </div>
                                     </div>
+                                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 8px; text-align: center;">After logging in, change this password for security.</p>
                                 </div>
-                                <p style="font-size: 11px; color: var(--text-muted); margin-top: 8px; text-align: center;">After logging in, change this password for security.</p>
                             </div>
-                        </div>
-                    `;
-                }
-
-                // Step-by-step instructions
-                if (instructions.steps && instructions.steps.length > 0) {
-                    instructions.steps.forEach((step, index) => {
-                        const stepNum = index + 2;
-                        stepHTML += `
-                            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--sand-deep);">
-                                <div class="step-header-section">
-                                    <div class="step-badge">${stepNum}</div>
-                                    <div style="flex: 1;">
-                                        <h6 class="step-title">${escapeHtml(step.title)}</h6>
-                                        <p class="step-description">${escapeHtml(step.description)}</p>
-                                    </div>
-                                </div>
-                                <div class="step-action"><strong>Action:</strong> ${escapeHtml(step.action)}</div>
-                                ${step.link ? `<a href="${step.link}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px; background-color: var(--forest-deep); color: var(--cream-light); border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 12px; margin-top: 8px;">🔗 Open ${escapeHtml(asset.platform_name)}</a>` : ''}
-                            </div>
-                        `;
+                        `
                     });
                 }
 
-                // Last message section
+                // Add instruction steps
+                if (instructions.steps && instructions.steps.length > 0) {
+                    instructions.steps.forEach((step, index) => {
+                        workflowState.steps.push({
+                            title: step.title,
+                            description: step.description,
+                            content: `
+                                <div class="step-action"><strong>Action:</strong> ${escapeHtml(step.action)}</div>
+                                ${step.link ? `<a href="${step.link}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px; background-color: var(--forest-deep); color: var(--cream-light); border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 12px; margin-top: 8px;">🔗 Open ${escapeHtml(asset.platform_name)}</a>` : ''}
+                            `
+                        });
+                    });
+                }
+
+                // Add final message step
                 if (asset.action_type === 'last_message' && instructions.message) {
-                    stepHTML += `
-                        <div style="margin-top: 16px; padding: 14px; background-color: var(--sand); border-radius: 10px;">
-                            <h6 class="step-title" style="margin-bottom: 8px;">Final Message</h6>
+                    workflowState.steps.push({
+                        title: 'Final Message',
+                        description: 'Important message to send',
+                        content: `
                             <p style="font-size: 12.5px; color: var(--text-muted); margin: 0 0 10px 0; font-style: italic;">Copy and send this message:</p>
                             <div style="background-color: var(--cream); padding: 10px; border-radius: 8px; border: 1px solid var(--sand-deep); font-size: 12px; line-height: 1.5; color: var(--text-dark); word-break: break-word; white-space: pre-wrap; margin-bottom: 10px;" id="finalMessage">${escapeHtml(instructions.message)}</div>
                             <button onclick="copyToClipboard('finalMessage')" style="width: 100%; padding: 8px; background-color: var(--forest-deep); color: var(--cream-light); border: none; border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer;">📋 Copy Message</button>
-                        </div>
-                    `;
+                        `
+                    });
                 }
 
-                stepContainer.innerHTML = stepHTML;
-
-                // Update progress bar
-                const totalSteps = (asset.account_password ? 1 : 0) + (instructions.steps ? instructions.steps.length : 0);
-                document.getElementById('progressBar').style.width = '33%';
-                document.getElementById('progressText').textContent = `Step 1 of ${Math.max(totalSteps, 3)}`;
+                // Render the first step
+                renderWorkflowStep();
 
             } catch (error) {
                 console.error('Error loading instructions:', error);
                 stepContainer.innerHTML = `<div style="padding: 20px; color: var(--text-dark);">Error loading instructions. Please try again.</div>`;
+            }
+        }
+
+        // Render current workflow step
+        function renderWorkflowStep() {
+            const stepContainer = document.getElementById('stepContainer');
+            const step = workflowState.steps[workflowState.currentStep];
+            const totalSteps = workflowState.steps.length;
+
+            let stepHTML = `
+                <div class="step-header-section">
+                    <div class="step-badge">${workflowState.currentStep + 1}</div>
+                    <div style="flex: 1;">
+                        <h6 class="step-title">${step.title}</h6>
+                        <p class="step-description">${step.description}</p>
+                    </div>
+                </div>
+                <div style="margin-top: 12px;">
+                    ${step.content}
+                </div>
+            `;
+
+            stepContainer.innerHTML = stepHTML;
+
+            // Update progress bar
+            const progressPercent = ((workflowState.currentStep + 1) / totalSteps) * 100;
+            document.getElementById('progressBar').style.width = progressPercent + '%';
+            document.getElementById('progressText').textContent = `Step ${workflowState.currentStep + 1} of ${totalSteps}`;
+
+            // Update button states
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = workflowState.currentStep === 0;
+            nextBtn.disabled = workflowState.currentStep === totalSteps - 1;
+        }
+
+        // Navigate to next step
+        function nextStep() {
+            if (workflowState.currentStep < workflowState.steps.length - 1) {
+                workflowState.currentStep++;
+                renderWorkflowStep();
+            }
+        }
+
+        // Navigate to previous step
+        function prevStep() {
+            if (workflowState.currentStep > 0) {
+                workflowState.currentStep--;
+                renderWorkflowStep();
             }
         }
 
