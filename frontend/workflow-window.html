@@ -275,12 +275,31 @@
                 }
                 
                 if (!response.ok) {
-                    throw new Error('Failed to load instructions');
+                    const errorData = await response.text();
+                    console.error('API Error:', response.status, errorData);
+                    throw new Error(`Failed to load instructions (${response.status}): ${errorData}`);
                 }
                 
                 const data = await response.json();
+                console.log('API Response:', data);
+                
+                // Validate response structure
+                if (!data.success || !data.data || !data.data.instructions) {
+                    console.error('Invalid response structure:', data);
+                    throw new Error('Invalid response structure from server');
+                }
+                
                 const asset = data.data.asset;
-                const instructions = data.data.instructions;
+                const instructionsObj = data.data.instructions;
+                
+                // Instructions is an object with steps property
+                let instructions = instructionsObj.steps || instructionsObj;
+                
+                // Additional validation
+                if (!Array.isArray(instructions)) {
+                    console.error('Instructions is not an array:', instructions, 'Full object:', instructionsObj);
+                    throw new Error('Instructions data is invalid - expected array');
+                }
                 
                 let html = '';
                 
@@ -320,7 +339,7 @@
                 document.getElementById('content').innerHTML = html;
                 
             } catch (e) {
-                console.error('Error:', e);
+                console.error('Full error:', e);
                 document.getElementById('content').innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: ${e.message}</div>`;
             }
         }
