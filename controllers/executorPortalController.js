@@ -50,16 +50,18 @@ async function executorLogin(req, res) {
     }
 
     if (executor.verification_status !== 'verified') {
+      console.log(`[Executor Login] Verification failed for executor ${executor.executor_id}: status is '${executor.verification_status}'`);
       return res.status(403).json({
         success: false,
-        message: 'Executor email is not verified yet'
+        message: 'Please click the verification link in your email to complete setup. If you did not receive an email, ask your administrator to send you a new verification link.'
       });
     }
 
     if (executor.access_granted !== true) {
+      console.log(`[Executor Login] Access not granted for executor ${executor.executor_id}`);
       return res.status(403).json({
         success: false,
-        message: 'Executor is verified, but access has not been granted yet'
+        message: 'Your administrator has not granted you access yet. Please ask them to grant access.'
       });
     }
 
