@@ -469,6 +469,13 @@
                     return;
                 }
 
+                // Handle 304 Not Modified
+                if (response.status === 304) {
+                    contentDiv.innerHTML = `<div class="alert alert-warning">Cached response - please refresh and try again</div>`;
+                    modal.show();
+                    return;
+                }
+
                 const data = await response.json();
 
                 if (!data.success) {

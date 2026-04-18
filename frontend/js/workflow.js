@@ -135,6 +135,12 @@ async function openWorkflow(assetId, token) {
             return;
         }
 
+        // Handle 304 Not Modified
+        if (response.status === 304) {
+            showWorkflowError('Cached response - please refresh and try again');
+            return;
+        }
+
         const data = await response.json();
 
         if (!data.success) {

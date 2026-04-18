@@ -269,6 +269,11 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
+                // Handle 304 Not Modified
+                if (response.status === 304) {
+                    throw new Error('Cached response - please try again or refresh the page');
+                }
+                
                 if (!response.ok) {
                     throw new Error('Failed to load instructions');
                 }
