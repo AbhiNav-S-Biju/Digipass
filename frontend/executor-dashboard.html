@@ -371,6 +371,12 @@
                     console.log('[Executor Dashboard] HTML inserted into assetsList, innerHTML length:', assetsList.innerHTML.length);
                     console.log('[Executor Dashboard] assetsList element exists?', !!assetsList);
                     console.log('[Executor Dashboard] assetsList children count after render:', assetsList.children.length);
+                    console.log('[Executor Dashboard] Generated HTML (first 500 chars):', assetsList.innerHTML.substring(0, 500));
+                    const computedStyle = window.getComputedStyle(assetsList);
+                    console.log('[Executor Dashboard] assetsList computed display:', computedStyle.display);
+                    console.log('[Executor Dashboard] assetsList computed visibility:', computedStyle.visibility);
+                    console.log('[Executor Dashboard] assetsList class list:', assetsList.className);
+                    console.log('[Executor Dashboard] assetsList parent element:', assetsList.parentElement);
                     document.getElementById('emptyState').classList.add('d-none');
                 } else {
                     console.log('[Executor Dashboard] No assets found, showing empty state');
