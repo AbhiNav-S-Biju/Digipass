@@ -53,10 +53,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize dashboard
   initDashboard();
+  bindPageNavigation();
   bindAssetActions();
   bindExecutorActions();
   loadDashboardData();
 });
+
+// Bind page navigation buttons
+function bindPageNavigation() {
+  // Bind all buttons with data-navigate attribute
+  const navButtons = document.querySelectorAll('[data-navigate]');
+  navButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      const pageName = button.dataset.navigate;
+      console.log('Button clicked for page:', pageName);
+      navigateToPage(pageName);
+    });
+  });
+}
 
 // Initialize dashboard page navigation
 function initDashboard() {
