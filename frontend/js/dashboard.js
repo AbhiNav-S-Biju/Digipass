@@ -133,7 +133,19 @@ async function loadDashboardData() {
     }
 
     document.getElementById('willCount').textContent = '0';
-    document.getElementById('switchStatus').textContent = 'Inactive';
+    
+    // Load dead man's switch status
+    try {
+      const statusRes = await apiCall('/dead-mans-switch/status', 'GET');
+      if (statusRes && statusRes.success) {
+        const status = statusRes.data.status === 'active' ? 'Active' : 'Triggered';
+        document.getElementById('switchStatus').textContent = status;
+      } else {
+        document.getElementById('switchStatus').textContent = 'Inactive';
+      }
+    } catch (err) {
+      document.getElementById('switchStatus').textContent = 'Inactive';
+    }
   } catch (error) {
     console.error('Error loading dashboard data:', error);
   }
