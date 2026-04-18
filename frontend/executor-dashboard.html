@@ -4,231 +4,527 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Executor Dashboard - DIGIPASS</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23102c26'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='%23f7e7ce'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231b3a2d'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='%23fdf6ec'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6, .navbar-brand {
+            font-family: 'DM Serif Display', serif;
+        }
+
         :root {
-            --primary-dark: #102c26;
-            --primary-dark-hover: #081a16;
-            --bg-light: #f7e7ce;
-            --text-dark: #2d2d2d;
-            --text-muted: #6c757d;
-            --border-light: #e9ecef;
+            --cream: #f5ead8;
+            --cream-light: #fdf6ec;
+            --forest-deep: #1b3a2d;
+            --forest-mid: #2d5a42;
+            --forest-light: #3d7a5a;
+            --sand: #e8d9c0;
+            --sand-deep: #d4c4a0;
+            --text-dark: #1a2e22;
+            --text-muted: #5a7260;
+            --accent-green: #3d7a5a;
+            --accent-light: #d4ead8;
         }
 
         body {
-            background-color: var(--bg-light);
+            background-color: var(--cream);
             color: var(--text-dark);
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
         }
 
+        /* Navbar */
         .navbar {
-            background-color: white !important;
-            border-bottom: 1px solid var(--border-light);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            background-color: var(--forest-deep) !important;
+            height: 58px;
+            padding: 0 2rem;
+            box-shadow: none;
+            border-bottom: none;
         }
 
         .navbar-brand {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--primary-dark) !important;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--cream-light) !important;
+            letter-spacing: 0.04em;
         }
 
-        .nav-link {
-            color: var(--text-dark) !important;
-            font-weight: 400;
-            font-size: 0.95rem;
+        .navbar-collapse {
+            justify-content: flex-end;
         }
 
-        .nav-link:hover {
-            color: var(--primary-dark) !important;
+        .portal-tag {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: rgba(245, 234, 216, 0.7);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            border-radius: 12px;
+            padding: 4px 10px;
+            margin-right: 12px;
+            display: inline-block;
+            font-weight: 500;
         }
 
         .btn-logout {
-            background-color: var(--primary-dark) !important;
-            color: white !important;
-            font-weight: 600;
-            font-size: 0.95rem;
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: var(--cream-light) !important;
+            font-weight: 500;
+            padding: 7px 18px;
             border-radius: 6px;
+            font-size: 13.5px;
         }
 
         .btn-logout:hover {
-            background-color: var(--primary-dark-hover) !important;
+            background-color: rgba(255, 255, 255, 0.15) !important;
         }
 
-        .card {
-            border: 1px solid var(--border-light);
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        /* Profile Banner */
+        .profile-banner {
+            background-color: var(--forest-deep);
+            padding: 28px 2rem 32px;
+            margin-bottom: 32px;
         }
 
-        .card h3 {
-            color: var(--primary-dark);
-            font-weight: 600;
-            font-size: 1.1rem;
+        .profile-banner-inner {
+            max-width: 1040px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid var(--border-light);
+        .profile-left {
+            display: flex;
+            gap: 16px;
+            align-items: center;
         }
 
-        .user-info-card {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-dark-hover) 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
+        .profile-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background-color: var(--forest-light);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cream-light);
+            font-size: 22px;
+            font-weight: 700;
+            font-family: 'DM Serif Display', serif;
         }
 
-        .user-info-card h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+        .profile-name {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        .user-info-card p {
-            opacity: 0.9;
+        .profile-name-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--cream-light);
+            font-family: 'DM Serif Display', serif;
             margin: 0;
         }
 
-        .page-header h2 {
-            color: var(--primary-dark);
+        .profile-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: rgba(245, 234, 216, 0.6);
+        }
+
+        .estate-badge {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(245, 234, 216, 0.8);
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 0;
+        }
+
+        .profile-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-stat:first-child {
+            border-left: none;
+            padding-left: 0;
+        }
+
+        .profile-stat-number {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--cream-light);
+            font-family: 'DM Serif Display', serif;
+        }
+
+        .profile-stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: rgba(245, 234, 216, 0.6);
+            margin-top: 2px;
             font-weight: 600;
-            font-size: clamp(1.5rem, 5vw, 2rem);
-            margin-bottom: 0.5rem;
+        }
+
+        /* Page Content */
+        .page-content {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 32px 2rem 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 34px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
         }
 
         .page-header p {
+            font-size: 13.5px;
             color: var(--text-muted);
-            font-size: 0.95rem;
+            margin-bottom: 28px;
+        }
+
+        /* Asset Cards Grid */
+        .assets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px;
+            margin-bottom: 2rem;
         }
 
         .asset-card {
-            background-color: white;
-            border: 1px solid var(--border-light);
-            border-radius: 8px;
-            padding: 1.5rem;
-            transition: box-shadow 0.2s;
+            background-color: var(--cream-light);
+            border: 1px solid var(--sand-deep);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: transform 0.2s ease;
         }
 
         .asset-card:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
         }
 
-        .asset-card h4 {
-            color: var(--primary-dark);
+        .asset-card-top {
+            padding: 20px 20px 0;
+        }
+
+        .asset-card-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .asset-card-icon {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            background-color: var(--sand);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .asset-card-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--text-muted);
+            fill: none;
+            stroke-width: 1.5;
+        }
+
+        .asset-card-details h3 {
+            font-size: 16px;
             font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            margin: 0 0 1px 0;
         }
 
-        .asset-type {
-            display: inline-block;
-            background-color: #f0e8e0;
-            color: var(--primary-dark);
-            padding: 0.4rem 0.8rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: capitalize;
-            margin-bottom: 1rem;
-        }
-
-        .asset-description {
+        .asset-card-details p {
+            font-size: 12.5px;
             color: var(--text-muted);
-            font-size: 0.9rem;
-            line-height: 1.6;
-            margin-bottom: 1rem;
+            margin: 0;
         }
 
-        .btn-primary {
-            background-color: var(--primary-dark) !important;
-            border-color: var(--primary-dark) !important;
-            font-weight: 600;
-            border-radius: 6px;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-dark-hover) !important;
-            border-color: var(--primary-dark-hover) !important;
-        }
-
-        .btn-secondary {
-            background-color: white !important;
-            color: var(--primary-dark) !important;
-            border: 1px solid var(--border-light) !important;
-            font-weight: 600;
-            border-radius: 6px;
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--primary-dark) !important;
-            background-color: #fafbfc !important;
-        }
-
-        .status-badge {
+        .asset-card-category {
             display: inline-block;
-            background-color: #dcfce7;
-            color: #166534;
-            padding: 0.4rem 0.8rem;
-            border-radius: 999px;
-            font-size: 0.8rem;
+            font-size: 10.5px;
             font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 10px;
+            letter-spacing: 0.04em;
+            text-transform: capitalize;
+            margin-top: 8px;
         }
 
+        .category-social { background-color: #ddeaf5; color: #1a4a6e; }
+        .category-finance { background-color: var(--accent-light); color: var(--forest-mid); }
+        .category-storage { background-color: #f0e6d4; color: #7a4f1a; }
+        .category-email { background-color: #ede8f5; color: #4a3080; }
+        .category-entertainment { background-color: var(--sand); color: var(--text-muted); }
+        .category-other { background-color: var(--sand); color: var(--text-muted); }
+
+        .asset-card-message {
+            margin: 0 20px 16px;
+            background-color: var(--sand);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+
+        .asset-card-message-label {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 6px;
+        }
+
+        .asset-card-message-label svg {
+            width: 12px;
+            height: 12px;
+            stroke: var(--text-muted);
+        }
+
+        .asset-card-message-text {
+            font-size: 13.5px;
+            color: var(--text-dark);
+            line-height: 1.55;
+            font-style: italic;
+        }
+
+        .asset-card-message-text::before,
+        .asset-card-message-text::after {
+            content: '"';
+        }
+
+        .asset-card-status {
+            padding: 10px 20px 14px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .asset-card-status-dot {
+            width: 7px;
+            height: 7px;
+            background-color: #8cbf9c;
+            border-radius: 50%;
+        }
+
+        .asset-card-footer {
+            border-top: 1px solid var(--sand-deep);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .asset-card-date {
+            font-size: 11.5px;
+            color: var(--text-muted);
+        }
+
+        .btn-view-instructions {
+            background-color: var(--forest-deep) !important;
+            color: var(--cream-light) !important;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 7px;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view-instructions:hover {
+            background-color: var(--forest-mid) !important;
+            transform: translateY(-1px);
+        }
+
+        .btn-view-instructions svg {
+            width: 13px;
+            height: 13px;
+            stroke: var(--cream-light);
+            fill: none;
+            stroke-width: 1.5;
+        }
+
+        /* Empty state */
         .alert-info {
-            border: 1px solid #bfdbfe;
-            background-color: #dbeafe;
-            color: #1e40af;
-            border-radius: 6px;
-            padding: 1rem;
+            background-color: var(--cream-light);
+            border: 1px solid var(--sand-deep);
+            color: var(--text-dark);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
         }
 
-        @media (max-width: 768px) {
+        /* Modal */
+        .modal-content {
+            background-color: var(--cream-light);
+            border: 1px solid var(--sand-deep);
+            border-radius: 14px;
+        }
+
+        .modal-header {
+            background-color: transparent;
+            border-bottom: 1px solid var(--sand-deep);
+            padding: 20px;
+        }
+
+        .modal-header h5 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 860px) {
+            .profile-banner {
+                padding: 20px 1rem 24px;
+            }
+
+            .profile-banner-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .profile-stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .page-content {
+                padding: 28px 1rem 3rem;
+            }
+
+            .page-header h1 {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .navbar {
+                padding: 0 1rem;
+            }
+
             .navbar-brand {
-                font-size: 1.1rem;
+                font-size: 18px;
             }
 
-            .user-info-card {
-                padding: 1.5rem;
+            .portal-tag {
+                display: none;
             }
 
-            .user-info-card h2 {
-                font-size: 1.2rem;
+            .profile-banner {
+                padding: 20px 1rem 24px;
+            }
+
+            .profile-banner-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .profile-avatar {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+            }
+
+            .profile-name-text {
+                font-size: 20px;
+            }
+
+            .profile-stats {
+                width: 100%;
+                gap: 0;
+            }
+
+            .profile-stat {
+                flex: 1;
+                padding: 0 12px;
+                border-left: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .profile-stat:first-child {
+                padding-left: 0;
+                border-left: none;
+            }
+
+            .profile-stat-number {
+                font-size: 20px;
+            }
+
+            .page-content {
+                padding: 24px 1rem 2rem;
+            }
+
+            .page-header h1 {
+                font-size: 24px;
+            }
+
+            .page-header p {
+                font-size: 12px;
+                margin-bottom: 20px;
+            }
+
+            .assets-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
             }
 
             .asset-card {
-                padding: 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .navbar-brand {
-                font-size: 1rem;
+                border-radius: 12px;
             }
 
-            .btn-logout {
-                font-size: 0.8rem;
-                padding: 0.4rem 0.8rem !important;
+            .asset-card-top {
+                padding: 16px 16px 0;
             }
 
-            .user-info-card {
-                padding: 1.2rem;
+            .asset-card-message {
+                margin: 0 16px 12px;
             }
 
-            .user-info-card h2 {
-                font-size: 1.1rem;
+            .asset-card-footer {
+                padding: 12px 16px;
             }
 
-            .asset-card {
-                padding: 0.75rem;
-            }
-
-            .page-header h2 {
-                font-size: 1.2rem;
+            .btn-view-instructions {
+                font-size: 11px;
+                padding: 6px 12px;
             }
         }
     </style>
@@ -236,40 +532,58 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container-fluid px-3 px-md-4">
+        <div class="container-fluid px-3 px-md-4" style="max-width: 100%; padding: 0 2rem;">
             <a class="navbar-brand" href="#">DIGIPASS</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <button id="logoutBtn" class="btn btn-logout btn-sm">Logout</button>
-                    </li>
-                </ul>
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <div class="portal-tag">Executor Portal</div>
+                <button id="logoutBtn" class="btn btn-logout">Logout</button>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="container-fluid px-3 px-md-4 py-4">
-        <!-- User Info Card -->
-        <div id="userCard" class="user-info-card">
-            <h2 id="executorName">Executor Name</h2>
-            <p id="inheritanceName">Estate: Loading...</p>
+    <!-- Profile Banner -->
+    <div class="profile-banner">
+        <div class="profile-banner-inner">
+            <div class="profile-left">
+                <div class="profile-avatar" id="executorAvatar">E</div>
+                <div class="profile-name">
+                    <p class="profile-name-text" id="executorName">Executor Name</p>
+                    <div class="profile-meta">
+                        <div class="estate-badge" id="inheritanceName">Estate: Loading...</div>
+                        <span>·</span>
+                        <span>Executor access granted</span>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-stats">
+                <div class="profile-stat">
+                    <div class="profile-stat-number" id="assetCount">0</div>
+                    <div class="profile-stat-label">Assets</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-number" id="estateName">–</div>
+                    <div class="profile-stat-label">Estate</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-number">✓</div>
+                    <div class="profile-stat-label">Status</div>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="page-content">
 
         <!-- Page Header -->
-        <div class="page-header mb-4">
-            <h2>Digital Assets</h2>
+        <div class="page-header">
+            <h1>Digital Assets</h1>
             <p>Assets you're authorized to manage</p>
         </div>
 
         <!-- Assets List -->
-        <div class="row g-4">
-            <div id="assetsList" class="col-12">
-                <p class="text-muted text-center py-5">Loading assets...</p>
-            </div>
+        <div class="assets-grid" id="assetsList">
+            <p class="text-muted text-center py-5">Loading assets...</p>
         </div>
 
         <!-- Empty State -->
@@ -305,40 +619,6 @@
     <script>
         const API_URL = 'https://digipass-3l63.onrender.com';
 
-        // Platform icon mapping
-        const PLATFORM_ICONS = {
-          'Instagram': 'fab fa-instagram',
-          'Facebook': 'fab fa-facebook',
-          'Twitter': 'fab fa-twitter',
-          'LinkedIn': 'fab fa-linkedin',
-          'TikTok': 'fab fa-tiktok',
-          'Snapchat': 'fab fa-snapchat',
-          'Discord': 'fab fa-discord',
-          'Gmail': 'fas fa-envelope',
-          'Outlook': 'fas fa-envelope',
-          'Yahoo Mail': 'fas fa-envelope',
-          'ProtonMail': 'fas fa-envelope',
-          'Apple Mail': 'fas fa-envelope',
-          'PayPal': 'fab fa-paypal',
-          'Amazon': 'fab fa-amazon',
-          'Banking App': 'fas fa-university',
-          'Stripe': 'fab fa-stripe-s',
-          'Square': 'fas fa-square',
-          'Google Drive': 'fab fa-google-drive',
-          'Dropbox': 'fab fa-dropbox',
-          'OneDrive': 'fas fa-cloud',
-          'iCloud': 'fas fa-cloud',
-          'Netflix': 'fas fa-tv',
-          'Spotify': 'fab fa-spotify',
-          'Disney+': 'fas fa-play-circle',
-          'Hulu': 'fas fa-play-circle',
-          'Other': 'fas fa-lock'
-        };
-
-        function getPlatformIcon(platformName) {
-          return PLATFORM_ICONS[platformName] || 'fas fa-lock';
-        }
-
         // Check if executor is logged in
         const token = localStorage.getItem('executorToken');
         if (!token) {
@@ -346,8 +626,17 @@
         }
 
         const executor = JSON.parse(localStorage.getItem('executor') || '{}');
-        document.getElementById('executorName').textContent = executor.ownerName || 'Estate Owner';
-        document.getElementById('inheritanceName').textContent = `Estate: ${executor.ownerName || 'Your Estate'}`;
+        const executorName = executor.ownerName || 'Estate Owner';
+        const estateName = executor.ownerName || 'Your Estate';
+        
+        // Update profile banner
+        document.getElementById('executorName').textContent = executorName;
+        document.getElementById('inheritanceName').textContent = estateName;
+        document.getElementById('estateName').textContent = estateName.split(' ')[0];
+        
+        // Generate avatar initials
+        const initials = executorName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        document.getElementById('executorAvatar').textContent = initials;
 
         // Logout functionality
         document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -377,53 +666,65 @@
 
                 if (assets && assets.length > 0) {
                     const assetsList = document.getElementById('assetsList');
-                    const actionEmojis = {
-                        'pass': '📤',
-                        'delete': '🗑️',
-                        'last_message': '💬'
-                    };
-                    const actionLabels = {
-                        'pass': 'Pass to You',
-                        'delete': 'Delete Account',
-                        'last_message': 'Final Message'
-                    };
                     assetsList.innerHTML = assets.map(asset => {
-                        const actionEmoji = actionEmojis[asset.action_type] || '📋';
-                        const actionLabel = actionLabels[asset.action_type] || asset.action_type;
-                        const platformIcon = getPlatformIcon(asset.platform_name);
+                        const categoryClass = `category-${asset.category || 'other'}`;
+                        const assetDate = new Date(asset.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        
                         return `
-                            <div class="col-12 col-md-6 col-lg-4">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center gap-2 mb-2">
-                                            <i class="${platformIcon}" style="font-size: 1.5rem; color: #102c26;"></i>
-                                            <h5 class="card-title mb-0">${escapeHtml(asset.platform_name)}</h5>
+                            <div class="asset-card">
+                                <div class="asset-card-top">
+                                    <div class="asset-card-header">
+                                        <div class="asset-card-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                <rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect>
+                                                <path d="M3 11h18"></path>
+                                            </svg>
                                         </div>
-                                        <p class="card-text text-muted small mb-2">
-                                            <strong>Account:</strong> ${escapeHtml(asset.account_identifier || 'N/A')}
-                                        </p>
-                                        <div class="mb-2">
-                                            <span class="badge bg-secondary">${asset.category}</span>
+                                        <div class="asset-card-details">
+                                            <h3>${escapeHtml(asset.platform_name)}</h3>
+                                            <p>${escapeHtml(asset.account_identifier || 'N/A')}</p>
+                                            <div class="asset-card-category ${categoryClass}">${asset.category || 'other'}</div>
                                         </div>
-                                        <div class="mb-3 p-2 bg-light rounded">
-                                            <span>${actionEmoji} ${actionLabel}</span>
-                                        </div>
-                                        ${asset.last_message ? `<div class="alert alert-info small mb-0"><strong>Message:</strong> ${escapeHtml(asset.last_message.substring(0, 80))}${asset.last_message.length > 80 ? '...' : ''}</div>` : ''}
                                     </div>
-                                    <div class="card-footer bg-transparent">
-                                        <small class="text-muted">Added ${new Date(asset.created_at).toLocaleDateString()}</small>
-                                        <br>
-                                        <button class="btn btn-primary btn-sm mt-2 w-100" data-asset-id="${asset.asset_id}" data-platform="${asset.platform_name}" data-action="${asset.action_type}" onclick="openWorkflow(${asset.asset_id}, token)">
-                                            <i class="fas fa-book"></i> View Instructions
-                                        </button>
+                                </div>
+                                ${asset.last_message ? `
+                                <div class="asset-card-message">
+                                    <div class="asset-card-message-label">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                        </svg>
+                                        Final Message
                                     </div>
+                                    <div class="asset-card-message-text">${escapeHtml(asset.last_message.substring(0, 100))}${asset.last_message.length > 100 ? '...' : ''}</div>
+                                </div>
+                                ` : ''}
+                                <div class="asset-card-status">
+                                    <div class="asset-card-status-dot"></div>
+                                    <span>Ready to access</span>
+                                </div>
+                                <div class="asset-card-footer">
+                                    <span class="asset-card-date">Added ${assetDate}</span>
+                                    <button class="btn-view-instructions" data-asset-id="${asset.asset_id}" data-platform="${asset.platform_name}" data-action="${asset.action_type}" onclick="openAssetInstructions(${asset.asset_id})">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                            <line x1="12" y1="19" x2="12" y2="5"></line>
+                                            <line x1="9" y1="14" x2="15" y2="14"></line>
+                                        </svg>
+                                        View Instructions
+                                    </button>
                                 </div>
                             </div>
                         `;
                     }).join('');
+                    
+                    // Update asset count in profile stats
+                    document.getElementById('assetCount').textContent = assets.length;
+                    
                     document.getElementById('emptyState').classList.add('d-none');
                 } else {
                     document.getElementById('assetsList').innerHTML = '';
+                    document.getElementById('assetCount').textContent = '0';
                     document.getElementById('emptyState').classList.remove('d-none');
                 }
             } catch (error) {
