@@ -721,14 +721,115 @@
                 <p>Automated check-ins and executor notifications</p>
             </div>
             <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body text-center py-5">
-                            <h3 class="text-muted mb-3">Coming Soon</h3>
-                            <p class="text-muted">The Dead Man's Switch feature will allow you to set up automated check-ins. If you don't respond within the set timeframe, your designated executors will be notified automatically.</p>
-                            <div class="mt-4">
-                                <span class="badge bg-secondary">Feature in Development</span>
+                <div class="col-12 col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light border-bottom">
+                            <h5 class="mb-0">Check-In Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="switchStatusLoading" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
                             </div>
+                            <div id="switchStatusContent" style="display: none;">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <p class="text-muted mb-1">Current Status</p>
+                                        <p class="fs-5 fw-bold"><span id="dmsStatus" class="badge bg-success">Active</span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="text-muted mb-1">Check Interval</p>
+                                        <p class="fs-5 fw-bold"><span id="dmsInterval">30</span> days</p>
+                                    </div>
+                                </div>
+                                <hr class="my-3">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <p class="text-muted mb-1">Last Check-in</p>
+                                        <p class="fs-6" id="dmsLastCheckin">-</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="text-muted mb-1">Days Until Alert</p>
+                                        <p class="fs-6"><span id="dmsDaysUntil" class="badge bg-warning">0</span> days</p>
+                                    </div>
+                                </div>
+                                <div class="alert alert-info mt-4" role="alert">
+                                    <i class="fas fa-info-circle"></i> If you don't check in within <span id="alertDays">30</span> days, your designated executors will be notified and granted access to your digital assets.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header bg-light border-bottom">
+                            <h5 class="mb-0">Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <button id="checkInBtn" class="btn btn-primary btn-lg w-100 mb-3" onclick="manualCheckIn()">
+                                <i class="fas fa-check-circle"></i> Check In Now
+                            </button>
+                            <p class="text-muted text-center text-sm">Confirm that you're okay and reset the countdown timer</p>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header bg-light border-bottom">
+                            <h5 class="mb-0">Update Check Interval</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="intervalForm" onsubmit="updateCheckInterval(event)">
+                                <div class="mb-3">
+                                    <label for="intervalDays" class="form-label">Check-in Required Every (days)</label>
+                                    <input 
+                                        type="number" 
+                                        id="intervalDays" 
+                                        class="form-control form-control-lg" 
+                                        min="7" 
+                                        max="365" 
+                                        value="30"
+                                        required>
+                                    <small class="form-text text-muted d-block mt-2">
+                                        Range: 7 days (weekly) to 365 days (yearly). After this period without checking in, your executors will be notified.
+                                    </small>
+                                </div>
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-save"></i> Save New Interval
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-4">
+                    <div class="card">
+                        <div class="card-header bg-light border-bottom">
+                            <h5 class="mb-0">Designated Executors</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="executorListLoading" class="text-center py-4">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                            <div id="executorListContent" style="display: none;">
+                                <div id="executorList"></div>
+                                <p id="noExecutors" class="text-muted text-sm text-center">No executors assigned yet</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header bg-light border-bottom">
+                            <h5 class="mb-0">How It Works</h5>
+                        </div>
+                        <div class="card-body">
+                            <ol class="small mb-0">
+                                <li class="mb-2">Set your check-in interval (default: 30 days)</li>
+                                <li class="mb-2">Check in regularly to confirm your status</li>
+                                <li class="mb-2">If inactive for the set period, executors are notified</li>
+                                <li class="mb-2">Executors gain access to your digital assets</li>
+                            </ol>
                         </div>
                     </div>
                 </div>

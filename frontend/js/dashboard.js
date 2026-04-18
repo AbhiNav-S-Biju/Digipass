@@ -853,3 +853,153 @@ window.addEventListener('click', (event) => {
 
 // Logout functionality
 document.getElementById('logoutBtn').addEventListener('click', logout);
+
+// ========== Dead Man's Switch Functions ==========
+
+// Load dead man's switch data
+async function loadSwitchData() {
+  try {
+    const statusLoading = document.getElementById('switchStatusLoading');
+    const statusContent = document.getElementById('switchStatusContent');
+    const executorLoading = document.getElementById('executorListLoading');
+    const executorContent = document.getElementById('executorListContent');
+
+    // Show loading states
+    statusLoading.style.display = 'block';
+    statusContent.style.display = 'none';
+    executorLoading.style.display = 'block';
+    executorContent.style.display = 'none';
+
+    // Fetch DMS status and executor data in parallel
+    const [statusRes, executorsRes] = await Promise.all([
+      apiCall('/dead-mans-switch/status', 'GET').catch(err => {
+        console.error('Error fetching DMS status:', err);
+        return null;
+      }),
+      apiCall('/dead-mans-switch/executor-notifications', 'GET').catch(err => {
+        console.error('Error fetching executor notifications:', err);
+        return null;
+      })
+    ]);
+
+    // Update switch status
+    if (statusRes && statusRes.success) {
+      const data = statusRes.data;
+      document.getElementById('dmsStatus').textContent = data.status === 'active' ? 'Active' : 'Triggered';
+      document.getElementById('dmsStatus').className = `badge ${data.status === 'active' ? 'bg-success' : 'bg-danger'}`;
+      document.getElementById('dmsInterval').textContent = data.check_interval_days;
+      document.getElementById('alertDays').textContent = data.check_interval_days;
+      document.getElementById('dmsDaysUntil').textContent = data.daysUntilTrigger;
+      document.getElementById('intervalDays').value = data.check_interval_days;
+      
+      // Format last check-in date
+      const lastCheckinDate = new Date(data.last_checkin);
+      const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      document.getElementById('dmsLastCheckin').textContent = lastCheckinDate.toLocaleDateString('en-US', options);
+
+      statusLoading.style.display = 'none';
+      statusContent.style.display = 'block';
+    } else {
+      statusLoading.innerHTML = '<p class="text-danger">Error loading status</p>';
+    }
+
+    // Update executor list
+    if (executorsRes && executorsRes.success) {
+      const executors = executorsRes.data.executors || [];
+      const executorList = document.getElementById('executorList');
+      const noExecutors = document.getElementById('noExecutors');
+
+      if (executors.length === 0) {
+        executorList.innerHTML = '';
+        noExecutors.style.display = 'block';
+      } else {
+        noExecutors.style.display = 'none';
+        executorList.innerHTML = executors.map(executor => `
+          <div class="executor-notification-item mb-3 pb-3 border-bottom">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <h6 class="mb-0">${escapeHtml(executor.full_name)}</h6>
+              <span class="badge ${executor.access_granted ? 'bg-danger' : 'bg-secondary'}">
+                ${executor.access_granted ? 'Access Granted' : 'Waiting'}
+              </span>
+            </div>
+            <p class="text-muted small mb-1">${escapeHtml(executor.executor_email)}</p>
+            <p class="text-muted small mb-0">Added ${formatAssetDate(executor.created_at)}</p>
+          </div>
+        `).join('');
+      }
+
+      executorLoading.style.display = 'none';
+      executorContent.style.display = 'block';
+    } else {
+      executorLoading.innerHTML = '<p class="text-danger">Error loading executors</p>';
+    }
+  } catch (error) {
+    console.error('Error loading switch data:', error);
+    showNotification('Error loading dead man switch data', 'error');
+  }
+}
+
+// Manual check-in function
+async function manualCheckIn() {
+  const checkInBtn = document.getElementById('checkInBtn');
+  checkInBtn.disabled = true;
+  const originalText = checkInBtn.textContent;
+  checkInBtn.textContent = 'Checking in...';
+
+  try {
+    const response = await apiCall('/dead-mans-switch/check-in', 'POST');
+
+    if (response.success) {
+      showNotification('✓ Check-in successful! Your timer has been reset.', 'success');
+      // Reload the data
+      await loadSwitchData();
+    } else {
+      throw new Error(response.message || 'Check-in failed');
+    }
+  } catch (error) {
+    console.error('Check-in error:', error);
+    showNotification(error.message || 'Failed to check in', 'error');
+  } finally {
+    checkInBtn.disabled = false;
+    checkInBtn.textContent = originalText;
+  }
+}
+
+// Update check interval function
+async function updateCheckInterval(event) {
+  event.preventDefault();
+  
+  const intervalInput = document.getElementById('intervalDays');
+  const interval = parseInt(intervalInput.value);
+  const submitBtn = event.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+
+  if (isNaN(interval) || interval < 7 || interval > 365) {
+    showNotification('Interval must be between 7 and 365 days', 'error');
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Saving...';
+
+  try {
+    const response = await apiCall('/dead-mans-switch/interval', 'PUT', {
+      check_interval_days: interval
+    });
+
+    if (response.success) {
+      showNotification('✓ Check interval updated successfully!', 'success');
+      // Reload the data
+      await loadSwitchData();
+    } else {
+      throw new Error(response.message || 'Update failed');
+    }
+  } catch (error) {
+    console.error('Update interval error:', error);
+    showNotification(error.message || 'Failed to update interval', 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+  }
+}
+

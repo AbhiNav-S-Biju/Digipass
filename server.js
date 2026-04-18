@@ -101,6 +101,7 @@ const assetsRoutes = require('./routes/assetsRoutes');
 const executorsRoutes = require('./routes/executorsRoutes');
 const executorPortalRoutes = require('./routes/executorPortalRoutes');
 const willRoutes = require('./routes/willRoutes');
+const deadMansSwitchRoutes = require('./routes/deadMansSwitchRoutes');
 
 // Disable ETags for API routes (prevents 304 responses)
 app.use('/api', (req, res, next) => {
@@ -134,7 +135,8 @@ app.use('/api', executorPortalRoutes);
 // Digital will routes
 app.use('/api', willRoutes);
 
-// 404 handler
+// Dead man's switch routes
+app.use('/api/dead-mans-switch', deadMansSwitchRoutes);
 app.use((req, res) => {
   res.status(404).json({
     success: false,
