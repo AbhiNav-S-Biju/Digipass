@@ -65,6 +65,13 @@ async function executorLogin(req, res) {
       });
     }
 
+    // Fetch owner info to display in executor portal
+    const { rows: ownerRows } = await pool.query(
+      'SELECT full_name FROM users WHERE user_id = $1',
+      [executor.user_id]
+    );
+    const ownerName = ownerRows.length > 0 ? ownerRows[0].full_name : 'Estate Owner';
+
     const token = generateExecutorToken(executor);
 
     return res.status(200).json({
@@ -77,7 +84,8 @@ async function executorLogin(req, res) {
           executor_name: executor.executor_name,
           executor_email: executor.executor_email,
           executor_phone: executor.executor_phone,
-          relationship: executor.relationship
+          relationship: executor.relationship,
+          ownerName: ownerName
         }
       }
     });

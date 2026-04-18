@@ -45,7 +45,7 @@ document.getElementById('executorLoginForm').addEventListener('submit', async (e
     }
 
     localStorage.setItem('executorToken', data.data.token);
-    localStorage.setItem('executorProfile', JSON.stringify(data.data.executor));
+    localStorage.setItem('executor', JSON.stringify(data.data.executor));
 
     showMessage('Executor access granted. Redirecting...', 'success');
     setTimeout(() => {

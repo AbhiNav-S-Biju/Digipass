@@ -287,8 +287,8 @@
         }
 
         const executor = JSON.parse(localStorage.getItem('executor') || '{}');
-        document.getElementById('executorName').textContent = executor.executor_name || 'Executor';
-        document.getElementById('inheritanceName').textContent = `Estate: ${executor.inheriterName || 'User Estate'}`;
+        document.getElementById('executorName').textContent = executor.ownerName || 'Estate Owner';
+        document.getElementById('inheritanceName').textContent = `Estate: ${executor.ownerName || 'Your Estate'}`;
 
         // Logout functionality
         document.getElementById('logoutBtn').addEventListener('click', () => {
