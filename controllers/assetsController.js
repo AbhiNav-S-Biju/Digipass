@@ -164,15 +164,6 @@ async function getAssets(req, res) {
     });
   }
 }
-    });
-  } catch (error) {
-    console.error('Get Assets Error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve assets'
-    });
-  }
-}
 
 async function deleteAsset(req, res) {
   try {
