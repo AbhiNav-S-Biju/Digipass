@@ -468,11 +468,11 @@ function copyCredential(fieldId) {
 
     const text = element.value;
     navigator.clipboard.writeText(text).then(() => {
-        const btn = event.target.closest('button');
+        const btn = event?.target?.closest('button');
         if (!btn) return;
 
         const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i>';
+        btn.innerHTML = '✓ Copied!';
         btn.style.backgroundColor = 'rgba(16, 44, 38, 0.3)';
 
         setTimeout(() => {
@@ -480,8 +480,27 @@ function copyCredential(fieldId) {
             btn.style.backgroundColor = '';
         }, 1500);
     }).catch(err => {
-        console.error('Failed to copy:', err);
-        alert('Failed to copy to clipboard');
+        console.warn('Clipboard API failed, trying fallback:', err);
+        // Fallback: try the old method
+        try {
+            element.select?.();
+            const success = document.execCommand('copy');
+            if (success) {
+                const btn = event?.target?.closest('button');
+                if (btn) {
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = '✓ Copied!';
+                    btn.style.backgroundColor = 'rgba(16, 44, 38, 0.3)';
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        btn.style.backgroundColor = '';
+                    }, 1500);
+                }
+            }
+        } catch (fallbackErr) {
+            console.warn('Fallback copy also failed:', fallbackErr);
+            // Silent fail - don't show alerts
+        }
     });
 }
 
