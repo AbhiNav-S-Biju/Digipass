@@ -38,13 +38,25 @@ const initializeDigitalAssetsTable = async () => {
       CREATE TABLE IF NOT EXISTS digital_assets (
         asset_id SERIAL PRIMARY KEY,
         user_id INTEGER NOT NULL,
-        asset_name VARCHAR(255) NOT NULL,
-        asset_type VARCHAR(50) NOT NULL,
-        encrypted_data TEXT NOT NULL,
+        platform_name VARCHAR(255),
+        category VARCHAR(100),
+        account_identifier VARCHAR(255),
+        action_type VARCHAR(50),
+        last_message TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
       )
+    `);
+    
+    // Ensure all columns exist (for migration)
+    await pool.query(`
+      ALTER TABLE digital_assets
+      ADD COLUMN IF NOT EXISTS platform_name VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS category VARCHAR(100),
+      ADD COLUMN IF NOT EXISTS account_identifier VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS action_type VARCHAR(50),
+      ADD COLUMN IF NOT EXISTS last_message TEXT
     `);
     
     // Create indexes
