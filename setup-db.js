@@ -8,6 +8,7 @@
 const {
   initializeUserActivityColumns,
   initializeDigitalAssetsTable,
+  updateDigitalAssetsSchema,
   initializeExecutorsTable,
   initializeDeadMansSwitchTable,
   initializeDigitalWillTable
@@ -19,6 +20,7 @@ async function setupDatabase() {
   try {
     const userActivityColumnsCreated = await initializeUserActivityColumns();
     const assetsTableCreated = await initializeDigitalAssetsTable();
+    const assetsSchemaUpdated = await updateDigitalAssetsSchema();
     const executorsTableCreated = await initializeExecutorsTable();
     const deadMansSwitchTableCreated = await initializeDeadMansSwitchTable();
     const digitalWillTableCreated = await initializeDigitalWillTable();
@@ -26,6 +28,7 @@ async function setupDatabase() {
     if (
       userActivityColumnsCreated &&
       assetsTableCreated &&
+      assetsSchemaUpdated &&
       executorsTableCreated &&
       deadMansSwitchTableCreated &&
       digitalWillTableCreated

@@ -288,10 +288,47 @@ const initializeDigitalWillTable = async () => {
   }
 };
 
+const updateDigitalAssetsSchema = async () => {
+  try {
+    // Add new columns for structured asset storage
+    await pool.query(`
+      ALTER TABLE digital_assets
+      ADD COLUMN IF NOT EXISTS platform_name VARCHAR(100),
+      ADD COLUMN IF NOT EXISTS category VARCHAR(50),
+      ADD COLUMN IF NOT EXISTS account_identifier VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS action_type VARCHAR(20),
+      ADD COLUMN IF NOT EXISTS last_message TEXT
+    `);
+
+    // Create indices for new columns
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_digital_assets_platform 
+      ON digital_assets(platform_name)
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_digital_assets_category 
+      ON digital_assets(category)
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_digital_assets_action 
+      ON digital_assets(action_type)
+    `);
+
+    console.log('✓ Digital assets schema updated successfully');
+    return true;
+  } catch (err) {
+    console.error('Error updating digital assets schema:', err.message);
+    return false;
+  }
+};
+
 module.exports = {
   initializeUsersTable,
   initializeUserActivityColumns,
   initializeDigitalAssetsTable,
+  updateDigitalAssetsSchema,
   initializeExecutorsTable,
   initializeDeadMansSwitchTable,
   initializeDigitalWillTable
