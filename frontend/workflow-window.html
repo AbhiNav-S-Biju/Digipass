@@ -27,16 +27,16 @@
         }
         
         .instructions-panel {
-            width: 30%;
+            width: 100%;
             background-color: #f7e7ce;
             color: #102c26;
             padding: 20px;
             overflow-y: auto;
-            border-right: 3px solid #102c26;
+            border-right: none;
         }
         
         .platform-panel {
-            width: 70%;
+            display: none;
             background: linear-gradient(135deg, #f7e7ce 0%, #f0dcc0 100%);
             display: flex;
             flex-direction: column;
@@ -276,41 +276,6 @@
                 platformUrl = url;
                 
                 document.getElementById('platformName').textContent = platformName;
-                document.getElementById('platformHeaderName').textContent = platformName;
-                document.getElementById('platformHeaderText').textContent = platformName;
-                
-                // Try to load platform page in iframe
-                const iframe = document.getElementById('platformIframe');
-                iframe.style.display = 'block';
-                iframe.src = platformUrl;
-                
-                // Handle iframe load errors - if blocked by X-Frame-Options
-                let iframeBlocked = false;
-                iframe.addEventListener('error', () => {
-                    iframeBlocked = true;
-                    openPlatformWindow();
-                });
-                
-                // Check if iframe is blocked after a delay
-                setTimeout(() => {
-                    if (!iframeBlocked) {
-                        try {
-                            // If we can't access iframe content, it's likely blocked
-                            if (iframe.contentDocument === null) {
-                                iframeBlocked = true;
-                                iframe.style.display = 'none';
-                                openPlatformWindow();
-                            }
-                        } catch (e) {
-                            // Cross-origin error - iframe is blocked
-                            if (!iframeBlocked) {
-                                iframeBlocked = true;
-                                iframe.style.display = 'none';
-                                openPlatformWindow();
-                            }
-                        }
-                    }
-                }, 1000);
                 
                 if (!assetId || !token) {
                     document.getElementById('content').innerHTML = '<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: Missing asset or token. Please close and try again.</div>';
@@ -393,22 +358,6 @@
             } catch (e) {
                 console.error('Full error:', e);
                 document.getElementById('content').innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: ${e.message}</div>`;
-            }
-        }
-        
-        function openPlatformWindow() {
-            if (platformUrl) {
-                // Open platform in a new window positioned to the right
-                const screenWidth = window.screen.width;
-                const screenHeight = window.screen.height;
-                const leftPos = Math.floor(screenWidth / 2);
-                const width = Math.floor(screenWidth / 2);
-                
-                window.open(
-                    platformUrl, 
-                    platformName.replace(/\s+/g, '_'), 
-                    `width=${width},height=${screenHeight},left=${leftPos},top=0,resizable=yes,scrollbars=yes`
-                );
             }
         }
         

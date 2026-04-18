@@ -508,18 +508,23 @@ function togglePasswordVisibility(fieldId) {
  * Open platform link + floating popup window with instructions
  */
 function openPlatformWithFloatingPopup(platformUrl, platformName) {
-    // Pass data via sessionStorage
+    // Pass data via sessionStorage for the instructions window
     sessionStorage.setItem('digipass_asset_id', workflowState.assetId);
     sessionStorage.setItem('digipass_token', localStorage.getItem('executorToken'));
     sessionStorage.setItem('digipass_platform_url', platformUrl);
     sessionStorage.setItem('digipass_platform_name', platformName);
     
-    // Open workflow window with 30:70 split internally (30% instructions, 70% instagram)
     const screenWidth = window.screen.width;
     const screenHeight = window.screen.height;
+    const halfWidth = Math.floor(screenWidth / 2);
     
-    // Open the workflow window full width for the split layout
-    window.open('workflow-window.html', 'digipass_workflow', `width=${screenWidth},height=${screenHeight},left=0,top=0,resizable=yes,scrollbars=yes`);
+    // Open instructions window on the LEFT (30% width)
+    window.open('workflow-window.html', 'digipass_instructions', `width=${halfWidth},height=${screenHeight},left=0,top=0,resizable=yes,scrollbars=yes`);
+    
+    // Open platform window on the RIGHT (70% width, but as separate window)
+    setTimeout(() => {
+        window.open(platformUrl, platformName.replace(/\s+/g, '_'), `width=${halfWidth},height=${screenHeight},left=${halfWidth},top=0,resizable=yes,scrollbars=yes`);
+    }, 500);
 }
 
 /**
