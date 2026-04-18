@@ -116,7 +116,7 @@ async function openWorkflow(assetId, token) {
     }
 
     // Show the popup (don't replace content yet)
-    popup.style.display = 'block';
+    popup.classList.remove('workflow-popup-hidden');
     
     // Restore saved position and initialize drag handling
     loadPopupPosition(assetId);
@@ -396,7 +396,7 @@ async function completeWorkflow() {
 function closeWorkflow() {
     const popup = document.getElementById('workflowPopup');
     if (popup) {
-        popup.style.display = 'none';
+        popup.classList.add('workflow-popup-hidden');
     }
     workflowState.isOpen = false;
     saveWorkflowProgress();
