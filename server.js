@@ -80,6 +80,16 @@ app.use(async (req, res, next) => {
 // Serve static files (frontend)
 app.use(express.static('frontend'));
 
+// Disable caching for HTML files to prevent stale versions
+app.use((req, res, next) => {
+  if (req.path.endsWith('.html') || req.path.endsWith('.html/')) {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+  }
+  next();
+});
+
 // Serve index.html for root path
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/frontend/index.html');
