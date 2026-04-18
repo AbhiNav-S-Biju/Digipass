@@ -342,11 +342,6 @@ async function handleGenerateWill() {
   }
 }
 
-// Load switch data (placeholder)
-function loadSwitchData() {
-  // To be implemented in Step 5
-}
-
 function bindAssetActions() {
   const assetForm = document.getElementById('assetForm');
   const refreshAssetsBtn = document.getElementById('refreshAssetsBtn');

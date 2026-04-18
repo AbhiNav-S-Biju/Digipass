@@ -120,10 +120,12 @@ const login = async (req, res, next) => {
         [user.user_id]
       );
 
+      // Ensure dead_mans_switch record exists
       await pool.query(
-        `UPDATE dead_mans_switch
-         SET last_checkin = CURRENT_TIMESTAMP, status = 'active', updated_at = CURRENT_TIMESTAMP
-         WHERE user_id = $1`,
+        `INSERT INTO dead_mans_switch (user_id, check_interval_days, last_checkin, status, created_at, updated_at)
+         VALUES ($1, 30, CURRENT_TIMESTAMP, 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+         ON CONFLICT (user_id) DO UPDATE SET
+         last_checkin = CURRENT_TIMESTAMP, status = 'active', updated_at = CURRENT_TIMESTAMP`,
         [user.user_id]
       );
     } catch (err) {

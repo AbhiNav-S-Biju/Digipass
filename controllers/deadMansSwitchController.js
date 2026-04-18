@@ -9,6 +9,14 @@ const getStatus = async (req, res) => {
   try {
     const userId = req.userId;
 
+    // Ensure dead_mans_switch record exists for this user
+    await pool.query(
+      `INSERT INTO dead_mans_switch (user_id, check_interval_days, last_checkin, status, created_at, updated_at)
+       VALUES ($1, 30, CURRENT_TIMESTAMP, 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+       ON CONFLICT (user_id) DO NOTHING`,
+      [userId]
+    );
+
     const { rows } = await pool.query(
       `SELECT 
         dms_id,
