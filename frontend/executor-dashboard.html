@@ -924,8 +924,8 @@
             const popup = document.getElementById('workflowPopup');
             const stepContainer = document.getElementById('stepContainer');
             
-            // Show loading state
-            popup.style.display = 'block';
+            // Show loading state - remove hidden class to trigger animation
+            popup.classList.remove('workflow-popup-hidden');
             stepContainer.innerHTML = '<div style="padding: 20px; text-align: center;"><div class="spinner-border" role="status" style="color: var(--forest-deep);"><span class="visually-hidden">Loading...</span></div></div>';
 
             try {
@@ -1103,26 +1103,6 @@
         // Copy credential to clipboard
         function copyCredential(fieldId) {
             const element = document.getElementById(fieldId);
-            let text = element.value || element.textContent;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = event.target.closest('button');
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                }, 2000);
-            });
-        }
-
-        // Close workflow popup
-        function closeWorkflow() {
-            document.getElementById('workflowPopup').style.display = 'none';
-        }
-
-        // Copy credential to clipboard
-        function copyCredential(fieldId) {
-            const element = document.getElementById(fieldId);
             const text = element.value;
             
             navigator.clipboard.writeText(text).then(() => {
@@ -1184,7 +1164,7 @@
     </script>
 
     <!-- Workflow Popup -->
-    <div id="workflowPopup" class="workflow-popup" style="display: none;">
+    <div id="workflowPopup" class="workflow-popup workflow-popup-hidden">
         <div class="workflow-container">
             <!-- Header -->
             <div class="workflow-header">
@@ -1298,9 +1278,24 @@
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
             border-radius: 14px;
-            animation: slideInRight 0.3s ease-out;
             background-color: var(--cream-light);
             border: 1px solid var(--sand-deep);
+            transition: all 0.3s ease-out;
+        }
+
+        /* Show state with animation */
+        .workflow-popup:not(.workflow-popup-hidden) {
+            opacity: 1;
+            transform: translateX(0);
+            visibility: visible;
+        }
+
+        /* Hidden state */
+        .workflow-popup.workflow-popup-hidden {
+            opacity: 0;
+            transform: translateX(420px);
+            visibility: hidden;
+            pointer-events: none;
         }
         
         /* When dragged, position is set via left/top */
