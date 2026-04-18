@@ -75,8 +75,12 @@ function initDashboard() {
 
 // Navigate to a specific page
 function navigateToPage(pageName) {
+  console.log('Navigating to page:', pageName);
+  
   const navLinks = document.querySelectorAll('a[data-page]');
   const pages = document.querySelectorAll('.page');
+
+  console.log('Found navLinks:', navLinks.length, 'pages:', pages.length);
 
   // Remove active class from all links and pages
   navLinks.forEach(l => l.classList.remove('active'));
@@ -85,12 +89,18 @@ function navigateToPage(pageName) {
   // Find and activate the link and page for this pageName
   const activeLink = document.querySelector(`a[data-page="${pageName}"]`);
   if (activeLink) {
+    console.log('Found active link for:', pageName);
     activeLink.classList.add('active');
+  } else {
+    console.log('No link found for:', pageName);
   }
 
   const targetPage = document.getElementById(`${pageName}Page`);
   if (targetPage) {
+    console.log('Found target page:', `${pageName}Page`);
     targetPage.classList.add('active');
+  } else {
+    console.log('No page found with ID:', `${pageName}Page`);
   }
 
   // Close navbar menu on mobile using Bootstrap method
@@ -104,6 +114,7 @@ function navigateToPage(pageName) {
   }
 
   // Load page data
+  console.log('Loading page data for:', pageName);
   loadPageData(pageName);
 }
 
