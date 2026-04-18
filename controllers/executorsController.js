@@ -147,9 +147,12 @@ async function addExecutor(req, res, next) {
     });
   } catch (error) {
     console.error('Add Executor Error:', error);
+    console.error('Stack:', error.stack);
     return res.status(500).json({
       success: false,
-      message: 'Failed to add executor'
+      message: 'Failed to add executor',
+      error: error.message, // Include error details for debugging
+      details: error.code || error.detail // Include database error details if available
     });
   }
 }
