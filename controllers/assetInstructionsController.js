@@ -1,5 +1,4 @@
 const pool = require('../db.js');
-const jwt = require('../utils/jwt.js');
 
 /**
  * Get detailed instructions for an asset
@@ -8,24 +7,13 @@ const jwt = require('../utils/jwt.js');
 async function getAssetInstructions(req, res) {
   try {
     const { assetId } = req.params;
-    const token = req.headers.authorization?.split(' ')[1];
-
-    if (!token) {
+    
+    // Executor info already verified by middleware
+    const executor = req.executor;
+    
+    if (!executor) {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
-
-    // Verify token and get executor info
-    const decoded = jwt.verify(token);
-    const { rows: executorRows } = await pool.query(
-      'SELECT * FROM executors WHERE executor_id = $1 AND verification_status = $2 AND access_granted = $3',
-      [decoded.executor_id, 'verified', true]
-    );
-
-    if (executorRows.length === 0) {
-      return res.status(403).json({ success: false, message: 'Access not authorized' });
-    }
-
-    const executor = executorRows[0];
 
     // Get asset details
     const { rows: assetRows } = await pool.query(
