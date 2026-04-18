@@ -295,6 +295,32 @@ body {
     font-size: 0.92rem;
 }
 
+.asset-action-btn {
+    background-color: #102c26;
+    color: #f7e7ce;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.asset-action-btn:hover {
+    background-color: #081a16;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 44, 38, 0.2);
+}
+
+.asset-action-btn:active {
+    transform: translateY(0);
+}
+
 .executor-meta {
     margin-top: 0.45rem;
     color: #4b5563;

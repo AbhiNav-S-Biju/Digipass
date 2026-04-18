@@ -99,6 +99,9 @@ async function loadExecutorAssets() {
             <h4>${escapeHtml(asset.asset_name)}</h4>
             <p class="asset-type">${escapeHtml(formatAssetType(asset.asset_type))}</p>
           </div>
+          <button class="asset-action-btn" onclick="openWorkflow('${asset.asset_id}', '${token}')">
+            <i class="fas fa-play-circle"></i> Start
+          </button>
         </div>
         <p class="asset-date">Added ${formatDate(asset.created_at)}</p>
       </article>
