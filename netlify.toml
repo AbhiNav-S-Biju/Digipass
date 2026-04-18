@@ -1,0 +1,11 @@
+[build]
+  publish = "frontend"
+  command = "echo 'Frontend is static, no build needed'"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[dev]
+  publish = "frontend"
