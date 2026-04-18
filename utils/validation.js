@@ -21,7 +21,10 @@ const validateName = (name) => {
 };
 
 const validatePhone = (phone) => {
-  const phoneRegex = /^[0-9\-\+\(\)\s]{10,}$/;
+  // Allow any phone format - at least 5 characters, letters/numbers/symbols
+  // Makes it flexible for international formats
+  if (!phone) return true; // Phone is optional
+  const phoneRegex = /^[a-zA-Z0-9\-\+\(\)\s\.]{5,}$/;
   return phoneRegex.test(phone?.trim());
 };
 
