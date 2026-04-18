@@ -300,14 +300,11 @@
         // Load assets
         async function loadAssets() {
             try {
-                console.log('[Executor Dashboard] Starting loadAssets...');
                 const response = await fetch(`${API_URL}/api/executor/assets`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-
-                console.log('[Executor Dashboard] Response status:', response.status);
 
                 if (response.status === 401) {
                     location.href = 'executor-login.html';
@@ -315,20 +312,9 @@
                 }
 
                 const data = await response.json();
-                console.log('[Executor Dashboard] Full API Response:', data);
-                console.log('[Executor Dashboard] data.assets:', data.assets);
-                console.log('[Executor Dashboard] data.data:', data.data);
-                console.log('[Executor Dashboard] Is data.assets array?', Array.isArray(data.assets));
-                console.log('[Executor Dashboard] Is data.data.assets array?', data.data && Array.isArray(data.data.assets));
 
                 // Check both possible response formats
                 const assets = data.assets || (data.data && data.data.assets) || [];
-                console.log('[Executor Dashboard] Assets to render:', assets);
-                console.log('[Executor Dashboard] Assets count:', assets.length);
-                if (assets.length > 0) {
-                    console.log('[Executor Dashboard] First asset object:', JSON.stringify(assets[0], null, 2));
-                    console.log('[Executor Dashboard] Asset keys:', Object.keys(assets[0]));
-                }
 
                 if (assets && assets.length > 0) {
                     const assetsList = document.getElementById('assetsList');
@@ -368,18 +354,8 @@
                             </div>
                         `;
                     }).join('');
-                    console.log('[Executor Dashboard] HTML inserted into assetsList, innerHTML length:', assetsList.innerHTML.length);
-                    console.log('[Executor Dashboard] assetsList element exists?', !!assetsList);
-                    console.log('[Executor Dashboard] assetsList children count after render:', assetsList.children.length);
-                    console.log('[Executor Dashboard] Generated HTML (first 500 chars):', assetsList.innerHTML.substring(0, 500));
-                    const computedStyle = window.getComputedStyle(assetsList);
-                    console.log('[Executor Dashboard] assetsList computed display:', computedStyle.display);
-                    console.log('[Executor Dashboard] assetsList computed visibility:', computedStyle.visibility);
-                    console.log('[Executor Dashboard] assetsList class list:', assetsList.className);
-                    console.log('[Executor Dashboard] assetsList parent element:', assetsList.parentElement);
                     document.getElementById('emptyState').classList.add('d-none');
                 } else {
-                    console.log('[Executor Dashboard] No assets found, showing empty state');
                     document.getElementById('assetsList').innerHTML = '';
                     document.getElementById('emptyState').classList.remove('d-none');
                 }
