@@ -514,8 +514,13 @@ function openPlatformWithFloatingPopup(platformUrl, platformName) {
     sessionStorage.setItem('digipass_platform_url', platformUrl);
     sessionStorage.setItem('digipass_platform_name', platformName);
     
+    // Position workflow window on the left side of screen (50% width)
+    const screenWidth = window.screen.width;
+    const screenHeight = window.screen.height;
+    const width = Math.floor(screenWidth / 2);
+    
     // Open the workflow window (contains instructions + platform button)
-    window.open('workflow-window.html', 'digipass_workflow', 'width=1200,height=700,left=50,top=50,resizable=yes,scrollbars=yes');
+    window.open('workflow-window.html', 'digipass_workflow', `width=${width},height=${screenHeight},left=0,top=0,resizable=yes,scrollbars=yes`);
 }
 
 /**

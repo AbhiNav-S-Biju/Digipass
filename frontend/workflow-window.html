@@ -346,7 +346,18 @@
         
         function openPlatform() {
             if (platformUrl) {
-                window.open(platformUrl, '_blank', 'noopener,noreferrer');
+                // Open platform in a new window positioned to the right
+                // Window positioning: left=50% of screen, top=0, width=50% of screen, height=100%
+                const screenWidth = window.screen.width;
+                const screenHeight = window.screen.height;
+                const leftPos = Math.floor(screenWidth / 2);
+                const width = Math.floor(screenWidth / 2);
+                
+                window.open(
+                    platformUrl, 
+                    platformName.replace(/\s+/g, '_'), 
+                    `width=${width},height=${screenHeight},left=${leftPos},top=0,resizable=yes,scrollbars=yes`
+                );
             }
         }
         
