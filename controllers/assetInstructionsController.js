@@ -916,38 +916,10 @@ function generateInstructions(asset, user, executor) {
     };
   }
 }
-        {
-          step: 5,
-          title: 'Send/Post the Message',
-          description: 'Post or send to appropriate recipients',
-          action: 'For social media: post publicly or send DM. For email: send to contacts as needed.'
-        },
-        {
-          step: 6,
-          title: 'Verify Delivery',
-          description: 'Confirm the message was successfully sent/posted',
-          action: 'Check that message appears in sent/posts section'
-        },
-        {
-          step: 7,
-          title: 'Logout',
-          description: 'Sign out of the account',
-          action: 'Click Logout or Sign Out button'
-        }
-      ],
-      checklist: [
-        'Accessed login page',
-        'Logged into account',
-        'Navigated to messaging',
-        'Sent final message',
-        'Verified delivery',
-        'Logged out'
-      ]
-    };
-  }
 
-  return baseInstructions;
-}
+module.exports = {
+  getAssetInstructions
+};
 
 module.exports = {
   getAssetInstructions
