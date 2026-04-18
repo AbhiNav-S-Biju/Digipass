@@ -41,8 +41,10 @@ app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
+    // Get userId from either regular user auth or executor auth
+    const userId = req.user?.id || req.executor?.user_id || req.ownerUserId;
     logApiRequest(req.method, req.path, res.statusCode, duration, {
-      userId: req.user?.id
+      userId: userId
     });
   });
   next();
