@@ -60,13 +60,45 @@ async function addAsset(req, res) {
       });
     }
 
-    const { rows } = await pool.query(
-      `INSERT INTO digital_assets (user_id, platform_name, category, account_identifier, action_type, last_message, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
-       RETURNING asset_id, platform_name, category, account_identifier, action_type, last_message, created_at`,
-      [userId, platform_name.trim(), category, account_identifier.trim(), action_type, last_message || null]
-    );
+    // Try new schema first
+    let result;
+    try {
+      result = await pool.query(
+        `INSERT INTO digital_assets (user_id, platform_name, category, account_identifier, action_type, last_message, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+         RETURNING asset_id, platform_name, category, account_identifier, action_type, last_message, created_at`,
+        [userId, platform_name.trim(), category, account_identifier.trim(), action_type, last_message || null]
+      );
+    } catch (newSchemaError) {
+      // Fall back to old schema if new columns don't exist
+      console.warn('New schema columns not found, using old schema:', newSchemaError.message);
+      result = await pool.query(
+        `INSERT INTO digital_assets (user_id, asset_name, asset_type, encrypted_data, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, NOW(), NOW())
+         RETURNING asset_id, asset_name, asset_type, created_at`,
+        [userId, platform_name.trim(), category, JSON.stringify({ account: account_identifier, action: action_type, message: last_message })]
+      );
+      
+      // Transform to new format for response
+      const oldRow = result.rows[0];
+      const newFormatRow = {
+        asset_id: oldRow.asset_id,
+        platform_name: oldRow.asset_name,
+        category: oldRow.asset_type,
+        account_identifier: account_identifier,
+        action_type: action_type,
+        last_message: last_message,
+        created_at: oldRow.created_at
+      };
+      
+      return res.status(201).json({
+        success: true,
+        message: 'Asset added successfully',
+        data: buildAssetResponse(newFormatRow)
+      });
+    }
 
+    const { rows } = result;
     return res.status(201).json({
       success: true,
       message: 'Asset added successfully',
@@ -85,19 +117,53 @@ async function getAssets(req, res) {
   try {
     const userId = getAuthenticatedUserId(req);
 
-    const { rows } = await pool.query(
-      `SELECT asset_id, platform_name, category, account_identifier, action_type, last_message, created_at
-       FROM digital_assets
-       WHERE user_id = $1
-       ORDER BY created_at DESC`,
-      [userId]
-    );
+    // Try new schema first, fall back to old schema if columns don't exist
+    let rows;
+    try {
+      const result = await pool.query(
+        `SELECT asset_id, platform_name, category, account_identifier, action_type, last_message, created_at
+         FROM digital_assets
+         WHERE user_id = $1
+         ORDER BY created_at DESC`,
+        [userId]
+      );
+      rows = result.rows;
+    } catch (newSchemaError) {
+      // Fall back to old schema if new columns don't exist
+      console.warn('New schema columns not found, falling back to old schema:', newSchemaError.message);
+      const result = await pool.query(
+        `SELECT asset_id, asset_name, asset_type, created_at
+         FROM digital_assets
+         WHERE user_id = $1
+         ORDER BY created_at DESC`,
+        [userId]
+      );
+      // Transform old format to new format
+      rows = result.rows.map(asset => ({
+        asset_id: asset.asset_id,
+        platform_name: asset.asset_name,
+        category: asset.asset_type,
+        account_identifier: null,
+        action_type: 'pass',
+        last_message: null,
+        created_at: asset.created_at
+      }));
+    }
 
     return res.status(200).json({
       success: true,
       message: 'Assets retrieved successfully',
       count: rows.length,
       data: rows.map(buildAssetResponse)
+    });
+  } catch (error) {
+    console.error('Get Assets Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve assets'
+    });
+  }
+}
     });
   } catch (error) {
     console.error('Get Assets Error:', error);
