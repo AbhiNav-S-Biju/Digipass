@@ -92,6 +92,14 @@ const executorsRoutes = require('./routes/executorsRoutes');
 const executorPortalRoutes = require('./routes/executorPortalRoutes');
 const willRoutes = require('./routes/willRoutes');
 
+// Disable ETags for API routes (prevents 304 responses)
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
