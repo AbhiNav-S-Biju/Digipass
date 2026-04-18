@@ -64,10 +64,13 @@ function initDashboard() {
   const navLinks = document.querySelectorAll('a[data-page]');
   const pages = document.querySelectorAll('.page');
 
+  console.log('[Dashboard Init] Found navLinks:', navLinks.length, 'pages:', pages.length);
+
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const pageName = link.dataset.page;
+      console.log('[Link Click] Navigating to:', pageName);
       navigateToPage(pageName);
     });
   });
@@ -75,6 +78,7 @@ function initDashboard() {
   // Also listen for hash changes (for anchor links and back button)
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.slice(1); // Remove the # symbol
+    console.log('[Hash Change] New hash:', hash);
     if (hash) {
       navigateToPage(hash);
     }
@@ -82,6 +86,7 @@ function initDashboard() {
 
   // Load initial page from hash on page load
   const initialHash = window.location.hash.slice(1);
+  console.log('[Dashboard Init] Initial hash:', initialHash);
   if (initialHash) {
     navigateToPage(initialHash);
   }
@@ -89,22 +94,36 @@ function initDashboard() {
 
 // Navigate to a specific page
 function navigateToPage(pageName) {
+  console.log('[navigateToPage]', pageName);
+  
   const navLinks = document.querySelectorAll('a[data-page]');
   const pages = document.querySelectorAll('.page');
 
+  console.log('[navigateToPage] Total pages:', pages.length);
+
   // Remove active class from all links and pages
   navLinks.forEach(l => l.classList.remove('active'));
-  pages.forEach(p => p.classList.remove('active'));
+  pages.forEach(p => {
+    p.classList.remove('active');
+    console.log('[navigateToPage] Removed active from:', p.id);
+  });
 
   // Find and activate the link and page for this pageName
   const activeLink = document.querySelector(`a[data-page="${pageName}"]`);
   if (activeLink) {
+    console.log('[navigateToPage] Found link for:', pageName);
     activeLink.classList.add('active');
+  } else {
+    console.log('[navigateToPage] NO LINK FOUND for:', pageName);
   }
 
-  const targetPage = document.getElementById(`${pageName}Page`);
+  const targetPageId = `${pageName}Page`;
+  const targetPage = document.getElementById(targetPageId);
   if (targetPage) {
+    console.log('[navigateToPage] Found page:', targetPageId, '- adding active class');
     targetPage.classList.add('active');
+  } else {
+    console.log('[navigateToPage] NO PAGE FOUND with ID:', targetPageId);
   }
 
   // Close navbar menu on mobile using Bootstrap method
@@ -118,6 +137,7 @@ function navigateToPage(pageName) {
   }
 
   // Load page data
+  console.log('[navigateToPage] Loading data for:', pageName);
   loadPageData(pageName);
 }
 
