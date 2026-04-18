@@ -179,12 +179,21 @@ async function getExecutorAssets(req, res) {
         [ownerUserId]
       ),
       pool.query(
-        `SELECT asset_id, asset_name, asset_type, created_at
+        `SELECT asset_id, platform_name, category, account_identifier, action_type, last_message, created_at
          FROM digital_assets
          WHERE user_id = $1
          ORDER BY created_at DESC`,
         [ownerUserId]
-      )
+      ).catch(async () => {
+        // Fall back to old schema if new columns don't exist
+        return pool.query(
+          `SELECT asset_id, asset_name, asset_type, created_at
+           FROM digital_assets
+           WHERE user_id = $1
+           ORDER BY created_at DESC`,
+          [ownerUserId]
+        );
+      })
     ]);
 
     if (ownerResult.rows.length === 0) {
@@ -193,6 +202,32 @@ async function getExecutorAssets(req, res) {
         message: 'Asset owner not found'
       });
     }
+
+    // Transform assets to ensure consistency
+    const transformedAssets = assetsResult.rows.map(asset => {
+      // If new columns exist
+      if (asset.platform_name) {
+        return {
+          asset_id: asset.asset_id,
+          platform_name: asset.platform_name,
+          category: asset.category,
+          account_identifier: asset.account_identifier,
+          action_type: asset.action_type,
+          last_message: asset.last_message,
+          created_at: asset.created_at
+        };
+      }
+      // If old columns only
+      return {
+        asset_id: asset.asset_id,
+        platform_name: asset.asset_name,
+        category: asset.asset_type,
+        account_identifier: null,
+        action_type: 'pass',
+        last_message: null,
+        created_at: asset.created_at
+      };
+    });
 
     return res.status(200).json({
       success: true,
@@ -204,8 +239,8 @@ async function getExecutorAssets(req, res) {
           executor_name: executor.executor_name,
           executor_email: executor.executor_email
         },
-        count: assetsResult.rows.length,
-        assets: assetsResult.rows
+        count: transformedAssets.length,
+        assets: transformedAssets
       }
     });
   } catch (error) {

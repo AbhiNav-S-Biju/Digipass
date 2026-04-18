@@ -315,21 +315,42 @@
 
                 if (data.assets && data.assets.length > 0) {
                     const assetsList = document.getElementById('assetsList');
-                    assetsList.innerHTML = data.assets.map(asset => `
-                        <div class="col-12 col-md-6 col-lg-4">
-                            <div class="asset-card">
-                                <h4>${asset.name}</h4>
-                                <div class="asset-type">${asset.type}</div>
-                                <div class="asset-description">
-                                    <strong>Username/Account:</strong> ${asset.username || 'N/A'}<br>
-                                    <strong>Notes:</strong> ${asset.notes || 'No notes provided'}
+                    const actionEmojis = {
+                        'pass': '📤',
+                        'delete': '🗑️',
+                        'last_message': '💬'
+                    };
+                    const actionLabels = {
+                        'pass': 'Pass to You',
+                        'delete': 'Delete Account',
+                        'last_message': 'Final Message'
+                    };
+                    assetsList.innerHTML = data.assets.map(asset => {
+                        const actionEmoji = actionEmojis[asset.action_type] || '📋';
+                        const actionLabel = actionLabels[asset.action_type] || asset.action_type;
+                        return `
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${escapeHtml(asset.platform_name)}</h5>
+                                        <p class="card-text text-muted small mb-2">
+                                            <strong>Account:</strong> ${escapeHtml(asset.account_identifier || 'N/A')}
+                                        </p>
+                                        <div class="mb-2">
+                                            <span class="badge bg-secondary">${asset.category}</span>
+                                        </div>
+                                        <div class="mb-3 p-2 bg-light rounded">
+                                            <span>${actionEmoji} ${actionLabel}</span>
+                                        </div>
+                                        ${asset.last_message ? `<div class="alert alert-info small mb-0"><strong>Message:</strong> ${escapeHtml(asset.last_message.substring(0, 80))}${asset.last_message.length > 80 ? '...' : ''}</div>` : ''}
+                                    </div>
+                                    <div class="card-footer bg-transparent">
+                                        <small class="text-muted">Added ${new Date(asset.created_at).toLocaleDateString()}</small>
+                                    </div>
                                 </div>
-                                <button onclick="copyToClipboard('${escapeHtml(asset.password)}')" class="btn btn-primary btn-sm">
-                                    Copy Password
-                                </button>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                     document.getElementById('emptyState').classList.add('d-none');
                 } else {
                     document.getElementById('assetsList').innerHTML = '';
