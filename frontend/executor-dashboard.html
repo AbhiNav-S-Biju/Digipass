@@ -276,6 +276,29 @@
         <div id="emptyState" class="alert alert-info d-none text-center">
             <p class="mb-0">No digital assets have been assigned to you yet. Check back soon.</p>
         </div>
+
+        <!-- Asset Instructions Modal -->
+        <div class="modal fade" id="instructionsModal" tabindex="-1" aria-labelledby="instructionsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div>
+                            <h5 class="modal-title" id="instructionsModalLabel">Asset Instructions</h5>
+                            <p class="text-muted small mb-0" id="instructionsSubtitle"></p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="instructionsContent">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -389,6 +412,10 @@
                                     </div>
                                     <div class="card-footer bg-transparent">
                                         <small class="text-muted">Added ${new Date(asset.created_at).toLocaleDateString()}</small>
+                                        <br>
+                                        <button class="btn btn-primary btn-sm mt-2 w-100" data-asset-id="${asset.asset_id}" data-platform="${asset.platform_name}" data-action="${asset.action_type}" onclick="openAssetInstructions(${asset.asset_id})">
+                                            <i class="fas fa-book"></i> View Instructions
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -422,6 +449,251 @@
                 "'": '&#039;'
             };
             return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Open asset instructions modal
+        async function openAssetInstructions(assetId) {
+            const modal = new bootstrap.Modal(document.getElementById('instructionsModal'));
+            const contentDiv = document.getElementById('instructionsContent');
+            contentDiv.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+
+            try {
+                const response = await fetch(`${API_URL}/api/executor/asset-instructions/${assetId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401) {
+                    location.href = 'executor-login.html';
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    contentDiv.innerHTML = `<div class="alert alert-danger">Failed to load instructions: ${data.message}</div>`;
+                    modal.show();
+                    return;
+                }
+
+                const instructions = data.data.instructions;
+                const asset = data.data.asset;
+                const user = data.data.user;
+
+                // Set modal title
+                document.getElementById('instructionsModalLabel').textContent = `${asset.platform_name} - ${instructions.overview.action}`;
+                document.getElementById('instructionsSubtitle').textContent = `Account: ${escapeHtml(asset.account_identifier)}`;
+
+                // Generate content
+                let html = `
+                    <div class="instructions-content">
+                        <!-- Account Overview -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Account Overview</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="mb-2"><strong>Platform:</strong> ${escapeHtml(asset.platform_name)}</p>
+                                        <p class="mb-2"><strong>Username/Email:</strong> ${escapeHtml(asset.account_identifier)}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-2"><strong>Registered Email:</strong> ${escapeHtml(user.email)}</p>
+                                        <p class="mb-2"><strong>Action:</strong> <span class="badge bg-primary">${instructions.overview.action}</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                `;
+
+                // Step-by-step instructions
+                if (instructions.steps && instructions.steps.length > 0) {
+                    html += `
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-list-ol"></i> Step-by-Step Instructions</h6>
+                            </div>
+                            <div class="card-body">
+                    `;
+
+                    instructions.steps.forEach((step, index) => {
+                        html += `
+                            <div class="mb-3 pb-3 ${index < instructions.steps.length - 1 ? 'border-bottom' : ''}">
+                                <div class="d-flex align-items-start gap-2">
+                                    <span class="badge bg-primary" style="font-size: 0.9rem; min-width: 30px; text-align: center;">
+                                        ${step.step}
+                                    </span>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">${escapeHtml(step.title)}</h6>
+                                        <p class="text-muted small mb-1">${escapeHtml(step.description)}</p>
+                                        <p class="small mb-1"><strong>Action:</strong> ${escapeHtml(step.action)}</p>
+                                        ${step.link ? `<a href="${step.link}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-external-link-alt"></i> Open ${escapeHtml(asset.platform_name)}</a>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Password generation section (for "pass" action)
+                if (asset.action_type === 'pass') {
+                    html += `
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-key"></i> Password Setup</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Generate Temporary Password (Optional)</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="tempPassword" readonly value="">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="generateTemporaryPassword('${assetId}')">
+                                            <i class="fas fa-refresh"></i> Generate
+                                        </button>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('tempPassword')">
+                                            <i class="fas fa-copy"></i> Copy
+                                        </button>
+                                    </div>
+                                    <small class="text-muted d-block mt-2">Generate a secure temporary password for initial login.</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="customPassword" class="form-label">Your New Secure Password</label>
+                                    <input type="password" class="form-control" id="customPassword" placeholder="Enter password you will remember">
+                                    <small class="text-muted d-block mt-2">After logging in with the temporary password, set this as your new permanent password.</small>
+                                </div>
+
+                                <div class="alert alert-info small">
+                                    <i class="fas fa-lightbulb"></i> <strong>Tip:</strong> Use a password manager (Bitwarden, 1Password, KeePass) to store the new password securely.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Last message section (for "last_message" action)
+                if (asset.action_type === 'last_message' && instructions.message) {
+                    html += `
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-message"></i> Final Message</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info mb-0">
+                                    <p class="mb-0"><strong>Copy this message and send it:</strong></p>
+                                    <div class="p-2 bg-white rounded mt-2 border">
+                                        <p id="finalMessage" class="mb-0" style="white-space: pre-wrap;">${escapeHtml(instructions.message)}</p>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary mt-2" onclick="copyToClipboard('finalMessage')">
+                                        <i class="fas fa-copy"></i> Copy Message
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Completion Checklist
+                if (instructions.checklist && instructions.checklist.length > 0) {
+                    html += `
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-check-square"></i> Completion Checklist</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="checklist-${assetId}">
+                    `;
+
+                    instructions.checklist.forEach((item, index) => {
+                        html += `
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="check-${assetId}-${index}" data-asset="${assetId}">
+                                <label class="form-check-label" for="check-${assetId}-${index}">
+                                    ${escapeHtml(item)}
+                                </label>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                                </div>
+                                <hr>
+                                <p class="small text-muted mb-0">✓ Check off each step as you complete it. Your progress is saved locally.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                contentDiv.innerHTML = html;
+
+                // Load saved progress
+                loadAssetProgress(assetId);
+
+                // Add event listeners for checkboxes
+                document.querySelectorAll(`input[data-asset="${assetId}"]`).forEach(checkbox => {
+                    checkbox.addEventListener('change', () => saveAssetProgress(assetId));
+                });
+
+                modal.show();
+            } catch (error) {
+                console.error('Error loading instructions:', error);
+                contentDiv.innerHTML = `<div class="alert alert-danger">Error loading instructions. Please try again.</div>`;
+                modal.show();
+            }
+        }
+
+        // Generate temporary password
+        function generateTemporaryPassword(assetId) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            let password = '';
+            for (let i = 0; i < 16; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('tempPassword').value = password;
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            let text = element.value || element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+
+        // Save asset progress to localStorage
+        function saveAssetProgress(assetId) {
+            const checkboxes = document.querySelectorAll(`input[data-asset="${assetId}"]`);
+            const progress = [];
+            checkboxes.forEach((checkbox, index) => {
+                progress.push(checkbox.checked);
+            });
+            localStorage.setItem(`assetProgress-${assetId}`, JSON.stringify(progress));
+        }
+
+        // Load asset progress from localStorage
+        function loadAssetProgress(assetId) {
+            const saved = localStorage.getItem(`assetProgress-${assetId}`);
+            if (saved) {
+                const progress = JSON.parse(saved);
+                const checkboxes = document.querySelectorAll(`input[data-asset="${assetId}"]`);
+                checkboxes.forEach((checkbox, index) => {
+                    checkbox.checked = progress[index] || false;
+                });
+            }
         }
 
         loadAssets();
