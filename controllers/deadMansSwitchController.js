@@ -178,7 +178,7 @@ const getExecutorNotifications = async (req, res) => {
       `SELECT 
         e.executor_id,
         e.executor_email,
-        e.full_name,
+        e.executor_name as full_name,
         e.access_granted,
         e.created_at,
         dms.status,
