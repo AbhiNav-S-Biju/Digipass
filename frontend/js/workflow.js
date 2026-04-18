@@ -29,10 +29,11 @@ async function openWorkflow(assetId, token) {
     workflowState.steps = [];
     workflowState.completedSteps = new Set();
 
-    const popup = document.getElementById('workflowPopup');
+    // Wait for popup to be ready
+    const popup = await waitForElement('workflowPopup', 500);
     
     if (!popup) {
-        console.error('Workflow popup not found in DOM');
+        console.error('Workflow popup not found in DOM after waiting');
         alert('Error: Workflow popup not loaded. Please refresh the page.');
         return;
     }
@@ -83,6 +84,22 @@ async function openWorkflow(assetId, token) {
         // Load saved progress from localStorage
         loadWorkflowProgress(assetId);
 
+        // Ensure all elements are ready before rendering
+        await waitForElements([
+            'workflowTitle',
+            'workflowAccount',
+            'progressBar',
+            'progressText',
+            'stepNumber',
+            'stepTitle',
+            'stepDescription',
+            'stepAction',
+            'stepLinks',
+            'stepCompleteCheck',
+            'prevBtn',
+            'nextBtn'
+        ], 500);
+
         // Render the first step
         renderWorkflowStep();
 
@@ -91,6 +108,42 @@ async function openWorkflow(assetId, token) {
         console.error('Error loading workflow:', error);
         contentDiv.innerHTML = `<div style="color: red; padding: 16px;">Failed to load workflow. Please try again.</div>`;
     }
+}
+
+/**
+ * Wait for a single element to appear in DOM
+ */
+function waitForElement(elementId, timeout = 1000) {
+    return new Promise((resolve) => {
+        const startTime = Date.now();
+        
+        const checkElement = () => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                resolve(element);
+                return;
+            }
+            
+            if (Date.now() - startTime > timeout) {
+                console.warn(`Element #${elementId} not found after ${timeout}ms`);
+                resolve(null);
+                return;
+            }
+            
+            setTimeout(checkElement, 50);
+        };
+        
+        checkElement();
+    });
+}
+
+/**
+ * Wait for multiple elements to appear in DOM
+ */
+function waitForElements(elementIds, timeout = 1000) {
+    return Promise.all(
+        elementIds.map(id => waitForElement(id, timeout))
+    );
 }
 
 /**
@@ -103,29 +156,6 @@ function renderWorkflowStep() {
         return;
     }
 
-    // Ensure all required elements exist
-    const requiredElements = [
-        'workflowTitle',
-        'workflowAccount',
-        'progressBar',
-        'progressText',
-        'stepNumber',
-        'stepTitle',
-        'stepDescription',
-        'stepAction',
-        'stepLinks',
-        'stepCompleteCheck',
-        'prevBtn',
-        'nextBtn'
-    ];
-
-    for (const id of requiredElements) {
-        if (!document.getElementById(id)) {
-            console.error(`Required element #${id} not found in DOM`);
-            return;
-        }
-    }
-
     const step = workflowState.steps[workflowState.currentStepIndex];
     if (!step) {
         // No more steps - show completion state
@@ -134,45 +164,59 @@ function renderWorkflowStep() {
     }
 
     // Update title and account
-    document.getElementById('workflowTitle').textContent = workflowState.asset.platform_name;
-    document.getElementById('workflowAccount').textContent = `Account: ${escapeHtml(workflowState.asset.account_identifier)}`;
+    const titleEl = document.getElementById('workflowTitle');
+    const accountEl = document.getElementById('workflowAccount');
+    
+    if (titleEl) titleEl.textContent = workflowState.asset.platform_name;
+    if (accountEl) accountEl.textContent = `Account: ${escapeHtml(workflowState.asset.account_identifier)}`;
 
     // Update progress
     const totalSteps = workflowState.steps.length;
     const progress = ((workflowState.currentStepIndex + 1) / totalSteps) * 100;
-    document.getElementById('progressBar').style.width = progress + '%';
-    document.getElementById('progressText').textContent = `Step ${workflowState.currentStepIndex + 1} of ${totalSteps}`;
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    if (progressBar) progressBar.style.width = progress + '%';
+    if (progressText) progressText.textContent = `Step ${workflowState.currentStepIndex + 1} of ${totalSteps}`;
 
     // Update step content
-    document.getElementById('stepNumber').textContent = step.step;
-    document.getElementById('stepTitle').textContent = escapeHtml(step.title);
-    document.getElementById('stepDescription').textContent = escapeHtml(step.description);
-    document.getElementById('stepAction').innerHTML = `<strong>Action:</strong> ${escapeHtml(step.action)}`;
+    const stepNumber = document.getElementById('stepNumber');
+    const stepTitle = document.getElementById('stepTitle');
+    const stepDesc = document.getElementById('stepDescription');
+    const stepAction = document.getElementById('stepAction');
+    const stepLinks = document.getElementById('stepLinks');
+    
+    if (stepNumber) stepNumber.textContent = step.step;
+    if (stepTitle) stepTitle.textContent = escapeHtml(step.title);
+    if (stepDesc) stepDesc.textContent = escapeHtml(step.description);
+    if (stepAction) stepAction.innerHTML = `<strong>Action:</strong> ${escapeHtml(step.action)}`;
 
     // Add step links
-    const linksContainer = document.getElementById('stepLinks');
-    linksContainer.innerHTML = '';
-    if (step.link) {
-        const link = document.createElement('a');
-        link.href = step.link;
-        link.target = '_blank';
-        link.innerHTML = `<i class="fas fa-external-link-alt"></i> Open ${escapeHtml(workflowState.asset.platform_name)}`;
-        linksContainer.appendChild(link);
+    if (stepLinks) {
+        stepLinks.innerHTML = '';
+        if (step.link) {
+            const link = document.createElement('a');
+            link.href = step.link;
+            link.target = '_blank';
+            link.innerHTML = `<i class="fas fa-external-link-alt"></i> Open ${escapeHtml(workflowState.asset.platform_name)}`;
+            stepLinks.appendChild(link);
+        }
     }
 
     // Update checkbox state
     const checkbox = document.getElementById('stepCompleteCheck');
-    checkbox.checked = workflowState.completedSteps.has(workflowState.currentStepIndex);
+    if (checkbox) checkbox.checked = workflowState.completedSteps.has(workflowState.currentStepIndex);
 
     // Update button states
     updateNavigationButtons();
 
     // Update complete button visibility
     const completeBtn = document.getElementById('completeBtn');
-    if (workflowState.currentStepIndex === totalSteps - 1) {
-        completeBtn.style.display = 'flex';
-    } else {
-        completeBtn.style.display = 'none';
+    if (completeBtn) {
+        if (workflowState.currentStepIndex === totalSteps - 1) {
+            completeBtn.style.display = 'flex';
+        } else {
+            completeBtn.style.display = 'none';
+        }
     }
 }
 
