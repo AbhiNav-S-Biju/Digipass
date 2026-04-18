@@ -27,7 +27,7 @@
         }
         
         .instructions-panel {
-            width: 50%;
+            width: 30%;
             background-color: #f7e7ce;
             color: #102c26;
             padding: 20px;
@@ -36,7 +36,7 @@
         }
         
         .platform-panel {
-            width: 50%;
+            width: 70%;
             background: linear-gradient(135deg, #f7e7ce 0%, #f0dcc0 100%);
             display: flex;
             flex-direction: column;
@@ -45,65 +45,19 @@
         }
         
         .platform-panel-header {
-            padding: 15px 20px;
+            padding: 12px 20px;
             background-color: white;
-            border-bottom: 2px solid #ddd;
+            border-bottom: 1px solid #ddd;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
         }
         
         .platform-panel-header h5 {
             margin: 0;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             color: #102c26;
             font-weight: 600;
-        }
-        
-        .platform-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-            text-align: center;
-        }
-        
-        .platform-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            color: #102c26;
-            opacity: 0.8;
-        }
-        
-        .platform-message h4 {
-            color: #102c26;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-        
-        .platform-message p {
-            color: #555;
-            font-size: 0.95rem;
-            margin-bottom: 10px;
-            line-height: 1.6;
-        }
-        
-        .loading-spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f0f0f0;
-            border-top: 4px solid #102c26;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
         
         #platformIframe {
@@ -112,7 +66,6 @@
             width: 100%;
             height: 100%;
             background-color: white;
-            display: none;
         }
         
         .instructions-header {
@@ -303,20 +256,7 @@
         <!-- RIGHT: Platform Window -->
         <div class="platform-panel">
             <div class="platform-panel-header">
-                <h5 id="platformHeaderName"><i class="fas fa-external-link-alt"></i> Platform</h5>
-            </div>
-            <div class="platform-content" id="platformContent">
-                <div class="loading-spinner"></div>
-                <div class="platform-message">
-                    <h4 id="platformLoadingText">Opening Instagram...</h4>
-                    <p>A new window is opening with the <span id="platformNameMsg">Instagram</span> login page.</p>
-                    <p style="margin-top: 20px; font-size: 0.85rem; color: #888;">
-                        If the window doesn't appear, check your browser's popup blocker settings.
-                    </p>
-                    <button class="btn btn-dark" style="margin-top: 20px;" onclick="retryOpenPlatform()">
-                        <i class="fas fa-redo"></i> Open Again
-                    </button>
-                </div>
+                <h5 id="platformHeaderName"><i class="fas fa-globe"></i> <span id="platformHeaderText">Platform</span></h5>
             </div>
             <iframe id="platformIframe" title="Platform login"></iframe>
         </div>
@@ -337,13 +277,40 @@
                 
                 document.getElementById('platformName').textContent = platformName;
                 document.getElementById('platformHeaderName').textContent = platformName;
-                document.getElementById('platformNameMsg').textContent = platformName;
-                document.getElementById('platformLoadingText').textContent = `Opening ${platformName}...`;
+                document.getElementById('platformHeaderText').textContent = platformName;
                 
-                // Auto-open the platform in a new positioned window
-                setTimeout(() => {
+                // Try to load platform page in iframe
+                const iframe = document.getElementById('platformIframe');
+                iframe.style.display = 'block';
+                iframe.src = platformUrl;
+                
+                // Handle iframe load errors - if blocked by X-Frame-Options
+                let iframeBlocked = false;
+                iframe.addEventListener('error', () => {
+                    iframeBlocked = true;
                     openPlatformWindow();
-                }, 500);
+                });
+                
+                // Check if iframe is blocked after a delay
+                setTimeout(() => {
+                    if (!iframeBlocked) {
+                        try {
+                            // If we can't access iframe content, it's likely blocked
+                            if (iframe.contentDocument === null) {
+                                iframeBlocked = true;
+                                iframe.style.display = 'none';
+                                openPlatformWindow();
+                            }
+                        } catch (e) {
+                            // Cross-origin error - iframe is blocked
+                            if (!iframeBlocked) {
+                                iframeBlocked = true;
+                                iframe.style.display = 'none';
+                                openPlatformWindow();
+                            }
+                        }
+                    }
+                }, 1000);
                 
                 if (!assetId || !token) {
                     document.getElementById('content').innerHTML = '<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: Missing asset or token. Please close and try again.</div>';
@@ -429,16 +396,6 @@
             }
         }
         
-        function showIframeFallback() {
-            document.getElementById('platformIframe').style.display = 'none';
-            document.getElementById('iframeFallback').style.display = 'flex';
-            
-            // Open the platform in a separate window since iframe is blocked
-            if (platformUrl) {
-                openPlatformWindow();
-            }
-        }
-        
         function openPlatformWindow() {
             if (platformUrl) {
                 // Open platform in a new window positioned to the right
@@ -453,10 +410,6 @@
                     `width=${width},height=${screenHeight},left=${leftPos},top=0,resizable=yes,scrollbars=yes`
                 );
             }
-        }
-        
-        function retryOpenPlatform() {
-            openPlatformWindow();
         }
         
         function escapeHtml(text) {
