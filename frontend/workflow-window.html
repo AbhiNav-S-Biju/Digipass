@@ -267,43 +267,37 @@
         let platformUrl = '';
         let platformName = '';
         
-        // Helper function to wait for element to exist
-        function waitForElement(id, timeout = 5000) {
-            return new Promise((resolve, reject) => {
-                const startTime = Date.now();
-                const checkElement = () => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        resolve(element);
-                    } else if (Date.now() - startTime > timeout) {
-                        reject(new Error(`Element ${id} not found after ${timeout}ms`));
-                    } else {
-                        setTimeout(checkElement, 100);
-                    }
-                };
-                checkElement();
-            });
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
         
         async function loadInstructions() {
             try {
-                // Wait for DOM elements to be ready
-                await waitForElement('platformName');
-                await waitForElement('content');
-                
+                // Get session data
                 const assetId = sessionStorage.getItem('digipass_asset_id');
                 const token = sessionStorage.getItem('digipass_token');
                 const url = sessionStorage.getItem('digipass_platform_url');
                 platformName = sessionStorage.getItem('digipass_platform_name') || 'Platform';
                 platformUrl = url;
                 
-                // Set title
-                const titleEl = document.getElementById('platformName');
-                if (titleEl) titleEl.textContent = platformName;
+                // Safely set title - check element exists
+                try {
+                    const titleEl = document.getElementById('platformName');
+                    if (titleEl) {
+                        titleEl.textContent = platformName;
+                    }
+                } catch (e) {
+                    console.warn('Could not set title:', e);
+                }
                 
                 if (!assetId || !token) {
                     const contentEl = document.getElementById('content');
-                    if (contentEl) contentEl.innerHTML = '<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: Missing asset or token. Please close and try again.</div>';
+                    if (contentEl) {
+                        contentEl.innerHTML = '<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: Missing asset or token. Please close and try again.</div>';
+                    }
                     return;
                 }
                 
@@ -346,7 +340,7 @@
                 let html = '';
                 
                 // Add credentials if available
-                if (asset.account_password) {
+                if (asset && asset.account_password) {
                     html += `
                         <div class="credentials-box">
                             <h5><i class="fas fa-key"></i> Login Credentials</h5>
@@ -379,28 +373,29 @@
                 html += '</div>';
                 
                 const contentEl = document.getElementById('content');
-                if (contentEl) contentEl.innerHTML = html;
+                if (contentEl) {
+                    contentEl.innerHTML = html;
+                }
                 
             } catch (e) {
                 console.error('Full error:', e);
-                const contentEl = document.getElementById('content');
-                if (contentEl) contentEl.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: ${e.message}</div>`;
+                try {
+                    const contentEl = document.getElementById('content');
+                    if (contentEl) {
+                        contentEl.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: ${escapeHtml(e.message)}</div>`;
+                    }
+                } catch (displayError) {
+                    console.error('Could not display error:', displayError);
+                }
             }
         }
         
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        // Load when page opens - use a small delay to ensure DOM is ready
-        window.addEventListener('DOMContentLoaded', loadInstructions);
-        // Also try immediately in case DOMContentLoaded already fired
+        // Load when document is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', loadInstructions);
         } else {
-            setTimeout(loadInstructions, 100);
+            // DOM already loaded
+            setTimeout(loadInstructions, 200);
         }
     </script>
 </body>
