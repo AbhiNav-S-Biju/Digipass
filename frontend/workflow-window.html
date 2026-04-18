@@ -265,7 +265,7 @@
                     return;
                 }
                 
-                const response = await fetch(`${API_URL}/api/executor/asset-instructions/${assetId}`, {
+                const response = await fetch(`${API_URL}/executor/asset-instructions/${assetId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
