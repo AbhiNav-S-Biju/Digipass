@@ -167,16 +167,31 @@ function renderWorkflowStep() {
         const stepAction = document.getElementById('stepAction');
         if (stepAction) stepAction.innerHTML = `<strong>Action:</strong> ${escapeHtml(step.action || 'Complete this step')}`;
 
-        // Add step links
+        // Add step links (opens in NEW tab so popup stays visible)
         const stepLinks = document.getElementById('stepLinks');
         if (stepLinks) {
             stepLinks.innerHTML = '';
             if (step.link) {
                 const link = document.createElement('a');
                 link.href = step.link;
-                link.target = '_blank';
+                link.target = '_blank';  // Opens in new tab
+                link.rel = 'noopener noreferrer';
                 link.innerHTML = `<i class="fas fa-external-link-alt"></i> Open ${escapeHtml(workflowState.asset?.platform_name || 'Platform')}`;
                 stepLinks.appendChild(link);
+            }
+        }
+
+        // Show credentials section if available
+        const credSection = document.getElementById('credentialsSection');
+        if (credSection) {
+            if (workflowState.asset?.account_password) {
+                credSection.style.display = 'block';
+                const usernameInput = document.getElementById('credUsername');
+                const passwordInput = document.getElementById('credPassword');
+                if (usernameInput) usernameInput.value = workflowState.asset?.account_identifier || '';
+                if (passwordInput) passwordInput.value = workflowState.asset?.account_password || '';
+            } else {
+                credSection.style.display = 'none';
             }
         }
 
@@ -353,6 +368,51 @@ function showNotification(message, type = 'info') {
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', alertHTML);
+}
+
+/**
+ * Copy credential to clipboard
+ */
+function copyCredential(fieldId) {
+    const element = document.getElementById(fieldId);
+    if (!element) return;
+
+    const text = element.value;
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target.closest('button');
+        if (!btn) return;
+
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        btn.style.backgroundColor = 'rgba(16, 44, 38, 0.3)';
+
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.style.backgroundColor = '';
+        }, 1500);
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        alert('Failed to copy to clipboard');
+    });
+}
+
+/**
+ * Toggle password visibility
+ */
+function togglePasswordVisibility(fieldId) {
+    const element = document.getElementById(fieldId);
+    if (!element) return;
+
+    const btn = event.target.closest('button');
+    if (!btn) return;
+
+    if (element.type === 'password') {
+        element.type = 'text';
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+    } else {
+        element.type = 'password';
+        btn.innerHTML = '<i class="fas fa-eye"></i>';
+    }
 }
 
 /**
