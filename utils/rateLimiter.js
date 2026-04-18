@@ -13,6 +13,13 @@ const resetRateLimit = (key, windowMs) => {
 };
 
 const createRateLimiter = (options = {}) => {
+  // Disable rate limiting if explicitly disabled via env var or in dev/test mode
+  const disableRateLimit = process.env.DISABLE_RATE_LIMIT === 'true' || process.env.NODE_ENV !== 'production';
+  if (disableRateLimit) {
+    console.log('[Rate Limiter] DISABLED - development/testing mode');
+    return (req, res, next) => next(); // Skip rate limiting
+  }
+
   const windowMs = options.windowMs || 15 * 60 * 1000; // 15 minutes
   const maxRequests = options.maxRequests || 100;
   const message = options.message || 'Too many requests. Please try again later.';
