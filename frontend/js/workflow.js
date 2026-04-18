@@ -8,6 +8,83 @@ const workflowState = {
     completedSteps: new Set()
 };
 
+// Drag state
+let isDragging = false;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
+/**
+ * Initialize drag functionality for popup
+ */
+function initializeDragHandling() {
+    const popup = document.getElementById('workflowPopup');
+    const header = popup?.querySelector('.workflow-header');
+    
+    if (!header) return;
+    
+    header.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', dragPopup);
+    document.addEventListener('mouseup', stopDrag);
+}
+
+function startDrag(e) {
+    if (e.target.closest('.workflow-close-btn')) return; // Don't drag if clicking close button
+    
+    isDragging = true;
+    const popup = document.getElementById('workflowPopup');
+    const rect = popup.getBoundingClientRect();
+    
+    dragOffsetX = e.clientX - rect.left;
+    dragOffsetY = e.clientY - rect.top;
+}
+
+function dragPopup(e) {
+    if (!isDragging) return;
+    
+    const popup = document.getElementById('workflowPopup');
+    const newX = e.clientX - dragOffsetX;
+    const newY = e.clientY - dragOffsetY;
+    
+    // Keep popup within viewport
+    const maxX = window.innerWidth - popup.offsetWidth;
+    const maxY = window.innerHeight - popup.offsetHeight;
+    
+    popup.style.left = Math.max(0, Math.min(newX, maxX)) + 'px';
+    popup.style.top = Math.max(0, Math.min(newY, maxY)) + 'px';
+    popup.style.right = 'auto';
+    
+    // Save position to localStorage
+    const assetId = workflowState.assetId;
+    if (assetId) {
+        localStorage.setItem(`workflowPopupPosition_${assetId}`, JSON.stringify({
+            left: popup.style.left,
+            top: popup.style.top
+        }));
+    }
+}
+
+function stopDrag() {
+    isDragging = false;
+}
+
+/**
+ * Load saved popup position from localStorage
+ */
+function loadPopupPosition(assetId) {
+    const saved = localStorage.getItem(`workflowPopupPosition_${assetId}`);
+    if (saved) {
+        try {
+            const pos = JSON.parse(saved);
+            const popup = document.getElementById('workflowPopup');
+            popup.style.left = pos.left;
+            popup.style.top = pos.top;
+            popup.style.right = 'auto';
+        } catch (e) {
+            console.warn('Failed to restore popup position:', e);
+        }
+    }
+}
+
 // Ensure DOM is ready before initializing
 function initializeWorkflow() {
     const popup = document.getElementById('workflowPopup');
@@ -40,6 +117,10 @@ async function openWorkflow(assetId, token) {
 
     // Show the popup (don't replace content yet)
     popup.style.display = 'block';
+    
+    // Restore saved position and initialize drag handling
+    loadPopupPosition(assetId);
+    initializeDragHandling();
 
     try {
         // Fetch instructions from backend

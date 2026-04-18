@@ -838,6 +838,11 @@
             background-color: white;
             border: 2px solid #102c26;
         }
+        
+        /* When dragged, position is set via left/top */
+        .workflow-popup[style*="left"] {
+            right: auto;
+        }
 
         @keyframes slideInRight {
             from {
@@ -858,7 +863,7 @@
             color: #102c26;
         }
 
-        /* Header */
+        /* Header - Make draggable */
         .workflow-header {
             display: flex;
             justify-content: space-between;
@@ -866,10 +871,29 @@
             padding: 16px;
             border-bottom: 2px solid #102c26;
             background-color: #f7e7ce;
+            cursor: grab;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+
+        .workflow-header:active {
+            cursor: grabbing;
+            background-color: #e8d5ba;
+        }
+
+        .workflow-header::before {
+            content: '⋮⋮';
+            position: absolute;
+            left: 8px;
+            color: #102c26;
+            opacity: 0.5;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
         }
 
         .workflow-title-section {
             flex: 1;
+            padding-left: 8px;
         }
 
         .workflow-title {
