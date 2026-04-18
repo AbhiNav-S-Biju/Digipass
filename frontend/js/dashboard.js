@@ -758,30 +758,46 @@ function showQRModal(executorData) {
     qrLink.value = executorData.verification_link;
   }
 
-  // Show modal
-  modal.style.display = 'flex';
+  // Show modal using Bootstrap
+  const bootstrapModal = new bootstrap.Modal(modal, { backdrop: 'static', keyboard: false });
+  bootstrapModal.show();
 }
 
 function closeQRModal() {
   const modal = document.getElementById('qrModal');
-  modal.style.display = 'none';
+  const bootstrapModal = bootstrap.Modal.getInstance(modal);
+  if (bootstrapModal) {
+    bootstrapModal.hide();
+  }
 }
 
 function copyVerificationLink() {
   const linkInput = document.getElementById('qrModalLink');
   const copyBtn = event.target;
 
-  linkInput.select();
-  document.execCommand('copy');
+  // Use modern Clipboard API
+  navigator.clipboard.writeText(linkInput.value).then(() => {
+    const originalText = copyBtn.textContent;
+    copyBtn.textContent = 'Copied!';
+    copyBtn.style.background = '#10b981';
 
-  const originalText = copyBtn.textContent;
-  copyBtn.textContent = 'Copied!';
-  copyBtn.style.background = '#10b981';
+    setTimeout(() => {
+      copyBtn.textContent = originalText;
+      copyBtn.style.background = '';
+    }, 2000);
+  }).catch(() => {
+    // Fallback: select and copy
+    linkInput.select();
+    document.execCommand('copy');
+    const originalText = copyBtn.textContent;
+    copyBtn.textContent = 'Copied!';
+    copyBtn.style.background = '#10b981';
 
-  setTimeout(() => {
-    copyBtn.textContent = originalText;
-    copyBtn.style.background = '#667eea';
-  }, 2000);
+    setTimeout(() => {
+      copyBtn.textContent = originalText;
+      copyBtn.style.background = '';
+    }, 2000);
+  });
 }
 
 // Close modal when clicking outside
