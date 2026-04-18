@@ -388,10 +388,11 @@ async function handleAssetSubmit(event) {
   const submitButton = document.getElementById('assetSubmitBtn');
   const platformName = document.getElementById('platformName').value.trim();
   const accountIdentifier = document.getElementById('accountIdentifier').value.trim();
+  const accountPassword = document.getElementById('accountPassword').value.trim();
   const actionType = document.querySelector('input[name="actionType"]:checked')?.value;
   const lastMessage = document.getElementById('lastMessage').value.trim();
 
-  if (!platformName || !accountIdentifier || !actionType) {
+  if (!platformName || !accountIdentifier || !accountPassword || !actionType) {
     showNotification('Please fill in all required fields.', 'error');
     return;
   }
@@ -422,6 +423,7 @@ async function handleAssetSubmit(event) {
       platform_name: platformName,
       category: category,
       account_identifier: accountIdentifier,
+      account_password: accountPassword,
       action_type: actionType,
       last_message: actionType === 'last_message' ? lastMessage : null
     });

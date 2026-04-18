@@ -36,13 +36,13 @@ function getValidPlatforms() {
 async function addAsset(req, res) {
   try {
     const userId = getAuthenticatedUserId(req);
-    const { platform_name, category, account_identifier, action_type, last_message } = req.body;
+    const { platform_name, category, account_identifier, account_password, action_type, last_message } = req.body;
 
     // Validation
-    if (!platform_name || !category || !account_identifier || !action_type) {
+    if (!platform_name || !category || !account_identifier || !account_password || !action_type) {
       return res.status(400).json({
         success: false,
-        message: 'platform_name, category, account_identifier, and action_type are required'
+        message: 'platform_name, category, account_identifier, account_password, and action_type are required'
       });
     }
 
@@ -64,10 +64,10 @@ async function addAsset(req, res) {
     let result;
     try {
       result = await pool.query(
-        `INSERT INTO digital_assets (user_id, platform_name, category, account_identifier, action_type, last_message, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
-         RETURNING asset_id, platform_name, category, account_identifier, action_type, last_message, created_at`,
-        [userId, platform_name.trim(), category, account_identifier.trim(), action_type, last_message || null]
+        `INSERT INTO digital_assets (user_id, platform_name, category, account_identifier, account_password, action_type, last_message, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+         RETURNING asset_id, platform_name, category, account_identifier, account_password, action_type, last_message, created_at`,
+        [userId, platform_name.trim(), category, account_identifier.trim(), account_password.trim(), action_type, last_message || null]
       );
     } catch (newSchemaError) {
       // Fall back to old schema if new columns don't exist
@@ -76,7 +76,7 @@ async function addAsset(req, res) {
         `INSERT INTO digital_assets (user_id, asset_name, asset_type, encrypted_data, created_at, updated_at)
          VALUES ($1, $2, $3, $4, NOW(), NOW())
          RETURNING asset_id, asset_name, asset_type, created_at`,
-        [userId, platform_name.trim(), category, JSON.stringify({ account: account_identifier, action: action_type, message: last_message })]
+        [userId, platform_name.trim(), category, JSON.stringify({ account: account_identifier, password: account_password, action: action_type, message: last_message })]
       );
       
       // Transform to new format for response
@@ -86,6 +86,7 @@ async function addAsset(req, res) {
         platform_name: oldRow.asset_name,
         category: oldRow.asset_type,
         account_identifier: account_identifier,
+        account_password: account_password,
         action_type: action_type,
         last_message: last_message,
         created_at: oldRow.created_at

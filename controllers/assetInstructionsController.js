@@ -45,6 +45,7 @@ async function getAssetInstructions(req, res) {
           asset_id: asset.asset_id,
           platform_name: asset.platform_name,
           account_identifier: asset.account_identifier,
+          account_password: asset.account_password,
           action_type: asset.action_type,
           last_message: asset.last_message,
           category: asset.category,
