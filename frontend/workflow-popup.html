@@ -1,0 +1,376 @@
+<!-- Floating Workflow Popup -->
+<div id="workflowPopup" class="workflow-popup" style="display: none;">
+    <div class="workflow-container">
+        <!-- Header -->
+        <div class="workflow-header">
+            <div class="workflow-title-section">
+                <h5 id="workflowTitle" class="workflow-title">Platform Name</h5>
+                <p id="workflowAccount" class="workflow-account">Account: user@example.com</p>
+            </div>
+            <button class="workflow-close-btn" onclick="closeWorkflow()" title="Close workflow">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="workflow-progress">
+            <div id="progressBar" class="progress-fill"></div>
+            <span id="progressText" class="progress-text">Step 1 of 5</span>
+        </div>
+
+        <!-- Step Content -->
+        <div class="workflow-content">
+            <div id="stepContainer" class="step-container">
+                <div class="step-badge" id="stepNumber">1</div>
+                <div class="step-body">
+                    <h6 id="stepTitle" class="step-title">Step Title</h6>
+                    <p id="stepDescription" class="step-description">Step description goes here</p>
+                    <p id="stepAction" class="step-action"><strong>Action:</strong> What to do</p>
+                    <div id="stepLinks" class="step-links"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step Completion Checkbox -->
+        <div class="workflow-checklist">
+            <div class="form-check">
+                <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="stepCompleteCheck"
+                    onchange="markStepComplete()"
+                >
+                <label class="form-check-label" for="stepCompleteCheck">
+                    Mark this step as complete
+                </label>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="workflow-controls">
+            <button class="btn-nav btn-prev" id="prevBtn" onclick="prevStep()">
+                <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <div class="nav-spacer"></div>
+            <button class="btn-nav btn-next" id="nextBtn" onclick="nextStep()">
+                Next <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Mark Complete Button (Final Step) -->
+        <button class="btn-complete" id="completeBtn" onclick="completeWorkflow()" style="display: none;">
+            <i class="fas fa-check-circle"></i> Mark Task Complete
+        </button>
+    </div>
+</div>
+
+<style>
+    /* Workflow Popup Styling */
+    .workflow-popup {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        width: 380px;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        border-radius: 8px;
+        animation: slideInRight 0.3s ease-out;
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(400px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .workflow-container {
+        background-color: #f7e7ce;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        color: #102c26;
+    }
+
+    /* Header */
+    .workflow-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 16px;
+        border-bottom: 2px solid #102c26;
+        background-color: #f7e7ce;
+    }
+
+    .workflow-title-section {
+        flex: 1;
+    }
+
+    .workflow-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-bottom: 4px;
+        color: #102c26;
+    }
+
+    .workflow-account {
+        font-size: 0.85rem;
+        color: #555;
+        margin: 0;
+    }
+
+    .workflow-close-btn {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: #102c26;
+        padding: 0;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+    .workflow-close-btn:hover {
+        background-color: rgba(16, 44, 38, 0.1);
+    }
+
+    /* Progress Bar */
+    .workflow-progress {
+        position: relative;
+        height: 6px;
+        background-color: #e0d4c0;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background-color: #102c26;
+        width: 20%;
+        transition: width 0.3s ease;
+    }
+
+    .progress-text {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        color: #102c26;
+        background-color: #f7e7ce;
+        padding: 0 4px;
+    }
+
+    /* Step Content */
+    .workflow-content {
+        flex: 1;
+        padding: 16px;
+        overflow-y: auto;
+    }
+
+    .step-container {
+        display: flex;
+        gap: 12px;
+    }
+
+    .step-badge {
+        min-width: 36px;
+        width: 36px;
+        height: 36px;
+        background-color: #102c26;
+        color: #f7e7ce;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+
+    .step-body {
+        flex: 1;
+    }
+
+    .step-title {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #102c26;
+    }
+
+    .step-description {
+        font-size: 0.9rem;
+        color: #555;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    .step-action {
+        font-size: 0.85rem;
+        color: #102c26;
+        margin-bottom: 8px;
+        padding: 8px;
+        background-color: rgba(16, 44, 38, 0.05);
+        border-left: 3px solid #102c26;
+        border-radius: 3px;
+    }
+
+    .step-links {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .step-links a {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 10px;
+        background-color: #102c26;
+        color: #f7e7ce;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        transition: background-color 0.2s;
+    }
+
+    .step-links a:hover {
+        background-color: #0a1f1a;
+        text-decoration: none;
+    }
+
+    /* Checklist */
+    .workflow-checklist {
+        padding: 12px 16px;
+        border-top: 1px solid #e0d4c0;
+        border-bottom: 1px solid #e0d4c0;
+    }
+
+    .workflow-checklist .form-check-input {
+        width: 18px;
+        height: 18px;
+        margin-top: 2px;
+        cursor: pointer;
+        accent-color: #102c26;
+    }
+
+    .workflow-checklist .form-check-label {
+        font-size: 0.9rem;
+        color: #555;
+        cursor: pointer;
+        margin-left: 6px;
+    }
+
+    /* Navigation Controls */
+    .workflow-controls {
+        display: flex;
+        gap: 10px;
+        padding: 12px 16px;
+        border-top: 1px solid #e0d4c0;
+    }
+
+    .nav-spacer {
+        flex: 1;
+    }
+
+    .btn-nav {
+        flex: 1;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .btn-prev {
+        background-color: transparent;
+        color: #102c26;
+        border: 1px solid #102c26;
+    }
+
+    .btn-prev:hover:not(:disabled) {
+        background-color: rgba(16, 44, 38, 0.1);
+    }
+
+    .btn-prev:disabled,
+    .btn-next:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .btn-next {
+        background-color: #102c26;
+        color: #f7e7ce;
+        border: none;
+    }
+
+    .btn-next:hover:not(:disabled) {
+        background-color: #0a1f1a;
+    }
+
+    /* Complete Button */
+    .btn-complete {
+        width: calc(100% - 32px);
+        margin: 12px 16px;
+        padding: 12px;
+        background-color: #102c26;
+        color: #f7e7ce;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: background-color 0.2s;
+    }
+
+    .btn-complete:hover {
+        background-color: #0a1f1a;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .workflow-popup {
+            width: calc(100vw - 20px);
+            right: 10px;
+            max-height: 80vh;
+        }
+    }
+
+    /* Scrollbar styling */
+    .workflow-popup::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .workflow-popup::-webkit-scrollbar-track {
+        background-color: #e0d4c0;
+    }
+
+    .workflow-popup::-webkit-scrollbar-thumb {
+        background-color: #102c26;
+        border-radius: 3px;
+    }
+
+    .workflow-popup::-webkit-scrollbar-thumb:hover {
+        background-color: #0a1f1a;
+    }
+</style>
