@@ -8,6 +8,18 @@ const workflowState = {
     completedSteps: new Set()
 };
 
+// Ensure DOM is ready before initializing
+function initializeWorkflow() {
+    const popup = document.getElementById('workflowPopup');
+    if (!popup) {
+        // Retry in a moment if popup not found
+        console.warn('Workflow popup not yet in DOM, retrying...');
+        setTimeout(initializeWorkflow, 100);
+        return;
+    }
+    console.log('✓ Workflow popup initialized successfully');
+}
+
 /**
  * Open the workflow popup and load steps
  */
@@ -18,10 +30,18 @@ async function openWorkflow(assetId, token) {
     workflowState.completedSteps = new Set();
 
     const popup = document.getElementById('workflowPopup');
-    const contentDiv = popup ? popup.querySelector('#stepContainer') : null;
+    
+    if (!popup) {
+        console.error('Workflow popup not found in DOM');
+        alert('Error: Workflow popup not loaded. Please refresh the page.');
+        return;
+    }
 
-    if (!popup || !contentDiv) {
-        console.error('Workflow popup elements not found');
+    const contentDiv = popup.querySelector('#stepContainer');
+    
+    if (!contentDiv) {
+        console.error('Step container not found in workflow popup');
+        alert('Error: Workflow interface not fully loaded. Please refresh the page.');
         return;
     }
 
@@ -78,7 +98,33 @@ async function openWorkflow(assetId, token) {
  */
 function renderWorkflowStep() {
     const popup = document.getElementById('workflowPopup');
-    if (!popup) return;
+    if (!popup) {
+        console.error('Workflow popup element not found in DOM');
+        return;
+    }
+
+    // Ensure all required elements exist
+    const requiredElements = [
+        'workflowTitle',
+        'workflowAccount',
+        'progressBar',
+        'progressText',
+        'stepNumber',
+        'stepTitle',
+        'stepDescription',
+        'stepAction',
+        'stepLinks',
+        'stepCompleteCheck',
+        'prevBtn',
+        'nextBtn'
+    ];
+
+    for (const id of requiredElements) {
+        if (!document.getElementById(id)) {
+            console.error(`Required element #${id} not found in DOM`);
+            return;
+        }
+    }
 
     const step = workflowState.steps[workflowState.currentStepIndex];
     if (!step) {
@@ -134,8 +180,10 @@ function renderWorkflowStep() {
  * Show completion state
  */
 function showCompletionState() {
-    const popup = document.getElementById('workflowPopup');
-    document.getElementById('stepContainer').innerHTML = `
+    const stepContainer = document.getElementById('stepContainer');
+    if (!stepContainer) return;
+    
+    stepContainer.innerHTML = `
         <div style="text-align: center; padding: 20px;">
             <div style="font-size: 3rem; margin-bottom: 10px;">
                 <i class="fas fa-check-circle" style="color: #102c26;"></i>
@@ -144,8 +192,11 @@ function showCompletionState() {
             <p style="color: #555; font-size: 0.9rem;">All steps have been completed for this asset.</p>
         </div>
     `;
-    document.getElementById('prevBtn').disabled = true;
-    document.getElementById('nextBtn').disabled = true;
+    
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    if (prevBtn) prevBtn.disabled = true;
+    if (nextBtn) nextBtn.disabled = true;
 }
 
 /**
@@ -234,6 +285,11 @@ function updateNavigationButtons() {
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
 
+    if (!prevBtn || !nextBtn) {
+        console.warn('Navigation buttons not found in DOM');
+        return;
+    }
+
     prevBtn.disabled = workflowState.currentStepIndex === 0;
     nextBtn.disabled = workflowState.currentStepIndex === totalSteps - 1;
 }
@@ -291,4 +347,18 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Initialize workflow when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeWorkflow();
+});
+
+// Also initialize immediately (in case DOMContentLoaded already fired)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeWorkflow();
+    });
+} else {
+    initializeWorkflow();
 }
