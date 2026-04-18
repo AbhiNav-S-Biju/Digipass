@@ -890,60 +890,38 @@
             }
         }
 
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Password copied to clipboard');
-            }).catch(() => {
-                alert('Failed to copy password');
-            });
-        }
-
-        function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.replace(/[&<>"']/g, m => map[m]);
-        }
-
-        // Copy credential to clipboard
-        function copyCredential(fieldId) {
-            const element = document.getElementById(fieldId);
-            const text = element.value;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Copied to clipboard!');
-            }).catch(() => {
-                alert('Failed to copy');
-            });
-        }
-
-        // Toggle password visibility
-        function togglePasswordVisibility(fieldId) {
-            const element = document.getElementById(fieldId);
-            
-            if (element.type === 'password') {
-                element.type = 'text';
-            } else {
-                element.type = 'password';
-            }
-        }
-
-        // Copy to clipboard (legacy function for final message)
+        // Copy text to clipboard (for final messages)
         function copyToClipboard(elementId) {
             const element = document.getElementById(elementId);
-            let text = element.value || element.textContent;
+            if (!element) return;
+            
+            const text = element.value || element.textContent;
             
             navigator.clipboard.writeText(text).then(() => {
-                const btn = event.target.closest('button');
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                }, 2000);
+                const btn = event?.target.closest('button');
+                if (btn) {
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '📋 Copied!';
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                    }, 2000);
+                }
+            }).catch((err) => {
+                console.error('Copy failed:', err);
+                try {
+                    element.select();
+                    document.execCommand('copy');
+                    const btn = event?.target.closest('button');
+                    if (btn) {
+                        const originalText = btn.innerHTML;
+                        btn.innerHTML = '📋 Copied!';
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                        }, 2000);
+                    }
+                } catch (e) {
+                    alert('Could not copy. Please try manually selecting the text.');
+                }
             });
         }
 
@@ -967,6 +945,71 @@
                     checkbox.checked = progress[index] || false;
                 });
             }
+        }
+
+        // Helper: Escape HTML for safe display
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Toggle password visibility
+        function togglePasswordVisibility(fieldId) {
+            const element = document.getElementById(fieldId);
+            if (!element) return;
+            
+            if (element.type === 'password') {
+                element.type = 'text';
+            } else {
+                element.type = 'password';
+            }
+        }
+
+        // Copy credential to clipboard
+        function copyCredential(fieldId) {
+            const element = document.getElementById(fieldId);
+            if (!element) return;
+            
+            const text = element.value || element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                // Show success toast
+                const btn = event?.target.closest('button');
+                if (btn) {
+                    const originalText = btn.textContent || btn.innerHTML;
+                    btn.textContent = '✓ Copied!';
+                    btn.innerHTML = '✓ Copied!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.innerHTML = originalText;
+                    }, 2000);
+                }
+            }).catch((err) => {
+                console.error('Copy failed:', err);
+                // Fallback: try selecting and copying
+                try {
+                    element.select?.();
+                    document.execCommand('copy');
+                    const btn = event?.target.closest('button');
+                    if (btn) {
+                        const originalText = btn.textContent || btn.innerHTML;
+                        btn.textContent = '✓ Copied!';
+                        btn.innerHTML = '✓ Copied!';
+                        setTimeout(() => {
+                            btn.textContent = originalText;
+                            btn.innerHTML = originalText;
+                        }, 2000);
+                    }
+                } catch (e) {
+                    console.warn('Fallback copy failed:', e);
+                }
+            });
         }
 
         loadAssets();
