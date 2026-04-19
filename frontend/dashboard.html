@@ -1186,7 +1186,7 @@
         function initializeProfileTrigger() {
             try {
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const userName = user.name || user.username || 'User';
+                const userName = user.fullName || user.name || 'User';
                 const userEmail = user.email || 'user@example.com';
                 const initials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
                 
