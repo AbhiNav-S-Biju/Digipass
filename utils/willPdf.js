@@ -65,9 +65,126 @@ function getCategoryColor(category) {
 }
 
 function maskPassword(password) {
-  // Use Unicode bullet - properly set before rendering
-  return '\u25CF'.repeat(12); // ● character repeated 12 times
+  // Using asterisks as placeholder - will be replaced with drawn bullets
+  return 'password_field_placeholder';
 }
+
+// ===================== HELPER FUNCTIONS =====================
+
+function drawPasswordBullets(doc, x, y, count = 10) {
+  const radius = 2.5;
+  const spacing = 8;
+  doc.save();
+  doc.fillColor(COLORS.textMuted);
+  for (let i = 0; i < count; i++) {
+    doc.circle(x + (i * spacing), y + 5, radius).fill();
+  }
+  doc.restore();
+}
+
+function drawCheckmark(doc, x, y, color = '#3d7a5a') {
+  doc.save()
+    .strokeColor(color)
+    .lineWidth(1.5)
+    .moveTo(x, y + 3)
+    .lineTo(x + 3, y + 6)
+    .lineTo(x + 9, y)
+    .stroke()
+    .restore();
+}
+
+function drawBadge(doc, text, x, y, bgColor, textColor) {
+  const padding = { x: 8, y: 3 };
+  const fontSize = 8;
+  doc.fontSize(fontSize);
+  const textWidth = doc.widthOfString(text);
+  const badgeW = textWidth + padding.x * 2;
+  const badgeH = 16;
+
+  doc.save();
+  
+  // Background - rounded rectangle
+  doc.fillColor(bgColor).rect(x, y, badgeW, badgeH).fill();
+  
+  // Text
+  doc.fillColor(textColor).fontSize(fontSize).font('Helvetica-Bold');
+  doc.text(text, x + padding.x, y + padding.y, {
+    width: textWidth,
+    lineBreak: false
+  });
+
+  doc.restore();
+  return badgeW;
+}
+
+function getCategoryStyle(category) {
+  const colors = getCategoryColor(category);
+  return colors;
+}
+
+function drawLogo(doc, x, y, size = 36, onDark = true) {
+  const stroke = onDark ? '#fdf6ec' : '#1b3a2d';
+  const dotColor = '#8cbf9c';
+  const scale = size / 48;
+
+  doc.save();
+  
+  // Rounded square background
+  const bgColor = onDark ? 'rgba(255,255,255,0.12)' : '#e8d9c0';
+  doc.fillColor(bgColor).opacity(0.12).rect(x, y, size, size).fill();
+  doc.opacity(1);
+  doc.strokeColor(stroke).lineWidth(0.5).rect(x, y, size, size).stroke();
+
+  // Vault rectangle body
+  const vx = x + (11 * scale);
+  const vy = y + (13 * scale);
+  const vw = 22 * scale;
+  const vh = 17 * scale;
+  doc.strokeColor(stroke).lineWidth(1.2).rect(vx, vy, vw, vh).stroke();
+
+  // Horizontal divider line
+  doc.strokeColor(stroke).lineWidth(1);
+  doc.moveTo(vx, vy + (vh * 0.45)).lineTo(vx + vw, vy + (vh * 0.45)).stroke();
+
+  // Left green square
+  doc.fillColor(dotColor).rect(vx + (vw * 0.1), vy + (vh * 0.55), vw * 0.25, vh * 0.35).fill();
+  
+  // Right green square (semi-transparent)
+  doc.opacity(0.45).fillColor(dotColor).rect(vx + (vw * 0.45), vy + (vh * 0.55), vw * 0.25, vh * 0.35).fill();
+  doc.opacity(1);
+
+  // Key pin
+  const kx = x + (31 * scale);
+  const ky = y + (8 * scale);
+  doc.fillColor(stroke).circle(kx, ky, 2.5 * scale).fill();
+  doc.strokeColor(stroke).lineWidth(1.5).moveTo(kx, ky + (2.5 * scale)).lineTo(kx, vy).stroke();
+
+  doc.restore();
+}
+
+function drawSectionCircle(doc, num, x, y) {
+  doc.save()
+    .fillColor(COLORS.forestDeep).circle(x + 12, y + 12, 12).fill()
+    .fillColor('#ffffff').fontSize(10).font('Helvetica-Bold')
+    .text(String(num), x + 7, y + 7, { width: 10, align: 'center', lineBreak: false })
+    .restore();
+}
+
+function drawWatermark(doc) {
+  const centerX = doc.page.width / 2;
+  const centerY = doc.page.height / 2;
+  doc.save()
+    .rotate(-30, { origin: [centerX, centerY] })
+    .fillColor(COLORS.forestDeep)
+    .opacity(0.03)
+    .fontSize(80)
+    .font('Helvetica-Bold')
+    .text('DIGIPASS', centerX - 160, centerY - 40)
+    .opacity(1)
+    .restore();
+}
+
+// ===================== END HELPERS =====================
 
 function drawBox(doc, x, y, width, height, options = {}) {
   const { bgColor = COLORS.creamLight, borderColor = COLORS.sandDeep, borderWidth = 1 } = options;
@@ -82,14 +199,16 @@ function drawBox(doc, x, y, width, height, options = {}) {
   doc.rect(x, y, width, height).stroke();
 }
 
-function drawVaultIcon(doc, x, y, size = 36) {
+function drawVaultIconOLD(doc, x, y, size = 36) {
   // Convert SVG to pdfkit drawing commands
   const scale = size / 48;
   
+  doc.save();
+  
   // Rounded square background with semi-transparent white
-  doc.fillColor(COLORS.creamLight).fillOpacity(0.12);
+  doc.fillColor(COLORS.creamLight).opacity(0.12);
   doc.rect(x, y, size, size, 4).fill();
-  doc.fillOpacity(1); // Reset opacity
+  doc.opacity(1); // Reset opacity
   
   doc.strokeColor(COLORS.creamLight).lineWidth(0.5);
   doc.rect(x, y, size, size, 4).stroke();
@@ -112,9 +231,9 @@ function drawVaultIcon(doc, x, y, size = 36) {
   doc.rect(x + (14 * scale), y + (25 * scale), 6 * scale, 4 * scale, 0.5).fill();
   
   // Right key slot (semi-transparent)
-  doc.fillColor(COLORS.accentGreen).fillOpacity(0.45);
+  doc.fillColor(COLORS.accentGreen).opacity(0.45);
   doc.rect(x + (22 * scale), y + (25 * scale), 6 * scale, 4 * scale, 0.5).fill();
-  doc.fillOpacity(1); // Reset opacity
+  doc.opacity(1); // Reset opacity
   
   // Shackle (vertical line)
   const shackleX = x + (31 * scale);
@@ -124,6 +243,8 @@ function drawVaultIcon(doc, x, y, size = 36) {
   // Lock top (circle)
   doc.fillColor(COLORS.creamLight);
   doc.circle(x + (31 * scale), y + (8 * scale), 2.5 * scale).fill();
+  
+  doc.restore();
 }
 
 
@@ -132,12 +253,14 @@ function drawHeaderBlock(doc, user, willId) {
   const pageWidth = 595; // A4 width
   const headerHeight = 140;
   
-  // Draw background - SET COLOR FIRST
+  // Draw background
+  doc.save();
   doc.fillColor(COLORS.forestDeep);
   doc.rect(0, 0, pageWidth, headerHeight).fill();
+  doc.restore();
   
-  // Draw vault icon
-  drawVaultIcon(doc, margin, 22, 40);
+  // Draw logo
+  drawLogo(doc, margin, 22, 40, true);
   
   // Logo text next to icon
   doc.fillColor(COLORS.creamLight);
@@ -156,11 +279,13 @@ function drawHeaderBlock(doc, user, willId) {
   // Legal Document badge (top right)
   const badgeX = pageWidth - margin - 80;
   const badgeY = 20;
+  doc.save();
   doc.fillColor(COLORS.accentAmber);
   doc.rect(badgeX, badgeY, 70, 24).fill();
   doc.fillColor(COLORS.textDark);
   doc.font('Helvetica-Bold').fontSize(9);
   doc.text('Legal\nDocument', badgeX + 5, badgeY + 4, { width: 60, align: 'center' });
+  doc.restore();
   
   // Meta info (bottom of header)
   doc.fillColor(COLORS.sand);
@@ -276,14 +401,17 @@ function drawAssetCard(doc, asset, index, y) {
   doc.font('Helvetica-Bold').fontSize(8);
   doc.text(asset.category.substring(0, 12), tagX + 3, tagY + 5, { width: tagWidth - 6, align: 'center' });
   
-  // Secured status badge (top right) - SET COLOR FIRST
+  // Secured status badge (top right) - use drawn checkmark, not Unicode
   const securedBadgeX = margin + cardWidth - 68;
   const securedBadgeWidth = 60;
-  doc.fillColor(COLORS.accentGreen);
-  doc.rect(securedBadgeX, tagY, securedBadgeWidth, tagHeight).fill();
-  doc.fillColor('#ffffff');
-  doc.font('Helvetica-Bold').fontSize(8);
-  doc.text('✓ Secured', securedBadgeX + 2, tagY + 5, { width: securedBadgeWidth - 4, align: 'center' });
+  doc.save();
+  doc.fillColor(COLORS.accentGreen).rect(securedBadgeX, tagY, securedBadgeWidth, tagHeight).fill();
+  // Draw checkmark inside badge
+  drawCheckmark(doc, securedBadgeX + 5, tagY + 4, '#ffffff');
+  // Add text
+  doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(8);
+  doc.text('Secured', securedBadgeX + 15, tagY + 5, { width: securedBadgeWidth - 20, align: 'center' });
+  doc.restore();
   
   // Better date format
   doc.fillColor(COLORS.textMuted);
@@ -311,8 +439,8 @@ function drawAssetCard(doc, asset, index, y) {
   
   doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
   doc.text('PASSWORD', col2X, detailsY);
-  doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
-  doc.text(maskPassword(asset.account_password || ''), col2X, detailsY + 10);
+  // Draw password bullets instead of text (Unicode bullets don't render in Helvetica)
+  drawPasswordBullets(doc, col2X, detailsY + 10, 10);
   
   // Row 2: Recovery Email and Action Type
   doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
@@ -381,12 +509,26 @@ function drawExecutorCard(doc, executor, index, y) {
   doc.font('Helvetica-Bold').fontSize(12).fillColor(COLORS.forestDeep);
   doc.text(executor.executor_name, contentX, contentY, { width: 350 });
   
-  // Verification badge (top right)
+  // Verification badge (top right) - use drawn checkmark for verified status
   const isVerified = executor.verification_status === 'verified';
   const badgeColor = isVerified ? COLORS.accentGreen : COLORS.accentAmber;
-  const badgeText = isVerified ? '✓ Verified' : '⏳ Pending';
-  doc.font('Helvetica-Bold').fontSize(9).fillColor(badgeColor);
-  doc.text(badgeText, margin + cardWidth - 100, contentY, { align: 'right' });
+  const badgeX = margin + cardWidth - 100;
+  const badgeY = contentY - 2;
+  
+  doc.save();
+  doc.fillColor(badgeColor);
+  
+  if (isVerified) {
+    // Draw checkmark + "Verified" text
+    drawCheckmark(doc, badgeX, badgeY + 4, '#ffffff');
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(9);
+    doc.text('Verified', badgeX + 12, badgeY, { align: 'left' });
+  } else {
+    // Show "Pending" text for non-verified
+    doc.fillColor(badgeColor).font('Helvetica-Bold').fontSize(9);
+    doc.text('⏳ Pending', badgeX, badgeY, { align: 'left' });
+  }
+  doc.restore();
   
   // Contact info - 3 columns
   const detailY = contentY + 28;
@@ -515,7 +657,7 @@ function drawSignatureBlock(doc, user, y) {
   doc.text(dateStr, col2X, y, { width: colWidth, align: 'center' });
   
   // Draw vault seal icon instead of "D"
-  drawVaultIcon(doc, col3X + 57, y - 2, 24);
+  drawLogo(doc, col3X + 57, y - 2, 24, false);
 }
 
 function drawFooter(doc, user) {
@@ -552,6 +694,14 @@ function generateWillPdf({ outputPath, user, assets, executors, actions }) {
       });
       
       doc.pipe(stream);
+      
+      // Draw watermark on each page
+      doc.on('pageAdded', () => {
+        drawWatermark(doc);
+      });
+      
+      // Draw watermark on first page
+      drawWatermark(doc);
       
       let currentY = drawHeaderBlock(doc, user, `DW-${formatDateISO(new Date()).replace(/-/g, '')}-U${user.id || user.user_id}`);
       
