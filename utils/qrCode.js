@@ -33,7 +33,16 @@ async function generateExecutorVerificationQR(token) {
  */
 function getExecutorVerificationUrl(token) {
   // Use FRONTEND_URL for frontend file, fallback to APP_BASE_URL for local dev
-  const frontendUrl = process.env.FRONTEND_URL || process.env.APP_BASE_URL || 'http://localhost:3000';
+  let frontendUrl = process.env.FRONTEND_URL || process.env.APP_BASE_URL || 'http://localhost:3000';
+  
+  // Handle multiple URLs separated by comma - use the first one
+  if (frontendUrl.includes(',')) {
+    frontendUrl = frontendUrl.split(',')[0].trim();
+  }
+  
+  // Remove trailing slash to avoid double slashes
+  frontendUrl = frontendUrl.replace(/\/$/, '');
+  
   return `${frontendUrl}/executor-verify.html?token=${token}`;
 }
 
