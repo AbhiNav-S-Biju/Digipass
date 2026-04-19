@@ -82,6 +82,85 @@ function drawBox(doc, x, y, width, height, options = {}) {
   doc.rect(x, y, width, height).stroke();
 }
 
+function drawPasswordBullets(doc, x, y, count = 10) {
+  const radius = 2.5;
+  const spacing = 8;
+  doc.save();
+  doc.fillColor(COLORS.textMuted);
+  for (let i = 0; i < count; i++) {
+    doc.circle(x + (i * spacing), y + 5, radius).fill();
+  }
+  doc.restore();
+}
+
+function drawCheckmark(doc, x, y, color = '#3d7a5a') {
+  doc.save()
+    .strokeColor(color)
+    .lineWidth(1.5)
+    .moveTo(x, y + 3)
+    .lineTo(x + 3, y + 6)
+    .lineTo(x + 9, y)
+    .stroke()
+    .restore();
+}
+
+function drawLogo(doc, x, y, size = 36, onDark = true) {
+  const stroke = onDark ? COLORS.creamLight : COLORS.forestDeep;
+  const dotColor = COLORS.accentGreen;
+  const scale = size / 48;
+
+  doc.save();
+  
+  // Rounded square background - use fillOpacity instead of rgba
+  const bgColor = onDark ? COLORS.creamLight : COLORS.sand;
+  doc.fillColor(bgColor).fillOpacity(0.12).rect(x, y, size, size).fill();
+  doc.fillOpacity(1);
+  doc.strokeColor(stroke).lineWidth(0.5).rect(x, y, size, size).stroke();
+
+  // Vault rectangle body
+  const vx = x + (11 * scale);
+  const vy = y + (13 * scale);
+  const vw = 22 * scale;
+  const vh = 17 * scale;
+  doc.strokeColor(stroke).lineWidth(1.2).rect(vx, vy, vw, vh).stroke();
+
+  // Horizontal divider line
+  doc.strokeColor(stroke).lineWidth(1);
+  doc.moveTo(vx, vy + (vh * 0.45)).lineTo(vx + vw, vy + (vh * 0.45)).stroke();
+
+  // Left green square
+  doc.fillColor(dotColor).rect(vx + (vw * 0.1), vy + (vh * 0.55), vw * 0.25, vh * 0.35).fill();
+  
+  // Right green square (semi-transparent)
+  doc.fillOpacity(0.45).fillColor(dotColor).rect(vx + (vw * 0.45), vy + (vh * 0.55), vw * 0.25, vh * 0.35).fill();
+  doc.fillOpacity(1);
+
+  // Key pin
+  const kx = x + (31 * scale);
+  const ky = y + (8 * scale);
+  doc.fillColor(stroke).circle(kx, ky, 2.5 * scale).fill();
+  doc.strokeColor(stroke).lineWidth(1.5).moveTo(kx, ky + (2.5 * scale)).lineTo(kx, vy).stroke();
+
+  doc.restore();
+}
+
+function drawWatermark(doc) {
+  const pageWidth = 595;  // A4 width
+  const pageHeight = 842; // A4 height
+  const centerX = pageWidth / 2;
+  const centerY = pageHeight / 2;
+  
+  doc.save()
+    .rotate(-30, { origin: [centerX, centerY] })
+    .fillColor(COLORS.forestDeep)
+    .fillOpacity(0.03)
+    .fontSize(80)
+    .font('Helvetica-Bold')
+    .text('DIGIPASS', centerX - 160, centerY - 40)
+    .fillOpacity(1)
+    .restore();
+}
+
 function drawVaultIcon(doc, x, y, size = 36) {
   // Convert SVG to pdfkit drawing commands
   const scale = size / 48;
@@ -136,8 +215,8 @@ function drawHeaderBlock(doc, user, willId) {
   doc.fillColor(COLORS.forestDeep);
   doc.rect(0, 0, pageWidth, headerHeight).fill();
   
-  // Draw vault icon
-  drawVaultIcon(doc, margin, 22, 40);
+  // Draw improved logo
+  drawLogo(doc, margin, 22, 40, true);
   
   // Logo text next to icon
   doc.fillColor(COLORS.creamLight);
@@ -283,7 +362,8 @@ function drawAssetCard(doc, asset, index, y) {
   doc.rect(securedBadgeX, tagY, securedBadgeWidth, tagHeight).fill();
   doc.fillColor('#ffffff');
   doc.font('Helvetica-Bold').fontSize(8);
-  doc.text('✓ Secured', securedBadgeX + 2, tagY + 5, { width: securedBadgeWidth - 4, align: 'center' });
+  drawCheckmark(doc, securedBadgeX + 5, tagY + 4, '#ffffff');
+  doc.text('Secured', securedBadgeX + 16, tagY + 5, { width: securedBadgeWidth - 20, align: 'left' });
   
   // Better date format
   doc.fillColor(COLORS.textMuted);
@@ -312,7 +392,7 @@ function drawAssetCard(doc, asset, index, y) {
   doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
   doc.text('PASSWORD', col2X, detailsY);
   doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
-  doc.text(maskPassword(asset.account_password || ''), col2X, detailsY + 10);
+  drawPasswordBullets(doc, col2X, detailsY + 10, 10);
   
   // Row 2: Recovery Email and Action Type
   doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
@@ -384,9 +464,17 @@ function drawExecutorCard(doc, executor, index, y) {
   // Verification badge (top right)
   const isVerified = executor.verification_status === 'verified';
   const badgeColor = isVerified ? COLORS.accentGreen : COLORS.accentAmber;
-  const badgeText = isVerified ? '✓ Verified' : '⏳ Pending';
-  doc.font('Helvetica-Bold').fontSize(9).fillColor(badgeColor);
-  doc.text(badgeText, margin + cardWidth - 100, contentY, { align: 'right' });
+  const badgeX = margin + cardWidth - 100;
+  
+  if (isVerified) {
+    doc.fillColor(badgeColor);
+    drawCheckmark(doc, badgeX, contentY + 2, '#ffffff');
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(9);
+    doc.text('Verified', badgeX + 12, contentY, { align: 'left' });
+  } else {
+    doc.font('Helvetica-Bold').fontSize(9).fillColor(badgeColor);
+    doc.text('⏳ Pending', badgeX, contentY, { align: 'right' });
+  }
   
   // Contact info - 3 columns
   const detailY = contentY + 28;
@@ -515,7 +603,7 @@ function drawSignatureBlock(doc, user, y) {
   doc.text(dateStr, col2X, y, { width: colWidth, align: 'center' });
   
   // Draw vault seal icon instead of "D"
-  drawVaultIcon(doc, col3X + 57, y - 2, 24);
+  drawLogo(doc, col3X + 57, y - 2, 24, false);
 }
 
 function drawFooter(doc, user) {
@@ -552,6 +640,14 @@ function generateWillPdf({ outputPath, user, assets, executors, actions }) {
       });
       
       doc.pipe(stream);
+      
+      // Draw watermark on each page
+      doc.on('pageAdded', () => {
+        drawWatermark(doc);
+      });
+      
+      // Draw watermark on first page
+      drawWatermark(doc);
       
       let currentY = drawHeaderBlock(doc, user, `DW-${formatDateISO(new Date()).replace(/-/g, '')}-U${user.id || user.user_id}`);
       
