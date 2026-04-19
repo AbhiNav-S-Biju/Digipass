@@ -199,22 +199,22 @@ async function getExecutorAssets(req, res) {
          WHERE user_id = $1`,
         [ownerUserId]
       ),
+      // Query with COALESCE to handle both old and new schemas
       pool.query(
-        `SELECT asset_id, platform_name, category, account_identifier, action_type, last_message, created_at
+        `SELECT 
+          asset_id,
+          COALESCE(platform_name, asset_name) as platform_name,
+          COALESCE(category, asset_type) as category,
+          account_identifier,
+          action_type,
+          last_message,
+          encrypted_data,
+          created_at
          FROM digital_assets
          WHERE user_id = $1
          ORDER BY created_at DESC`,
         [ownerUserId]
-      ).catch(async () => {
-        // Fall back to old schema if new columns don't exist
-        return pool.query(
-          `SELECT asset_id, asset_name, asset_type, created_at
-           FROM digital_assets
-           WHERE user_id = $1
-           ORDER BY created_at DESC`,
-          [ownerUserId]
-        );
-      })
+      )
     ]);
 
     console.log(`[Executor Assets] Owner found: ${ownerResult.rows.length > 0}, Assets found: ${assetsResult.rows.length}`);
@@ -230,34 +230,59 @@ async function getExecutorAssets(req, res) {
     // Transform assets to ensure consistency
     const transformedAssets = assetsResult.rows
       .map(asset => {
-        // If new columns exist
-        if (asset.platform_name) {
-          return {
-            asset_id: asset.asset_id,
-            platform_name: asset.platform_name,
-            category: asset.category,
-            account_identifier: asset.account_identifier,
-            action_type: asset.action_type,
-            last_message: asset.last_message,
-            created_at: asset.created_at
-          };
+        // Handle both old and new schema
+        let accountIdentifier = asset.account_identifier;
+        let actionType = asset.action_type;
+        let lastMessage = asset.last_message;
+
+        // If using old schema, parse encrypted_data to extract account info
+        if (!accountIdentifier && asset.encrypted_data) {
+          try {
+            const decrypted = JSON.parse(asset.encrypted_data);
+            accountIdentifier = decrypted.account || null;
+            actionType = decrypted.action || null;
+            lastMessage = decrypted.message || null;
+          } catch (e) {
+            console.warn(`[Executor Assets] Failed to parse encrypted_data for asset ${asset.asset_id}`);
+          }
         }
-        // If old columns only
-        if (asset.asset_name) {
-          return {
-            asset_id: asset.asset_id,
-            platform_name: asset.asset_name,
-            category: asset.asset_type,
-            account_identifier: null,
-            action_type: 'pass',
-            last_message: null,
-            created_at: asset.created_at
-          };
-        }
-        // Skip completely empty assets
-        return null;
+
+        return {
+          asset_id: asset.asset_id,
+          platform_name: asset.platform_name,
+          category: asset.category,
+          account_identifier: accountIdentifier,
+          action_type: actionType,
+          last_message: lastMessage,
+          created_at: asset.created_at
+        };
       })
-      .filter(asset => asset !== null);
+      .filter(asset => asset.platform_name !== null && asset.platform_name !== undefined);
+
+    console.log(`[Executor Assets] Transformed ${transformedAssets.length} assets (filtered nulls)`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Executor assets retrieved successfully',
+      data: {
+        owner: ownerResult.rows[0],
+        executor: {
+          executor_id: executor.executor_id,
+          executor_name: executor.executor_name,
+          executor_email: executor.executor_email
+        },
+        count: transformedAssets.length,
+        assets: transformedAssets
+      }
+    });
+  } catch (error) {
+    console.error('Executor Assets Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve executor assets'
+    });
+  }
+}
 
     return res.status(200).json({
       success: true,

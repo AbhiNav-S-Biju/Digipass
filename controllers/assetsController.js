@@ -130,38 +130,51 @@ async function getAssets(req, res) {
   try {
     const userId = getAuthenticatedUserId(req);
 
-    // Try new schema first, fall back to old schema if columns don't exist
-    let rows;
-    try {
-      const result = await pool.query(
-        `SELECT asset_id, platform_name, category, account_identifier, action_type, last_message, created_at
-         FROM digital_assets
-         WHERE user_id = $1
-         ORDER BY created_at DESC`,
-        [userId]
-      );
-      rows = result.rows;
-    } catch (newSchemaError) {
-      // Fall back to old schema if new columns don't exist
-      console.warn('New schema columns not found, falling back to old schema:', newSchemaError.message);
-      const result = await pool.query(
-        `SELECT asset_id, asset_name, asset_type, created_at
-         FROM digital_assets
-         WHERE user_id = $1
-         ORDER BY created_at DESC`,
-        [userId]
-      );
-      // Transform old format to new format
-      rows = result.rows.map(asset => ({
+    // Use COALESCE to handle both old and new schemas seamlessly
+    const result = await pool.query(
+      `SELECT 
+        asset_id,
+        COALESCE(platform_name, asset_name) as platform_name,
+        COALESCE(category, asset_type) as category,
+        account_identifier,
+        action_type,
+        last_message,
+        encrypted_data,
+        created_at
+       FROM digital_assets
+       WHERE user_id = $1
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+
+    // Transform assets to ensure consistency, extracting account info from encrypted_data if needed
+    const rows = result.rows.map(asset => {
+      let accountIdentifier = asset.account_identifier;
+      let actionType = asset.action_type;
+      let lastMessage = asset.last_message;
+
+      // If using old schema, parse encrypted_data to extract account info
+      if (!accountIdentifier && asset.encrypted_data) {
+        try {
+          const decrypted = JSON.parse(asset.encrypted_data);
+          accountIdentifier = decrypted.account || null;
+          actionType = decrypted.action || 'pass';
+          lastMessage = decrypted.message || null;
+        } catch (e) {
+          console.warn(`Failed to parse encrypted_data for asset ${asset.asset_id}`);
+        }
+      }
+
+      return {
         asset_id: asset.asset_id,
-        platform_name: asset.asset_name,
-        category: asset.asset_type,
-        account_identifier: null,
-        action_type: 'pass',
-        last_message: null,
+        platform_name: asset.platform_name,
+        category: asset.category,
+        account_identifier: accountIdentifier,
+        action_type: actionType,
+        last_message: lastMessage,
         created_at: asset.created_at
-      }));
-    }
+      };
+    });
 
     return res.status(200).json({
       success: true,
