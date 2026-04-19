@@ -143,6 +143,51 @@ function generateInstructions(asset, user, executor) {
       login: 'https://www.disneyplus.com/login',
       settings: 'https://www.disneyplus.com/account',
       delete: 'https://www.disneyplus.com/account'
+    },
+    tiktok: {
+      login: 'https://www.tiktok.com/login',
+      settings: 'https://www.tiktok.com/setting',
+      delete: 'https://www.tiktok.com/setting'
+    },
+    snapchat: {
+      login: 'https://accounts.snapchat.com/login',
+      settings: 'https://accounts.snapchat.com/accounts/settings',
+      delete: 'https://accounts.snapchat.com/accounts/delete'
+    },
+    netflix: {
+      login: 'https://www.netflix.com/login',
+      settings: 'https://www.netflix.com/account',
+      delete: 'https://www.netflix.com/account'
+    },
+    hulu: {
+      login: 'https://www.hulu.com/account/login',
+      settings: 'https://account.hulu.com/account/settings',
+      delete: 'https://account.hulu.com/account/settings'
+    },
+    'google drive': {
+      login: 'https://accounts.google.com/login',
+      settings: 'https://myaccount.google.com/',
+      delete: 'https://myaccount.google.com/deleteaccount'
+    },
+    dropbox: {
+      login: 'https://www.dropbox.com/login',
+      settings: 'https://www.dropbox.com/account',
+      delete: 'https://www.dropbox.com/account'
+    },
+    outlook: {
+      login: 'https://outlook.office.com/',
+      settings: 'https://account.microsoft.com/account',
+      delete: 'https://account.microsoft.com/account/delete'
+    },
+    onedrive: {
+      login: 'https://onedrive.live.com',
+      settings: 'https://account.microsoft.com/account',
+      delete: 'https://account.microsoft.com/account/delete'
+    },
+    icloud: {
+      login: 'https://www.icloud.com/login',
+      settings: 'https://www.icloud.com/',
+      delete: 'https://account.apple.com/account'
     }
   };
 
@@ -796,6 +841,420 @@ function generateInstructions(asset, user, executor) {
         description: 'Complete the account deletion',
         action: 'Confirm deletion - your Disney+ account and all data will be removed'
       }
+    ],
+    tiktok: [
+      {
+        step: 1,
+        title: 'Open TikTok Login',
+        description: 'Go to TikTok website or app login',
+        action: 'Click the button to open TikTok.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email/phone and password to access account'
+      },
+      {
+        step: 3,
+        title: 'Go to Settings',
+        description: 'Navigate to account settings',
+        action: 'Click profile icon → "Settings and privacy"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Find Account Section',
+        description: 'Look for account management options',
+        action: 'Go to "Account" section'
+      },
+      {
+        step: 5,
+        title: 'Delete Account',
+        description: 'Look for account deletion option',
+        action: 'Find "Delete account" option'
+      },
+      {
+        step: 6,
+        title: 'Enter Password',
+        description: 'Verify your identity',
+        action: 'Enter password to confirm deletion'
+      },
+      {
+        step: 7,
+        title: 'Confirm Final Deletion',
+        description: 'Complete the deletion process',
+        action: 'Confirm deletion - your TikTok account will be permanently deleted'
+      }
+    ],
+    snapchat: [
+      {
+        step: 1,
+        title: 'Open Snapchat Login',
+        description: 'Go to Snapchat web login',
+        action: 'Visit accounts.snapchat.com to login',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter username and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to account management',
+        action: 'Click "Account" in the menu',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Find Delete Account Option',
+        description: 'Look for account deletion settings',
+        action: 'Find "Delete Account" or "Close Account" option'
+      },
+      {
+        step: 5,
+        title: 'Review Account Data',
+        description: 'Snapchat will show what data will be deleted',
+        action: 'Review all data that will be removed'
+      },
+      {
+        step: 6,
+        title: 'Confirm Your Password',
+        description: 'Verify your identity',
+        action: 'Enter password to confirm deletion'
+      },
+      {
+        step: 7,
+        title: 'Complete Deletion',
+        description: 'Finalize the deletion process',
+        action: 'Confirm deletion - your Snapchat account will be deleted'
+      }
+    ],
+    netflix: [
+      {
+        step: 1,
+        title: 'Open Netflix Login',
+        description: 'Go to Netflix website',
+        action: 'Visit Netflix.com and login',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to account page',
+        action: 'Click profile icon → "Account"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Find Membership Section',
+        description: 'Look for membership and billing settings',
+        action: 'Find "Membership & billing"'
+      },
+      {
+        step: 5,
+        title: 'Cancel Membership',
+        description: 'First cancel active subscription',
+        action: 'Click "Cancel membership" - account can be deleted only after'
+      },
+      {
+        step: 6,
+        title: 'Delete Account After Cancellation',
+        description: 'Delete account option appears after cancellation',
+        action: 'Return to settings and find "Delete account" option'
+      },
+      {
+        step: 7,
+        title: 'Confirm Account Deletion',
+        description: 'Complete the deletion',
+        action: 'Confirm deletion - your Netflix account will be permanently deleted'
+      }
+    ],
+    hulu: [
+      {
+        step: 1,
+        title: 'Open Hulu Login',
+        description: 'Go to Hulu website',
+        action: 'Visit Hulu.com and login',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to account management',
+        action: 'Click account icon → "Account Settings"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Find Subscription Details',
+        description: 'Look for subscription and plan details',
+        action: 'Navigate to subscription section'
+      },
+      {
+        step: 5,
+        title: 'Cancel Subscription',
+        description: 'Cancel active Hulu subscription first',
+        action: 'Click "Cancel subscription"'
+      },
+      {
+        step: 6,
+        title: 'Delete Account',
+        description: 'Delete account option available after cancellation',
+        action: 'Find and click "Delete account" option'
+      },
+      {
+        step: 7,
+        title: 'Confirm Deletion',
+        description: 'Complete the account deletion',
+        action: 'Confirm deletion - your Hulu account will be permanently deleted'
+      }
+    ],
+    'google drive': [
+      {
+        step: 1,
+        title: 'Open Google Account',
+        description: 'Go to Google Account page',
+        action: 'Visit accounts.google.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password (this affects all Google services)'
+      },
+      {
+        step: 3,
+        title: 'Go to Data & Privacy',
+        description: 'Navigate to data deletion settings',
+        action: 'Click "Data & Privacy" in the left menu',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Find Download or Delete Options',
+        description: 'Look for data download or deletion',
+        action: 'Find "Delete your data or account" section'
+      },
+      {
+        step: 5,
+        title: 'Delete Your Google Account',
+        description: 'Choose to delete entire Google Account (includes Drive)',
+        action: 'Click "Delete your entire Google Account and data"'
+      },
+      {
+        step: 6,
+        title: 'Download Data (Optional)',
+        description: 'Option to backup your Google Drive files',
+        action: 'Choose to download or skip backup'
+      },
+      {
+        step: 7,
+        title: 'Confirm Deletion',
+        description: 'Complete the account and data deletion',
+        action: 'Confirm deletion - Google Account and Drive will be deleted'
+      }
+    ],
+    dropbox: [
+      {
+        step: 1,
+        title: 'Open Dropbox Login',
+        description: 'Go to Dropbox website',
+        action: 'Visit Dropbox.com and login',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to account settings',
+        action: 'Click profile picture → "Settings"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Find Account Tab',
+        description: 'Look for account management section',
+        action: 'Click on "Account" tab'
+      },
+      {
+        step: 5,
+        title: 'Scroll to Delete Account',
+        description: 'Find account deletion option',
+        action: 'Look for "Delete account" link at bottom'
+      },
+      {
+        step: 6,
+        title: 'Review Account Data',
+        description: 'Dropbox shows data that will be deleted',
+        action: 'Review all files that will be removed'
+      },
+      {
+        step: 7,
+        title: 'Confirm Deletion',
+        description: 'Complete account deletion',
+        action: 'Confirm deletion - your Dropbox account will be permanently deleted'
+      }
+    ],
+    outlook: [
+      {
+        step: 1,
+        title: 'Open Outlook Login',
+        description: 'Go to Outlook.office.com',
+        action: 'Click the button to open Outlook',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Microsoft Account Settings',
+        description: 'Navigate to Microsoft account management',
+        action: 'Click profile icon → "View account"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Find Privacy and Data Options',
+        description: 'Look for account deletion options',
+        action: 'Go to "Privacy" or "Security" settings'
+      },
+      {
+        step: 5,
+        title: 'Delete Microsoft Account',
+        description: 'Choose to delete entire Microsoft account (includes Outlook)',
+        action: 'Find "Delete account" option'
+      },
+      {
+        step: 6,
+        title: 'Confirm Your Identity',
+        description: 'Microsoft will verify your identity',
+        action: 'Complete identity verification steps'
+      },
+      {
+        step: 7,
+        title: 'Complete Deletion',
+        description: 'Finalize the account deletion',
+        action: 'Confirm deletion - your Outlook account will be permanently deleted'
+      }
+    ],
+    onedrive: [
+      {
+        step: 1,
+        title: 'Open OneDrive Login',
+        description: 'Go to OneDrive',
+        action: 'Visit OneDrive.live.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Microsoft Account',
+        description: 'Navigate to account settings',
+        action: 'Click profile icon → "View account"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Find Account Deletion',
+        description: 'Look for delete account option',
+        action: 'Go to "Security" or "More security" options'
+      },
+      {
+        step: 5,
+        title: 'Delete Microsoft Account',
+        description: 'Choose to delete entire Microsoft account (includes OneDrive)',
+        action: 'Find "Delete account" option'
+      },
+      {
+        step: 6,
+        title: 'Review Data',
+        description: 'Microsoft will show files that will be deleted',
+        action: 'Review all OneDrive files'
+      },
+      {
+        step: 7,
+        title: 'Confirm Deletion',
+        description: 'Complete account deletion',
+        action: 'Confirm deletion - your OneDrive account will be permanently deleted'
+      }
+    ],
+    icloud: [
+      {
+        step: 1,
+        title: 'Open iCloud Login',
+        description: 'Go to iCloud website',
+        action: 'Visit iCloud.com and login',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter Apple ID and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to Apple ID account settings',
+        action: 'Click profile name → "Account Settings"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Find Account Deletion',
+        description: 'Look for account deletion section',
+        action: 'Find "Delete account" or "Account & security" option'
+      },
+      {
+        step: 5,
+        title: 'Delete Apple ID Account',
+        description: 'Choose to delete entire Apple ID',
+        action: 'Click "Delete your account"'
+      },
+      {
+        step: 6,
+        title: 'Review Consequences',
+        description: 'Apple will show consequences of deletion',
+        action: 'Review what data will be deleted from all Apple services'
+      },
+      {
+        step: 7,
+        title: 'Confirm Deletion',
+        description: 'Complete the account deletion',
+        action: 'Confirm deletion - your iCloud account will be permanently deleted'
+      }
     ]
   };
 
@@ -1121,6 +1580,420 @@ function generateInstructions(asset, user, executor) {
         title: 'Complete Handover',
         description: 'Confirm account has been handed over',
         action: 'Take screenshot showing all account info is updated to executor\'s details'
+      }
+    ],
+    tiktok: [
+      {
+        step: 1,
+        title: 'Open TikTok Login',
+        description: 'Go to TikTok website',
+        action: 'Visit TikTok.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email/phone and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Settings',
+        description: 'Navigate to account settings',
+        action: 'Click profile icon → "Settings and privacy"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Update Email Address',
+        description: 'Change email to executor\'s email',
+        action: `Go to "Account" → Change email to ${executor.executor_email}`
+      },
+      {
+        step: 5,
+        title: 'Update Password',
+        description: 'Set a new password for the executor',
+        action: 'Go to "Password" → Set new secure password'
+      },
+      {
+        step: 6,
+        title: 'Enable Two-Factor Authentication',
+        description: 'Secure the account with 2FA',
+        action: 'Go to "Security" → Enable phone verification'
+      },
+      {
+        step: 7,
+        title: 'Complete Handover',
+        description: 'Document the transfer is complete',
+        action: 'Take screenshot showing email is now executor\'s email'
+      }
+    ],
+    snapchat: [
+      {
+        step: 1,
+        title: 'Open Snapchat Login',
+        description: 'Go to Snapchat accounts page',
+        action: 'Visit accounts.snapchat.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter username and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to account management',
+        action: 'Click "Account" in the menu',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Update Email Address',
+        description: 'Change email to executor\'s email',
+        action: `Go to "Email address" → Change to ${executor.executor_email}`
+      },
+      {
+        step: 5,
+        title: 'Update Phone Number',
+        description: 'Change phone to executor\'s phone',
+        action: 'Go to "Phone number" → Update with executor\'s number'
+      },
+      {
+        step: 6,
+        title: 'Change Password',
+        description: 'Set new password for executor',
+        action: 'Go to "Password" → Enter new secure password'
+      },
+      {
+        step: 7,
+        title: 'Complete Handover',
+        description: 'Confirm transfer is complete',
+        action: 'Take screenshot showing executor\'s contact info is now primary'
+      }
+    ],
+    netflix: [
+      {
+        step: 1,
+        title: 'Open Netflix Login',
+        description: 'Go to Netflix website',
+        action: 'Visit Netflix.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to account page',
+        action: 'Click profile icon → "Account"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Update Email Address',
+        description: 'Change email to executor\'s email',
+        action: `Go to "Email address" → Change to ${executor.executor_email}`
+      },
+      {
+        step: 5,
+        title: 'Update Password',
+        description: 'Set new password for executor',
+        action: 'Go to "Password" → Set new secure password'
+      },
+      {
+        step: 6,
+        title: 'Update Payment Method',
+        description: 'Add executor\'s payment method',
+        action: 'Go to "Payment info" → Add executor\'s payment details'
+      },
+      {
+        step: 7,
+        title: 'Complete Handover',
+        description: 'Confirm account transfer is complete',
+        action: 'Take screenshot showing email is now executor\'s email'
+      }
+    ],
+    hulu: [
+      {
+        step: 1,
+        title: 'Open Hulu Login',
+        description: 'Go to Hulu website',
+        action: 'Visit Hulu.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to account settings',
+        action: 'Click account icon → "Account Settings"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Update Email Address',
+        description: 'Change email to executor\'s email',
+        action: `Go to "Email" → Change to ${executor.executor_email}`
+      },
+      {
+        step: 5,
+        title: 'Update Password',
+        description: 'Set new password for executor',
+        action: 'Go to "Password" → Set new secure password'
+      },
+      {
+        step: 6,
+        title: 'Update Billing Information',
+        description: 'Add executor\'s payment method',
+        action: 'Go to "Billing" → Add executor\'s payment info'
+      },
+      {
+        step: 7,
+        title: 'Complete Handover',
+        description: 'Confirm transfer is complete',
+        action: 'Take screenshot showing email is now executor\'s email'
+      }
+    ],
+    'google drive': [
+      {
+        step: 1,
+        title: 'Open Google Account',
+        description: 'Go to Google Account page',
+        action: 'Visit accounts.google.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Personal info',
+        description: 'Navigate to personal information settings',
+        action: 'Click "Personal info" in the left menu',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Update Email Address',
+        description: 'Change recovery email to executor\'s email',
+        action: `Go to "Email" → Change recovery email to ${executor.executor_email}`
+      },
+      {
+        step: 5,
+        title: 'Update Phone Number',
+        description: 'Change recovery phone to executor\'s phone',
+        action: 'Go to "Phone" → Update recovery phone number'
+      },
+      {
+        step: 6,
+        title: 'Update Recovery Options',
+        description: 'Ensure executor can recover account',
+        action: 'Go to "Security" → Update recovery options'
+      },
+      {
+        step: 7,
+        title: 'Complete Handover',
+        description: 'Confirm account transfer is complete',
+        action: 'Take screenshot showing executor\'s info is now recovery contact'
+      }
+    ],
+    dropbox: [
+      {
+        step: 1,
+        title: 'Open Dropbox Login',
+        description: 'Go to Dropbox website',
+        action: 'Visit Dropbox.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Settings',
+        description: 'Navigate to account settings',
+        action: 'Click profile picture → "Settings"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Update Email Address',
+        description: 'Change email to executor\'s email',
+        action: `Go to "Email address" → Change to ${executor.executor_email}`
+      },
+      {
+        step: 5,
+        title: 'Update Password',
+        description: 'Set new password for executor',
+        action: 'Go to "Password" → Set new secure password'
+      },
+      {
+        step: 6,
+        title: 'Update Security Settings',
+        description: 'Setup 2FA if available',
+        action: 'Go to "Security" → Enable additional security measures'
+      },
+      {
+        step: 7,
+        title: 'Complete Handover',
+        description: 'Confirm account transfer is complete',
+        action: 'Take screenshot showing email is now executor\'s email'
+      }
+    ],
+    outlook: [
+      {
+        step: 1,
+        title: 'Open Outlook Login',
+        description: 'Go to Outlook.office.com',
+        action: 'Visit Outlook.office.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to Microsoft account',
+        action: 'Click profile icon → "View account"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Update Email Address',
+        description: 'Change email to executor\'s email',
+        action: `Go to "Email" → Change to ${executor.executor_email}`
+      },
+      {
+        step: 5,
+        title: 'Update Password',
+        description: 'Set new password for executor',
+        action: 'Go to "Change password" → Set new secure password'
+      },
+      {
+        step: 6,
+        title: 'Update Security Options',
+        description: 'Setup 2FA for additional security',
+        action: 'Go to "Security settings" → Enable 2-step verification'
+      },
+      {
+        step: 7,
+        title: 'Complete Handover',
+        description: 'Confirm account transfer is complete',
+        action: 'Take screenshot showing email is now executor\'s email'
+      }
+    ],
+    onedrive: [
+      {
+        step: 1,
+        title: 'Open OneDrive Login',
+        description: 'Go to OneDrive',
+        action: 'Visit OneDrive.live.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Microsoft Account',
+        description: 'Navigate to account settings',
+        action: 'Click profile icon → "View account"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Update Email Address',
+        description: 'Change email to executor\'s email',
+        action: `Go to "Email address" → Change to ${executor.executor_email}`
+      },
+      {
+        step: 5,
+        title: 'Update Password',
+        description: 'Set new password for executor',
+        action: 'Go to "Change password" → Set new secure password'
+      },
+      {
+        step: 6,
+        title: 'Update Security Settings',
+        description: 'Enable 2FA for security',
+        action: 'Go to "Security options" → Enable 2-step verification'
+      },
+      {
+        step: 7,
+        title: 'Complete Handover',
+        description: 'Confirm account transfer is complete',
+        action: 'Take screenshot showing executor now controls the account'
+      }
+    ],
+    icloud: [
+      {
+        step: 1,
+        title: 'Open iCloud Login',
+        description: 'Go to iCloud website',
+        action: 'Visit iCloud.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter Apple ID and password'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to Apple ID settings',
+        action: 'Click profile name → "Account Settings"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Update Apple ID Email',
+        description: 'Change email to executor\'s email',
+        action: `Go to "Email address" → Change to ${executor.executor_email}`
+      },
+      {
+        step: 5,
+        title: 'Update Password',
+        description: 'Set new password for executor',
+        action: 'Go to "Password & Security" → Change password'
+      },
+      {
+        step: 6,
+        title: 'Update Trusted Phone Numbers',
+        description: 'Change to executor\'s phone number',
+        action: 'Go to "Phone Numbers" → Update with executor\'s number'
+      },
+      {
+        step: 7,
+        title: 'Complete Handover',
+        description: 'Confirm account transfer is complete',
+        action: 'Take screenshot showing Apple ID is now under executor\'s control'
       }
     ]
   };
