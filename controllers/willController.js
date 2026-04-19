@@ -62,7 +62,7 @@ async function generateWill(req, res, next) {
 
     const [userResult, assetsResult, executorsResult] = await Promise.all([
       pool.query(
-        `SELECT user_id, full_name, email, phone
+        `SELECT user_id, full_name, email
          FROM users
          WHERE user_id = $1`,
         [userId]

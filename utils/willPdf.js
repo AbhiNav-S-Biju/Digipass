@@ -158,12 +158,12 @@ function drawUserDetailsSection(doc, user, startY) {
   doc.font('Helvetica-Bold').fontSize(10).fillColor(COLORS.textDark);
   doc.text('User ID', col2X, contentY);
   doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
-  doc.text(user.id || user.user_id || 'N/A', col2X, contentY + 12);
+  doc.text(user.user_id || user.id || 'N/A', col2X, contentY + 12);
   
   doc.font('Helvetica-Bold').fontSize(10).fillColor(COLORS.textDark);
-  doc.text('Phone', col2X, contentY + 35);
+  doc.text('Estate Name', col2X, contentY + 35);
   doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
-  doc.text(user.phone || 'Not provided', col2X, contentY + 47, { width: 220 });
+  doc.text('Primary Estate', col2X, contentY + 47, { width: 220 });
   
   return startY + boxHeight + 15;
 }
