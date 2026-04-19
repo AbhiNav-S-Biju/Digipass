@@ -812,15 +812,43 @@
                     }
                 });
 
+                const data = await response.json();
+
+                // Handle authentication errors
                 if (response.status === 401) {
+                    console.warn('Unauthorized - redirecting to login');
                     location.href = 'executor-login.html';
                     return;
                 }
 
-                const data = await response.json();
+                // Handle access denied
+                if (response.status === 403) {
+                    console.warn('Access denied - executor does not have access yet');
+                    document.getElementById('assetsList').innerHTML = '';
+                    document.getElementById('assetCount').textContent = '0';
+                    const emptyState = document.getElementById('emptyState');
+                    if (emptyState) {
+                        emptyState.innerHTML = '<div class="alert alert-warning"><strong>Access Pending</strong><br>Your administrator has not granted you access to the assets yet. Please contact them to grant access.</div>';
+                        emptyState.classList.remove('d-none');
+                    }
+                    return;
+                }
 
-                // Check both possible response formats
-                const assets = data.assets || (data.data && data.data.assets) || [];
+                // Handle other errors
+                if (!response.ok || !data.success) {
+                    console.error('Failed to load assets:', data.message);
+                    document.getElementById('assetsList').innerHTML = '';
+                    document.getElementById('assetCount').textContent = '0';
+                    const emptyState = document.getElementById('emptyState');
+                    if (emptyState) {
+                        emptyState.innerHTML = `<div class="alert alert-danger"><strong>Error</strong><br>${escapeHtml(data.message || 'Failed to load assets')}</div>`;
+                        emptyState.classList.remove('d-none');
+                    }
+                    return;
+                }
+
+                // Get assets from response
+                const assets = data.data && data.data.assets ? data.data.assets : [];
 
                 if (assets && assets.length > 0) {
                     const assetsList = document.getElementById('assetsList');
@@ -879,15 +907,28 @@
                     // Update asset count in profile stats
                     document.getElementById('assetCount').textContent = assets.length;
                     
-                    document.getElementById('emptyState').classList.add('d-none');
+                    const emptyState = document.getElementById('emptyState');
+                    if (emptyState) {
+                        emptyState.classList.add('d-none');
+                    }
                 } else {
                     document.getElementById('assetsList').innerHTML = '';
                     document.getElementById('assetCount').textContent = '0';
-                    document.getElementById('emptyState').classList.remove('d-none');
+                    const emptyState = document.getElementById('emptyState');
+                    if (emptyState) {
+                        emptyState.classList.remove('d-none');
+                    }
                 }
             } catch (error) {
-                console.error(error);
-                document.getElementById('assetsList').innerHTML = '<p class="text-danger">Failed to load assets.</p>';
+                console.error('Asset loading error:', error);
+                document.getElementById('assetsList').innerHTML = '';
+                document.getElementById('assetCount').textContent = '0';
+                const emptyState = document.getElementById('emptyState');
+                if (emptyState) {
+                    emptyState.innerHTML = '<div class="alert alert-danger"><strong>Error</strong><br>Failed to load assets. Please refresh the page or contact support.</div>';
+                    emptyState.classList.remove('d-none');
+                }
+            }
             }
         }
 
