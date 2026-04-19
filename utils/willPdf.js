@@ -195,25 +195,36 @@ function drawAssetCard(doc, asset, index, y) {
   
   // Asset number and name
   doc.font('Helvetica-Bold').fontSize(11).fillColor(COLORS.forestDeep);
-  doc.text(`${String(index + 1).padStart(2, '0')}. ${asset.platform_name}`, contentX, contentY, { width: 350 });
+  doc.text(`${String(index + 1).padStart(2, '0')}. ${asset.platform_name}`, contentX, contentY, { width: 280 });
   
   // Category tag (top right)
   const categoryColors = getCategoryColor(asset.category);
   const tagHeight = 20;
   const tagWidth = 70;
-  const tagX = margin + cardWidth - tagWidth - 12;
+  const tagX = margin + cardWidth - tagWidth - 85;
   const tagY = contentY - 2;
   
   doc.rect(tagX, tagY, tagWidth, tagHeight).fill(categoryColors.bg);
   doc.font('Helvetica-Bold').fontSize(8).fillColor(categoryColors.text);
   doc.text(asset.category.substring(0, 12), tagX + 3, tagY + 5, { width: tagWidth - 6, align: 'center' });
   
-  // Secured status and date
-  doc.font('Helvetica-Oblique').fontSize(9).fillColor(COLORS.accentGreen);
-  doc.text('% Secured', contentX, contentY + 22);
+  // Secured status badge (top right)
+  const securedBadgeX = margin + cardWidth - 68;
+  const securedBadgeWidth = 60;
+  doc.rect(securedBadgeX, tagY, securedBadgeWidth, tagHeight).fill(COLORS.accentGreen);
+  doc.font('Helvetica-Bold').fontSize(8).fillColor('#ffffff');
+  doc.text('✓ Secured', securedBadgeX + 2, tagY + 5, { width: securedBadgeWidth - 4, align: 'center' });
   
+  // Better date format
   doc.font('Helvetica').fontSize(8).fillColor(COLORS.textMuted);
-  doc.text(`Added: ${formatDateISO(asset.created_at)}`, tagX, tagY + 22, { width: tagWidth, align: 'right' });
+  const formattedDate = asset.created_at ? new Date(asset.created_at).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).replace(',', '') : 'N/A';
+  doc.text(`Added ${formattedDate}`, contentX, contentY + 22);
   
   // Details grid - 4 fields in 2x2 layout
   const detailsY = contentY + 42;
@@ -232,16 +243,21 @@ function drawAssetCard(doc, asset, index, y) {
   doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
   doc.text(maskPassword(asset.account_password || ''), col2X, detailsY + 10);
   
-  // Row 2: Recovery Email and 2FA Enabled
+  // Row 2: Recovery Email and Action Type
   doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
   doc.text('RECOVERY EMAIL', col1X, detailsY + rowHeight);
   doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
   doc.text('Not provided', col1X, detailsY + rowHeight + 10);
   
   doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
-  doc.text('2FA ENABLED', col2X, detailsY + rowHeight);
+  doc.text('ACTION', col2X, detailsY + rowHeight);
   doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
-  doc.text('No', col2X, detailsY + rowHeight + 10);
+  const actionLabel = {
+    pass: 'Pass to executor',
+    delete: 'Delete account',
+    last_message: 'Memorialise account'
+  };
+  doc.text(actionLabel[asset.action_type] || asset.action_type || 'Not specified', col2X, detailsY + rowHeight + 10);
   
   // Final message box
   if (asset.last_message) {
