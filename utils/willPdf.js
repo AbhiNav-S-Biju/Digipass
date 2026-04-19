@@ -79,6 +79,43 @@ function drawBox(doc, x, y, width, height, options = {}) {
     .stroke();
 }
 
+function drawVaultIcon(doc, x, y, size = 36) {
+  // Convert SVG to pdfkit drawing commands
+  // Vault icon with rounded background, vault box, divider line, key slots, shackle, and lock top
+  const scale = size / 48;
+  
+  // Rounded square background with semi-transparent white stroke
+  doc.rect(x, y, size, size, 4).fillOpacity(0.12).fill(COLORS.creamLight);
+  doc.rect(x, y, size, size, 4).strokeColor(COLORS.creamLight).lineWidth(0.5).stroke();
+  
+  // Main vault box (rounded rectangle)
+  const vaultX = x + (11 * scale);
+  const vaultY = y + (13 * scale);
+  const vaultW = 22 * scale;
+  const vaultH = 17 * scale;
+  doc.rect(vaultX, vaultY, vaultW, vaultH, 2).fillOpacity(0).strokeColor(COLORS.creamLight).lineWidth(1.2).stroke();
+  
+  // Divider line through vault
+  const dividerY = y + (21 * scale);
+  doc.moveTo(x + (11 * scale), dividerY).lineTo(x + (33 * scale), dividerY).strokeColor(COLORS.creamLight).lineWidth(1).stroke();
+  
+  // Left key slot
+  doc.rect(x + (14 * scale), y + (25 * scale), 6 * scale, 4 * scale, 0.5).fillColor(COLORS.accentGreen).fill();
+  
+  // Right key slot (semi-transparent)
+  doc.fillOpacity(0.45);
+  doc.rect(x + (22 * scale), y + (25 * scale), 6 * scale, 4 * scale, 0.5).fillColor(COLORS.accentGreen).fill();
+  doc.fillOpacity(1);
+  
+  // Shackle (vertical line)
+  const shackleX = x + (31 * scale);
+  doc.moveTo(shackleX, y + (9 * scale)).lineTo(shackleX, y + (14 * scale)).strokeColor(COLORS.creamLight).lineWidth(1.5).stroke();
+  
+  // Lock top (circle)
+  doc.circle(x + (31 * scale), y + (8 * scale), 2.5 * scale).fillColor(COLORS.creamLight).fill();
+}
+
+
 function drawHeaderBlock(doc, user, willId) {
   const margin = 48;
   const pageWidth = 595; // A4 width
@@ -87,15 +124,19 @@ function drawHeaderBlock(doc, user, willId) {
   // Background
   doc.rect(0, 0, pageWidth, headerHeight).fill(COLORS.forestDeep);
   
-  // Title and subtitle
-  doc.font('Helvetica-Bold').fontSize(28).fillColor(COLORS.creamLight);
-  doc.text('DIGIPASS', margin, 25, { width: 200 });
+  // Draw vault icon
+  drawVaultIcon(doc, margin, 22, 40);
   
-  doc.font('Helvetica-Bold').fontSize(18).fillColor(COLORS.accentGreen);
-  doc.text('Digital Will & Estate Declaration', margin, 60, { width: 300 });
+  // Logo text next to icon
+  doc.font('Helvetica-Bold').fontSize(24).fillColor(COLORS.creamLight);
+  doc.text('DIGIPASS', margin + 50, 28, { width: 150 });
   
-  doc.font('Helvetica').fontSize(10).fillColor(COLORS.cream);
-  doc.text('A structured record of digital assets, executor assignments, and final instructions', margin, 85, { width: 300 });
+  // Subtitle and description
+  doc.font('Helvetica-Bold').fontSize(16).fillColor(COLORS.accentGreen);
+  doc.text('Digital Will & Estate Declaration', margin, 62, { width: 300 });
+  
+  doc.font('Helvetica').fontSize(9).fillColor(COLORS.cream);
+  doc.text('A structured record of digital assets, executor assignments, and final instructions', margin, 84, { width: 400 });
   
   // Legal Document badge (top right)
   const badgeX = pageWidth - margin - 80;
@@ -438,8 +479,8 @@ function drawSignatureBlock(doc, user, y) {
   const dateStr = formatDateISO(new Date());
   doc.text(dateStr, col2X, y, { width: colWidth, align: 'center' });
   
-  doc.font('Helvetica-Bold').fontSize(10).fillColor(COLORS.forestDeep);
-  doc.text('D', col3X + 60, y, { width: 30, align: 'center' });
+  // Draw vault seal icon instead of "D"
+  drawVaultIcon(doc, col3X + 57, y - 2, 24);
 }
 
 function drawFooter(doc, user) {
