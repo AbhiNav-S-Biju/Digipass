@@ -284,29 +284,6 @@ async function getExecutorAssets(req, res) {
   }
 }
 
-    return res.status(200).json({
-      success: true,
-      message: 'Executor assets retrieved successfully',
-      data: {
-        owner: ownerResult.rows[0],
-        executor: {
-          executor_id: executor.executor_id,
-          executor_name: executor.executor_name,
-          executor_email: executor.executor_email
-        },
-        count: transformedAssets.length,
-        assets: transformedAssets
-      }
-    });
-  } catch (error) {
-    console.error('Executor Assets Error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve executor assets'
-    });
-  }
-}
-
 module.exports = {
   executorLogin,
   registerExecutor,
