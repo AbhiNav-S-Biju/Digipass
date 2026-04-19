@@ -96,6 +96,139 @@
             box-shadow: 0 4px 12px rgba(212, 196, 160, 0.3);
         }
 
+        /* Profile Trigger (Dropdown) */
+        #profileTrigger {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.15s ease;
+            margin-left: 8px;
+        }
+
+        #profileTrigger:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .profile-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background-color: var(--forest-light);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DM Serif Display', serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--cream-light);
+            flex-shrink: 0;
+        }
+
+        .profile-username {
+            font-size: 13px;
+            color: var(--cream-light);
+            font-weight: 500;
+        }
+
+        .profile-chevron {
+            width: 14px;
+            height: 14px;
+            stroke: rgba(245, 234, 216, 0.7);
+            stroke-width: 2.5;
+            fill: none;
+            transition: transform 0.25s ease;
+        }
+
+        #profileTrigger.open .profile-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Dropdown Menu */
+        #profileDropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 220px;
+            background: var(--cream-light);
+            border: 1px solid var(--sand-deep);
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        #profileDropdown.open {
+            display: block;
+        }
+
+        .dd-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--sand-deep);
+        }
+
+        .dd-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .dd-email {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .dd-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 16px;
+            font-size: 13.5px;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .dd-item:hover {
+            background-color: var(--sand);
+        }
+
+        .dd-item svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            fill: none;
+            flex-shrink: 0;
+        }
+
+        .dd-divider {
+            height: 1px;
+            background-color: var(--sand-deep);
+        }
+
+        .dd-item.logout {
+            color: #a32d2d;
+        }
+
+        .dd-item.logout:hover {
+            background-color: #fcebeb;
+        }
+
+        .dd-item.logout svg {
+            stroke: #a32d2d;
+        }
+
         /* Main Content */
         .page {
             display: none;
@@ -506,12 +639,56 @@
                         <a class="nav-link" data-page="switch" href="#switch">Dead Man's Switch</a>
                     </li>
                     <li class="nav-item">
-                        <button id="logoutBtn" class="btn btn-logout btn-sm ms-2">Logout</button>
+                        <div id="profileTrigger" onclick="toggleDropdown()">
+                            <div class="profile-avatar" id="profileInitial">A</div>
+                            <span class="profile-username" id="profileName">User</span>
+                            <svg class="profile-chevron" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                            <div id="profileDropdown">
+                                <div class="dd-header">
+                                    <div class="dd-name" id="dropdownName">User Name</div>
+                                    <div class="dd-email" id="dropdownEmail">user@example.com</div>
+                                </div>
+                                <button class="dd-item" onclick="navigateToProfile()">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    My Profile
+                                </button>
+                                <button class="dd-item" onclick="navigateToSettings()">
+                                    <svg viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="1"></circle>
+                                        <circle cx="19" cy="12" r="1"></circle>
+                                        <circle cx="5" cy="12" r="1"></circle>
+                                    </svg>
+                                    Settings
+                                </button>
+                                <button class="dd-item" onclick="navigateToActivity()">
+                                    <svg viewBox="0 0 24 24">
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                        <circle cx="12" cy="12" r="9"></circle>
+                                    </svg>
+                                    Activity Log
+                                </button>
+                                <div class="dd-divider"></div>
+                                <button class="dd-item logout" onclick="closeDropdownAndLogout()">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M10 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M17 16l4-4m0 0l-4-4m4 4H7"></path>
+                                    </svg>
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
+    
+    <!-- Hidden logout button for backward compatibility with dashboard.js -->
+    <button id="logoutBtn" style="display: none;"></button>
 
     <!-- Main Content -->
     <main class="container-fluid px-3 px-md-4 py-4">
@@ -948,5 +1125,82 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/utils.js?v=9"></script>
     <script src="js/dashboard.js?v=9"></script>
+    
+    <!-- Profile Dropdown UI Script -->
+    <script>
+        // Toggle dropdown visibility
+        function toggleDropdown() {
+            document.getElementById('profileDropdown').classList.toggle('open');
+            document.getElementById('profileTrigger').classList.toggle('open');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const trigger = document.getElementById('profileTrigger');
+            if (trigger && !trigger.contains(e.target)) {
+                document.getElementById('profileDropdown').classList.remove('open');
+                document.getElementById('profileTrigger').classList.remove('open');
+            }
+        });
+
+        // Profile navigation placeholders (UI only - real navigation in main app)
+        function navigateToProfile() {
+            closeDropdown();
+            // Placeholder - actual navigation handled by main app
+            window.location.href = '/profile.html';
+        }
+
+        function navigateToSettings() {
+            closeDropdown();
+            // Placeholder - actual navigation handled by main app
+            window.location.href = '/profile.html?tab=security';
+        }
+
+        function navigateToActivity() {
+            closeDropdown();
+            // Placeholder - actual navigation handled by main app
+            window.location.href = '/profile.html?tab=activity';
+        }
+
+        function closeDropdown() {
+            document.getElementById('profileDropdown').classList.remove('open');
+            document.getElementById('profileTrigger').classList.remove('open');
+        }
+
+        // Logout handler
+        function closeDropdownAndLogout() {
+            closeDropdown();
+            // Trigger existing logout functionality
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.click();
+            } else {
+                // Fallback logout
+                localStorage.removeItem('user');
+                localStorage.removeItem('userToken');
+                window.location.href = '/login.html';
+            }
+        }
+
+        // Initialize profile trigger with user data from localStorage
+        function initializeProfileTrigger() {
+            try {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const userName = user.name || user.username || 'User';
+                const userEmail = user.email || 'user@example.com';
+                const initials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
+                
+                document.getElementById('profileInitial').textContent = initials;
+                document.getElementById('profileName').textContent = userName;
+                document.getElementById('dropdownName').textContent = userName;
+                document.getElementById('dropdownEmail').textContent = userEmail;
+            } catch (e) {
+                console.warn('Could not initialize profile trigger:', e);
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initializeProfileTrigger);
+    </script>
 </body>
 </html>
