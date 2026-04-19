@@ -33,19 +33,28 @@ async function executorLogin(req, res) {
     if (rows.length === 0) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid executor credentials'
+        message: 'No executor account found with this email. Please check your email address or ask your administrator to add you as an executor.'
       });
     }
 
     const executor = rows[0];
-    const isValidPassword = executor.executor_password_hash
-      ? await comparePassword(password, executor.executor_password_hash)
-      : false;
-
-    if (!isValidPassword) {
+    
+    // Check if password has been set yet
+    if (!executor.executor_password_hash) {
+      console.log(`[Executor Login] No password set for executor ${executor.executor_email}`);
       return res.status(401).json({
         success: false,
-        message: 'Invalid executor credentials'
+        message: 'Your account is not yet activated. Please click the verification link in your email to set your password.'
+      });
+    }
+    
+    const isValidPassword = await comparePassword(password, executor.executor_password_hash);
+
+    if (!isValidPassword) {
+      console.log(`[Executor Login] Invalid password for executor ${executor.executor_email}`);
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
       });
     }
 
