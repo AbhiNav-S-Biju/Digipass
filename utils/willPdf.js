@@ -65,7 +65,7 @@ function getCategoryColor(category) {
 }
 
 function maskPassword(password) {
-  return '●●●●●●●●●●';
+  return '********************';
 }
 
 function drawBox(doc, x, y, width, height, options = {}) {
