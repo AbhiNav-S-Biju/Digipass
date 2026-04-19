@@ -41,6 +41,7 @@ const initializeDigitalAssetsTable = async () => {
         platform_name VARCHAR(255),
         category VARCHAR(100),
         account_identifier VARCHAR(255),
+        account_password TEXT,
         action_type VARCHAR(50),
         last_message TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -55,6 +56,7 @@ const initializeDigitalAssetsTable = async () => {
       ADD COLUMN IF NOT EXISTS platform_name VARCHAR(255),
       ADD COLUMN IF NOT EXISTS category VARCHAR(100),
       ADD COLUMN IF NOT EXISTS account_identifier VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS account_password TEXT,
       ADD COLUMN IF NOT EXISTS action_type VARCHAR(50),
       ADD COLUMN IF NOT EXISTS last_message TEXT
     `);
