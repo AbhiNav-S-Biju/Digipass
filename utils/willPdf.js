@@ -65,8 +65,8 @@ function getCategoryColor(category) {
 }
 
 function maskPassword(password) {
-  // Use bullet characters - render more reliably in PDFs with proper font
-  return '●●●●●●●●●●';
+  // Use asterisks - render 100% reliably in all PDF viewers without issues
+  return '*'.repeat(22);
 }
 
 function drawBox(doc, x, y, width, height, options = {}) {
