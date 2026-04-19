@@ -65,7 +65,8 @@ function getCategoryColor(category) {
 }
 
 function maskPassword(password) {
-  return '********************';
+  // Use bullet characters - render more reliably in PDFs with proper font
+  return '●●●●●●●●●●';
 }
 
 function drawBox(doc, x, y, width, height, options = {}) {
@@ -365,7 +366,7 @@ function drawInstructionsSection(doc, user, assets, executors, y) {
   });
   
   if (assets.length > 0) {
-    const assetTypes = [...new Set(assets.map(a => a.asset_type))];
+    const assetTypes = [...new Set(assets.map(a => a.category))];
     instructions.push(`Asset categories covered: ${assetTypes.join(', ')}. Executors should coordinate to avoid duplicate actions.`);
   }
   
