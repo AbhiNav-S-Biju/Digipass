@@ -61,44 +61,13 @@ async function addAsset(req, res) {
       });
     }
 
-    // Try new schema first
-    let result;
-    try {
-      result = await pool.query(
-        `INSERT INTO digital_assets (user_id, platform_name, category, account_identifier, account_password, action_type, last_message, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
-         RETURNING asset_id, platform_name, category, account_identifier, account_password, action_type, last_message, created_at`,
-        [userId, platform_name.trim(), category, account_identifier.trim(), account_password.trim(), action_type, last_message || null]
-      );
-    } catch (newSchemaError) {
-      // Fall back to old schema if new columns don't exist
-      console.warn('New schema columns not found, using old schema:', newSchemaError.message);
-      result = await pool.query(
-        `INSERT INTO digital_assets (user_id, asset_name, asset_type, encrypted_data, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, NOW(), NOW())
-         RETURNING asset_id, asset_name, asset_type, created_at`,
-        [userId, platform_name.trim(), category, JSON.stringify({ account: account_identifier, password: account_password, action: action_type, message: last_message })]
-      );
-      
-      // Transform to new format for response
-      const oldRow = result.rows[0];
-      const newFormatRow = {
-        asset_id: oldRow.asset_id,
-        platform_name: oldRow.asset_name,
-        category: oldRow.asset_type,
-        account_identifier: account_identifier,
-        account_password: account_password,
-        action_type: action_type,
-        last_message: last_message,
-        created_at: oldRow.created_at
-      };
-      
-      return res.status(201).json({
-        success: true,
-        message: 'Asset added successfully',
-        data: buildAssetResponse(newFormatRow)
-      });
-    }
+    // Insert using new schema only (all old assets have been migrated)
+    const result = await pool.query(
+      `INSERT INTO digital_assets (user_id, platform_name, category, account_identifier, account_password, action_type, last_message, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+       RETURNING asset_id, platform_name, category, account_identifier, account_password, action_type, last_message, created_at`,
+      [userId, platform_name.trim(), category, account_identifier.trim(), account_password.trim(), action_type, last_message || null]
+    );
 
     const { rows } = result;
     const asset = rows[0];
