@@ -839,12 +839,107 @@ function generateInstructions(asset, user, executor) {
     ]
   };
 
+  // Generate generic instructions for unsupported platforms
+  const getGenericDeleteSteps = () => [
+    {
+      step: 1,
+      title: `Open ${asset.platform_name} Login`,
+      description: `Go to ${asset.platform_name}'s official login page`,
+      action: 'Click the button to open login page',
+      link: links.login
+    },
+    {
+      step: 2,
+      title: 'Login to Your Account',
+      description: `Use: ${asset.account_identifier}`,
+      action: 'Enter your credentials to access the account'
+    },
+    {
+      step: 3,
+      title: 'Navigate to Account Settings',
+      description: `Look for Settings, Account, or Profile options`,
+      action: 'Click on your profile icon or settings menu',
+      link: links.settings
+    },
+    {
+      step: 4,
+      title: 'Find Account Deletion/Closure Option',
+      description: 'Look for Delete Account, Close Account, or Remove Account',
+      action: 'Scroll through settings to find account deletion option'
+    },
+    {
+      step: 5,
+      title: 'Review Account Information',
+      description: 'Review what will happen when account is deleted',
+      action: 'Read any warnings or information provided about deletion'
+    },
+    {
+      step: 6,
+      title: 'Confirm Your Identity',
+      description: 'You may need to enter password or verify via email',
+      action: 'Complete any verification steps requested'
+    },
+    {
+      step: 7,
+      title: 'Complete Deletion',
+      description: 'Finalize the account deletion',
+      action: `Click to confirm - ${asset.platform_name} account will be deleted`
+    }
+  ];
+
+  const getGenericPassSteps = () => [
+    {
+      step: 1,
+      title: `Open ${asset.platform_name} Login`,
+      description: `Go to ${asset.platform_name}'s official login page`,
+      action: 'Click the button to open login page',
+      link: links.login
+    },
+    {
+      step: 2,
+      title: 'Login to Your Account',
+      description: `Use: ${asset.account_identifier}`,
+      action: 'Enter credentials to access the account'
+    },
+    {
+      step: 3,
+      title: 'Navigate to Account Settings',
+      description: 'Find Settings or Account options',
+      action: 'Look for profile icon or settings menu',
+      link: links.settings
+    },
+    {
+      step: 4,
+      title: 'Update Account Contact Information',
+      description: 'Change email/phone to executor\'s contact info',
+      action: `Update email and/or phone to ${executor.executor_email}`
+    },
+    {
+      step: 5,
+      title: 'Change Password',
+      description: 'Set a new password for the executor',
+      action: 'Go to Security or Password settings and update password'
+    },
+    {
+      step: 6,
+      title: 'Enable Two-Factor Authentication (if available)',
+      description: 'Secure the account with 2FA using executor\'s phone',
+      action: 'Go to Security settings and enable 2FA'
+    },
+    {
+      step: 7,
+      title: 'Complete Handover',
+      description: 'Document that account has been handed over',
+      action: `Take a screenshot showing account is now controlled by executor`
+    }
+  ];
+
   // Use platform-specific instructions, fallback to generic
   const getSteps = () => {
     if (actionType === 'delete') {
-      return deleteInstructions[platform] || deleteInstructions.instagram;
+      return deleteInstructions[platform] || getGenericDeleteSteps();
     } else if (actionType === 'pass') {
-      return passInstructions[platform] || passInstructions.instagram;
+      return passInstructions[platform] || getGenericPassSteps();
     }
   };
 
