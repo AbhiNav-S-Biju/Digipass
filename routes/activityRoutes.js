@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateUser } = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
 const { getUserActivities } = require('../utils/activityLogger');
 
 /**
@@ -8,9 +8,9 @@ const { getUserActivities } = require('../utils/activityLogger');
  * Get user's activity log
  * Query params: limit (default 20)
  */
-router.get('/', authenticateUser, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.userId;
     const limit = Math.min(parseInt(req.query.limit) || 20, 100); // Max 100
 
     const activities = await getUserActivities(userId, limit);
