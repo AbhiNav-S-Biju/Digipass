@@ -182,10 +182,10 @@ function drawAssetCard(doc, asset, index, y) {
   const contentX = margin + 15;
   
   doc.font('Helvetica-Bold').fontSize(11).fillColor(COLORS.forestDeep);
-  const assetNumberText = `${String(index + 1).padStart(2, '0')}. ${asset.asset_name}`;
+  const assetNumberText = `${String(index + 1).padStart(2, '0')}. ${asset.platform_name}`;
   doc.text(assetNumberText, contentX, y + 12, { width: 350 });
   
-  const categoryColors = getCategoryColor(asset.asset_type);
+  const categoryColors = getCategoryColor(asset.category);
   const tagHeight = 18;
   const tagWidth = 60;
   const tagX = margin + cardWidth - tagWidth - 12;
@@ -193,7 +193,7 @@ function drawAssetCard(doc, asset, index, y) {
   
   doc.rect(tagX, tagY, tagWidth, tagHeight).fill(categoryColors.bg);
   doc.font('Helvetica-Bold').fontSize(8).fillColor(categoryColors.text);
-  doc.text(asset.asset_type.substring(0, 8), tagX + 2, tagY + 4, { width: tagWidth - 4, align: 'center' });
+  doc.text(asset.category.substring(0, 8), tagX + 2, tagY + 4, { width: tagWidth - 4, align: 'center' });
   
   doc.font('Helvetica').fontSize(9).fillColor(COLORS.accentGreen);
   doc.text('● Secured', contentX, y + 34);
@@ -206,11 +206,10 @@ function drawAssetCard(doc, asset, index, y) {
   const col2DetailX = contentX + 240;
   
   const details = [
-    { label: 'Account / Username', value: asset.username || asset.account_identifier || 'Not provided' },
-    { label: 'Password', value: maskPassword(asset.password_encrypted || '') },
-    { label: 'Recovery Email', value: asset.recovery_email || 'Not provided' },
-    { label: '2FA Enabled', value: asset.two_factor_method ? 'Yes' : 'No' },
-    { label: 'Preferred Action', value: asset.preferred_action || 'Not specified' }
+    { label: 'Account / Username', value: asset.account_identifier || 'Not provided' },
+    { label: 'Password', value: maskPassword(asset.account_password || '') },
+    { label: 'Action Type', value: asset.action_type || 'Not specified' },
+    { label: 'Last Message', value: (asset.last_message || 'No message').substring(0, 25) }
   ];
   
   details.forEach((detail, idx) => {
@@ -222,17 +221,6 @@ function drawAssetCard(doc, asset, index, y) {
     doc.font('Helvetica').fontSize(8).fillColor(COLORS.textMuted);
     doc.text(detail.value, colX, detailRowY + 8, { width: 220 });
   });
-  
-  if (asset.access_instructions) {
-    const msgBoxY = y + cardHeight - 25;
-    drawBox(doc, margin + 12, msgBoxY, cardWidth - 24, 20, {
-      bgColor: COLORS.sand,
-      borderColor: '#ccc',
-      borderWidth: 0.5
-    });
-    doc.font('Helvetica-Oblique').fontSize(8).fillColor(COLORS.textMuted);
-    doc.text(`"${asset.access_instructions}"`, margin + 17, msgBoxY + 4, { width: cardWidth - 34 });
-  }
   
   return y + cardHeight + 15;
 }

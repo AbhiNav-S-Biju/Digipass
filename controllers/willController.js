@@ -68,9 +68,8 @@ async function generateWill(req, res, next) {
         [userId]
       ),
       pool.query(
-        `SELECT asset_id, asset_name, asset_type, username, email, 
-                password_encrypted, recovery_email, two_factor_method, 
-                access_instructions, preferred_action, created_at
+        `SELECT asset_id, platform_name, category, account_identifier, 
+                account_password, action_type, last_message, created_at
          FROM digital_assets
          WHERE user_id = $1
          ORDER BY created_at DESC`,
