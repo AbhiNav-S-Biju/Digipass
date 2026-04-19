@@ -117,22 +117,34 @@ function drawHeaderBlock(doc, user, willId) {
   return headerHeight + 20;
 }
 
-function drawSectionTitle(doc, title, y) {
-  doc.font('Helvetica-Bold').fontSize(14).fillColor(COLORS.forestDeep);
-  doc.text(title, 48, y);
-  doc.moveDown(0.2);
+function drawSectionTitle(doc, sectionNum, title, y) {
+  const margin = 48;
   
-  const currentY = doc.y;
-  doc.strokeColor(COLORS.forestMid).lineWidth(2);
-  doc.moveTo(48, currentY).lineTo(547, currentY).stroke();
+  // Numbered circle
+  const circleX = margin - 25;
+  const circleY = y + 3;
+  const circleRadius = 8;
   
-  return doc.y + 12;
+  doc.circle(circleX, circleY, circleRadius).fillColor(COLORS.forestDeep).fill();
+  doc.font('Helvetica-Bold').fontSize(10).fillColor(COLORS.creamLight);
+  doc.text(sectionNum.toString(), circleX - 3, circleY - 5, { width: 6, align: 'center' });
+  
+  // Title
+  doc.font('Helvetica-Bold').fontSize(13).fillColor(COLORS.forestDeep);
+  doc.text(title, margin + 15, y, { width: 400 });
+  
+  // Underline
+  const currentY = doc.y + 5;
+  doc.strokeColor(COLORS.forestMid).lineWidth(1.5);
+  doc.moveTo(margin, currentY).lineTo(547, currentY).stroke();
+  
+  return currentY + 8;
 }
 
 function drawUserDetailsSection(doc, user, startY) {
   const margin = 48;
   const sectionWidth = 499;
-  const boxHeight = 100;
+  const boxHeight = 110;
   
   drawBox(doc, margin, startY, sectionWidth, boxHeight, {
     bgColor: COLORS.creamLight,
@@ -141,29 +153,28 @@ function drawUserDetailsSection(doc, user, startY) {
   });
   
   const col1X = margin + 15;
-  const col2X = margin + 250;
+  const col2X = margin + 260;
   const contentY = startY + 12;
+  const lineHeight = 22;
   
-  doc.font('Helvetica-Bold').fontSize(10).fillColor(COLORS.textDark);
+  doc.font('Helvetica-Bold').fontSize(9).fillColor(COLORS.textDark).text('FULL NAME', col1X, contentY);
+  doc.font('Helvetica').fontSize(10).fillColor(COLORS.textMuted).text(user.full_name || 'Not provided', col1X, contentY + 10);
   
-  doc.text('Full Name', col1X, contentY);
-  doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
-  doc.text(user.full_name || 'Not provided', col1X, contentY + 12, { width: 220 });
+  doc.font('Helvetica-Bold').fontSize(9).fillColor(COLORS.textDark).text('USER ID', col1X, contentY + lineHeight);
+  doc.font('Helvetica').fontSize(10).fillColor(COLORS.textMuted).text(user.user_id || user.id || 'N/A', col1X, contentY + lineHeight + 10);
   
-  doc.font('Helvetica-Bold').fontSize(10).fillColor(COLORS.textDark);
-  doc.text('Email', col1X, contentY + 35);
-  doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
-  doc.text(user.email || 'Not provided', col1X, contentY + 47, { width: 220 });
+  doc.font('Helvetica-Bold').fontSize(9).fillColor(COLORS.textDark).text('PHONE NUMBER', col1X, contentY + lineHeight * 2);
+  doc.font('Helvetica').fontSize(10).fillColor(COLORS.textMuted).text('Not provided', col1X, contentY + lineHeight * 2 + 10);
   
-  doc.font('Helvetica-Bold').fontSize(10).fillColor(COLORS.textDark);
-  doc.text('User ID', col2X, contentY);
-  doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
-  doc.text(user.user_id || user.id || 'N/A', col2X, contentY + 12);
+  // Column 2
+  doc.font('Helvetica-Bold').fontSize(9).fillColor(COLORS.textDark).text('EMAIL ADDRESS', col2X, contentY);
+  doc.font('Helvetica').fontSize(10).fillColor(COLORS.textMuted).text(user.email || 'Not provided', col2X, contentY + 10);
   
-  doc.font('Helvetica-Bold').fontSize(10).fillColor(COLORS.textDark);
-  doc.text('Estate Name', col2X, contentY + 35);
-  doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
-  doc.text('Primary Estate', col2X, contentY + 47, { width: 220 });
+  doc.font('Helvetica-Bold').fontSize(9).fillColor(COLORS.textDark).text('ESTATE NAME', col2X, contentY + lineHeight);
+  doc.font('Helvetica').fontSize(10).fillColor(COLORS.textMuted).text('Primary Estate', col2X, contentY + lineHeight + 10);
+  
+  doc.font('Helvetica-Bold').fontSize(9).fillColor(COLORS.textDark).text('WILL VERSION', col2X, contentY + lineHeight * 2);
+  doc.font('Helvetica').fontSize(10).fillColor(COLORS.textMuted).text('v1.0', col2X, contentY + lineHeight * 2 + 10);
   
   return startY + boxHeight + 15;
 }
@@ -171,56 +182,96 @@ function drawUserDetailsSection(doc, user, startY) {
 function drawAssetCard(doc, asset, index, y) {
   const margin = 48;
   const cardWidth = 499;
-  const cardHeight = 160;
+  const cardHeight = 210;
   
   drawBox(doc, margin, y, cardWidth, cardHeight, {
     bgColor: '#ffffff',
     borderColor: COLORS.sandDeep,
-    borderWidth: 1
+    borderWidth: 1.5
   });
   
   const contentX = margin + 15;
+  const contentY = y + 12;
   
+  // Asset number and name
   doc.font('Helvetica-Bold').fontSize(11).fillColor(COLORS.forestDeep);
-  const assetNumberText = `${String(index + 1).padStart(2, '0')}. ${asset.platform_name}`;
-  doc.text(assetNumberText, contentX, y + 12, { width: 350 });
+  doc.text(`${String(index + 1).padStart(2, '0')}. ${asset.platform_name}`, contentX, contentY, { width: 350 });
   
+  // Category tag (top right)
   const categoryColors = getCategoryColor(asset.category);
-  const tagHeight = 18;
-  const tagWidth = 60;
+  const tagHeight = 20;
+  const tagWidth = 70;
   const tagX = margin + cardWidth - tagWidth - 12;
-  const tagY = y + 12;
+  const tagY = contentY - 2;
   
   doc.rect(tagX, tagY, tagWidth, tagHeight).fill(categoryColors.bg);
   doc.font('Helvetica-Bold').fontSize(8).fillColor(categoryColors.text);
-  doc.text(asset.category.substring(0, 8), tagX + 2, tagY + 4, { width: tagWidth - 4, align: 'center' });
+  doc.text(asset.category.substring(0, 12), tagX + 3, tagY + 5, { width: tagWidth - 6, align: 'center' });
   
-  doc.font('Helvetica').fontSize(9).fillColor(COLORS.accentGreen);
-  doc.text('● Secured', contentX, y + 34);
+  // Secured status and date
+  doc.font('Helvetica-Oblique').fontSize(9).fillColor(COLORS.accentGreen);
+  doc.text('% Secured', contentX, contentY + 22);
   
   doc.font('Helvetica').fontSize(8).fillColor(COLORS.textMuted);
-  doc.text(`Added: ${formatDateISO(asset.created_at)}`, tagX, tagY + 20, { width: tagWidth, align: 'right' });
+  doc.text(`Added: ${formatDateISO(asset.created_at)}`, tagX, tagY + 22, { width: tagWidth, align: 'right' });
   
-  const detailY = y + 55;
-  const col1DetailX = contentX;
-  const col2DetailX = contentX + 240;
+  // Details grid - 4 fields in 2x2 layout
+  const detailsY = contentY + 42;
+  const col1X = contentX;
+  const col2X = contentX + 245;
+  const rowHeight = 28;
   
-  const details = [
-    { label: 'Account / Username', value: asset.account_identifier || 'Not provided' },
-    { label: 'Password', value: maskPassword(asset.account_password || '') },
-    { label: 'Action Type', value: asset.action_type || 'Not specified' },
-    { label: 'Last Message', value: (asset.last_message || 'No message').substring(0, 25) }
-  ];
+  // Row 1: Account/Username and Password
+  doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
+  doc.text('ACCOUNT / USERNAME', col1X, detailsY);
+  doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
+  doc.text(asset.account_identifier || 'Not provided', col1X, detailsY + 10);
   
-  details.forEach((detail, idx) => {
-    const colX = idx % 2 === 0 ? col1DetailX : col2DetailX;
-    const detailRowY = detailY + Math.floor(idx / 2) * 17;
+  doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
+  doc.text('PASSWORD', col2X, detailsY);
+  doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
+  doc.text(maskPassword(asset.account_password || ''), col2X, detailsY + 10);
+  
+  // Row 2: Recovery Email and 2FA Enabled
+  doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
+  doc.text('RECOVERY EMAIL', col1X, detailsY + rowHeight);
+  doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
+  doc.text('Not provided', col1X, detailsY + rowHeight + 10);
+  
+  doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
+  doc.text('2FA ENABLED', col2X, detailsY + rowHeight);
+  doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
+  doc.text('No', col2X, detailsY + rowHeight + 10);
+  
+  // Final message box
+  if (asset.last_message) {
+    const msgBoxY = y + cardHeight - 32;
+    drawBox(doc, contentX, msgBoxY, cardWidth - 30, 28, {
+      bgColor: COLORS.sand,
+      borderColor: '#ccc',
+      borderWidth: 0.5
+    });
     
     doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
-    doc.text(detail.label + ':', colX, detailRowY);
-    doc.font('Helvetica').fontSize(8).fillColor(COLORS.textMuted);
-    doc.text(detail.value, colX, detailRowY + 8, { width: 220 });
-  });
+    doc.text('FINAL MESSAGE TO EXECUTORS', contentX + 6, msgBoxY + 3);
+    
+    doc.font('Helvetica-Oblique').fontSize(9).fillColor(COLORS.textMuted);
+    const message = asset.last_message.substring(0, 80);
+    doc.text(`"${message}"`, contentX + 6, msgBoxY + 13);
+  } else {
+    const msgBoxY = y + cardHeight - 32;
+    drawBox(doc, contentX, msgBoxY, cardWidth - 30, 28, {
+      bgColor: COLORS.sand,
+      borderColor: '#ccc',
+      borderWidth: 0.5
+    });
+    
+    doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
+    doc.text('FINAL MESSAGE TO EXECUTORS', contentX + 6, msgBoxY + 3);
+    
+    doc.font('Helvetica-Oblique').fontSize(9).fillColor(COLORS.textMuted);
+    doc.text('No final message left.', contentX + 6, msgBoxY + 13);
+  }
   
   return y + cardHeight + 15;
 }
@@ -228,50 +279,57 @@ function drawAssetCard(doc, asset, index, y) {
 function drawExecutorCard(doc, executor, index, y) {
   const margin = 48;
   const cardWidth = 499;
-  const cardHeight = 90;
+  const cardHeight = 100;
   
   drawBox(doc, margin, y, cardWidth, cardHeight, {
     bgColor: '#ffffff',
     borderColor: COLORS.sandDeep,
-    borderWidth: 1
+    borderWidth: 1.5
   });
   
   const contentX = margin + 15;
+  const contentY = y + 12;
   
-  doc.font('Helvetica-Bold').fontSize(11).fillColor(COLORS.forestDeep);
-  doc.text(`${index + 1}. ${executor.executor_name}`, contentX, y + 12, { width: 350 });
+  // Executor name
+  doc.font('Helvetica-Bold').fontSize(12).fillColor(COLORS.forestDeep);
+  doc.text(executor.executor_name, contentX, contentY, { width: 350 });
   
+  // Verification badge (top right)
   const isVerified = executor.verification_status === 'verified';
   const badgeColor = isVerified ? COLORS.accentGreen : COLORS.accentAmber;
   const badgeText = isVerified ? '✓ Verified' : '⏳ Pending';
   doc.font('Helvetica-Bold').fontSize(9).fillColor(badgeColor);
-  doc.text(badgeText, margin + cardWidth - 90, y + 12, { align: 'right' });
+  doc.text(badgeText, margin + cardWidth - 100, contentY, { align: 'right' });
   
-  const detailY = y + 40;
+  // Contact info - 3 columns
+  const detailY = contentY + 28;
   const col1X = contentX;
-  const col2X = contentX + 160;
-  const col3X = contentX + 320;
+  const col2X = contentX + 155;
+  const col3X = contentX + 310;
   
-  const contacts = [
-    { label: 'Email', value: executor.executor_email, x: col1X },
-    { label: 'Phone', value: executor.executor_phone || 'Not provided', x: col2X },
-    { label: 'Relationship', value: executor.relationship || 'Not specified', x: col3X }
-  ];
+  doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
+  doc.text('EMAIL', col1X, detailY);
+  doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
+  doc.text(executor.executor_email, col1X, detailY + 10);
   
-  contacts.forEach(contact => {
-    doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
-    doc.text(contact.label + ':', contact.x, detailY);
-    doc.font('Helvetica').fontSize(8).fillColor(COLORS.textMuted);
-    doc.text(contact.value, contact.x, detailY + 8, { width: 140 });
-  });
+  doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
+  doc.text('PHONE', col2X, detailY);
+  doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
+  doc.text(executor.executor_phone || 'Not provided', col2X, detailY + 10);
   
+  doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.textDark);
+  doc.text('RELATIONSHIP', col3X, detailY);
+  doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
+  doc.text(executor.relationship || 'Not specified', col3X, detailY + 10);
+  
+  // Access badge (bottom left)
   const accessBg = executor.access_granted ? COLORS.forestMid : COLORS.accentAmber;
   const accessText = executor.access_granted ? 'Full Access Granted' : 'Access Pending';
-  const badgeY = y + cardHeight - 16;
+  const badgeY = y + cardHeight - 18;
   
-  doc.rect(contentX, badgeY, 100, 12).fill(accessBg);
+  doc.rect(contentX, badgeY, 110, 14).fill(accessBg);
   doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.creamLight);
-  doc.text(accessText, contentX + 3, badgeY + 2, { width: 94, align: 'center' });
+  doc.text(accessText, contentX + 3, badgeY + 2, { width: 104, align: 'center' });
   
   return y + cardHeight + 12;
 }
@@ -402,12 +460,12 @@ function generateWillPdf({ outputPath, user, assets, executors, actions }) {
       
       currentY += 15;
       
-      currentY = drawSectionTitle(doc, 'SECTION 1 — TESTATOR / USER DETAILS', currentY);
+      currentY = drawSectionTitle(doc, 1, 'TESTATOR — USER DETAILS', currentY);
       currentY = drawUserDetailsSection(doc, user, currentY);
       
       currentY += 15;
       
-      currentY = drawSectionTitle(doc, 'SECTION 2 — DIGITAL ASSETS', currentY);
+      currentY = drawSectionTitle(doc, 2, `DIGITAL ASSETS — ${assets.length} LISTED`, currentY);
       
       if (assets.length === 0) {
         doc.font('Helvetica-Oblique').fontSize(9).fillColor(COLORS.textMuted);
@@ -430,7 +488,7 @@ function generateWillPdf({ outputPath, user, assets, executors, actions }) {
         currentY = 48;
       }
       
-      currentY = drawSectionTitle(doc, 'SECTION 3 — ASSIGNED EXECUTORS', currentY);
+      currentY = drawSectionTitle(doc, 3, `ASSIGNED EXECUTORS — ${executors.length} APPOINTED`, currentY);
       
       if (executors.length === 0) {
         doc.font('Helvetica-Oblique').fontSize(9).fillColor(COLORS.textMuted);
@@ -453,7 +511,7 @@ function generateWillPdf({ outputPath, user, assets, executors, actions }) {
         currentY = 48;
       }
       
-      currentY = drawSectionTitle(doc, 'SECTION 4 — EXECUTOR INSTRUCTIONS', currentY);
+      currentY = drawSectionTitle(doc, 4, 'EXECUTOR INSTRUCTIONS', currentY);
       currentY = drawInstructionsSection(doc, user, assets, executors, currentY);
       
       currentY += 15;
@@ -463,7 +521,7 @@ function generateWillPdf({ outputPath, user, assets, executors, actions }) {
         currentY = 48;
       }
       
-      currentY = drawSectionTitle(doc, 'SECTION 5 — DECLARATION & SIGNATURE', currentY);
+      currentY = drawSectionTitle(doc, 5, 'DECLARATION & SIGNATURE', currentY);
       currentY = drawDeclarationSection(doc, user, currentY);
       
       currentY += 15;
