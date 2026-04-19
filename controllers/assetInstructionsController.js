@@ -133,6 +133,16 @@ function generateInstructions(asset, user, executor) {
       login: 'https://www.reddit.com/login',
       settings: 'https://www.reddit.com/settings/account',
       delete: 'https://www.reddit.com/settings/account'
+    },
+    spotify: {
+      login: 'https://www.spotify.com/login',
+      settings: 'https://www.spotify.com/account/edit/',
+      delete: 'https://www.spotify.com/account/settings'
+    },
+    'disney+': {
+      login: 'https://www.disneyplus.com/login',
+      settings: 'https://www.disneyplus.com/account',
+      delete: 'https://www.disneyplus.com/account'
     }
   };
 
@@ -648,6 +658,144 @@ function generateInstructions(asset, user, executor) {
         description: 'Finalize the account deactivation',
         action: 'Click "Deactivate" to complete - account will be permanently deleted after 30 days'
       }
+    ],
+    amazon: [
+      {
+        step: 1,
+        title: 'Open Amazon Login',
+        description: 'Go to Amazon\'s official login page',
+        action: 'Click the button to open Amazon.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email/phone and password to access account'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to your account settings',
+        action: 'Click "Account & Lists" → "Your Account"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Find Login & Security',
+        description: 'Look for Account settings section',
+        action: 'Go to "Login & security" section in Account settings'
+      },
+      {
+        step: 5,
+        title: 'Close Your Account',
+        description: 'Look for account closure option',
+        action: 'Scroll down and find "Close your account" link'
+      },
+      {
+        step: 6,
+        title: 'Review Account Status',
+        description: 'Review any outstanding orders or obligations',
+        action: 'Check for active subscriptions, orders, or refunds before closure'
+      },
+      {
+        step: 7,
+        title: 'Confirm Closure',
+        description: 'Complete the account deletion process',
+        action: 'Follow instructions to permanently delete account'
+      }
+    ],
+    spotify: [
+      {
+        step: 1,
+        title: 'Open Spotify Login',
+        description: 'Go to Spotify\'s official login page',
+        action: 'Click the button to open Spotify.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password to access account'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to your account settings',
+        action: 'Click your profile name → "Account"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Find Privacy Settings',
+        description: 'Look for privacy and data options',
+        action: 'Scroll down to find "Data rights" or "Privacy" section'
+      },
+      {
+        step: 5,
+        title: 'Download or Delete Data',
+        description: 'Choose to delete account permanently',
+        action: 'Click "Download your data" or look for delete account option'
+      },
+      {
+        step: 6,
+        title: 'Confirm Your Password',
+        description: 'Enter password to verify account deletion',
+        action: 'Type your password in the confirmation dialog'
+      },
+      {
+        step: 7,
+        title: 'Complete Deletion',
+        description: 'Finalize the account deletion',
+        action: 'Confirm deletion - your Spotify account will be permanently deleted'
+      }
+    ],
+    'disney+': [
+      {
+        step: 1,
+        title: 'Open Disney+ Login',
+        description: 'Go to Disney+ website and login',
+        action: 'Click the button to open DisneyPlus.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password to access account'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to your account settings',
+        action: 'Click your profile icon → "Account"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Find Account Details',
+        description: 'Look for account information section',
+        action: 'Go to "Account" or "Profile" section'
+      },
+      {
+        step: 5,
+        title: 'Cancel Subscription (if needed)',
+        description: 'Cancel active subscription before deleting account',
+        action: 'Cancel any active Disney+ subscription first'
+      },
+      {
+        step: 6,
+        title: 'Delete Account',
+        description: 'Look for account deletion option',
+        action: 'Find and click "Delete account" or "Close account" link'
+      },
+      {
+        step: 7,
+        title: 'Confirm Deletion',
+        description: 'Complete the account deletion',
+        action: 'Confirm deletion - your Disney+ account and all data will be removed'
+      }
     ]
   };
 
@@ -835,6 +983,144 @@ function generateInstructions(asset, user, executor) {
         title: 'Document Completion',
         description: 'Confirm handover is complete',
         action: 'Take screenshot showing account details have been updated'
+      }
+    ],
+    amazon: [
+      {
+        step: 1,
+        title: 'Open Amazon Login',
+        description: 'Go to Amazon\'s official login page',
+        action: 'Click the button to open Amazon.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email/phone and password to access account'
+      },
+      {
+        step: 3,
+        title: 'Go to Account & Lists',
+        description: 'Navigate to your account settings',
+        action: 'Click "Account & Lists" → "Your Account"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Update Login & Security',
+        description: 'Change email to executor\'s email',
+        action: `Go to "Login & security" → Change email to ${executor.executor_email}`
+      },
+      {
+        step: 5,
+        title: 'Update Payment Method',
+        description: 'Add executor\'s payment method',
+        action: 'Go to "Your payments" → Add new payment method under executor\'s name'
+      },
+      {
+        step: 6,
+        title: 'Update Address Book',
+        description: 'Add executor\'s address as primary',
+        action: 'Go to "Your addresses" → Add executor\'s address if needed'
+      },
+      {
+        step: 7,
+        title: 'Share Account Access',
+        description: 'Document that account has been handed over',
+        action: 'Take screenshot showing email is now executor\'s email'
+      }
+    ],
+    spotify: [
+      {
+        step: 1,
+        title: 'Open Spotify Login',
+        description: 'Go to Spotify\'s official login page',
+        action: 'Click the button to open Spotify.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password to access account'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to your account settings',
+        action: 'Click your profile name → "Account"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Update Email Address',
+        description: 'Change email to executor\'s email',
+        action: `Go to "Email address" section → Change to ${executor.executor_email}`
+      },
+      {
+        step: 5,
+        title: 'Update Password',
+        description: 'Set a new password for the executor',
+        action: 'Go to "Change password" → Enter new secure password'
+      },
+      {
+        step: 6,
+        title: 'Manage Subscriptions',
+        description: 'Update billing information if needed',
+        action: 'Go to "Premium" or "Subscription" → Update payment method to executor\'s'
+      },
+      {
+        step: 7,
+        title: 'Complete Handover',
+        description: 'Confirm account transfer is complete',
+        action: 'Take screenshot showing email is now executor\'s email'
+      }
+    ],
+    'disney+': [
+      {
+        step: 1,
+        title: 'Open Disney+ Login',
+        description: 'Go to Disney+ website and login',
+        action: 'Click the button to open DisneyPlus.com',
+        link: links.login
+      },
+      {
+        step: 2,
+        title: 'Login to Your Account',
+        description: `Use: ${asset.account_identifier}`,
+        action: 'Enter email and password to access account'
+      },
+      {
+        step: 3,
+        title: 'Go to Account Settings',
+        description: 'Navigate to your account settings',
+        action: 'Click your profile icon → "Account"',
+        link: links.settings
+      },
+      {
+        step: 4,
+        title: 'Update Email Address',
+        description: 'Change email to executor\'s email',
+        action: `Go to "Email" → Change email to ${executor.executor_email}`
+      },
+      {
+        step: 5,
+        title: 'Update Password',
+        description: 'Set a new password for the executor',
+        action: 'Go to "Change password" → Set new secure password'
+      },
+      {
+        step: 6,
+        title: 'Update Billing Information',
+        description: 'Add executor\'s payment method if needed',
+        action: 'Go to "Payment method" → Add executor\'s payment information'
+      },
+      {
+        step: 7,
+        title: 'Complete Handover',
+        description: 'Confirm account has been handed over',
+        action: 'Take screenshot showing all account info is updated to executor\'s details'
       }
     ]
   };
