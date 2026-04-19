@@ -65,54 +65,65 @@ function getCategoryColor(category) {
 }
 
 function maskPassword(password) {
-  // Use asterisks - render 100% reliably in all PDF viewers without issues
-  return '*'.repeat(22);
+  // Use Unicode bullet - properly set before rendering
+  return '\u25CF'.repeat(12); // ● character repeated 12 times
 }
 
 function drawBox(doc, x, y, width, height, options = {}) {
   const { bgColor = COLORS.creamLight, borderColor = COLORS.sandDeep, borderWidth = 1 } = options;
   
-  doc.rect(x, y, width, height).fill(bgColor);
-  doc.rect(x, y, width, height)
-    .strokeColor(borderColor)
-    .lineWidth(borderWidth)
-    .stroke();
+  // Fill background - SET COLOR FIRST, then fill
+  doc.fillColor(bgColor);
+  doc.rect(x, y, width, height).fill();
+  
+  // Draw border
+  doc.strokeColor(borderColor);
+  doc.lineWidth(borderWidth);
+  doc.rect(x, y, width, height).stroke();
 }
 
 function drawVaultIcon(doc, x, y, size = 36) {
   // Convert SVG to pdfkit drawing commands
-  // Vault icon with rounded background, vault box, divider line, key slots, shackle, and lock top
   const scale = size / 48;
   
-  // Rounded square background with semi-transparent white stroke
-  doc.rect(x, y, size, size, 4).fillOpacity(0.12).fill(COLORS.creamLight);
-  doc.rect(x, y, size, size, 4).strokeColor(COLORS.creamLight).lineWidth(0.5).stroke();
+  // Rounded square background with semi-transparent white
+  doc.fillColor(COLORS.creamLight).fillOpacity(0.12);
+  doc.rect(x, y, size, size, 4).fill();
+  doc.fillOpacity(1); // Reset opacity
+  
+  doc.strokeColor(COLORS.creamLight).lineWidth(0.5);
+  doc.rect(x, y, size, size, 4).stroke();
   
   // Main vault box (rounded rectangle)
   const vaultX = x + (11 * scale);
   const vaultY = y + (13 * scale);
   const vaultW = 22 * scale;
   const vaultH = 17 * scale;
-  doc.rect(vaultX, vaultY, vaultW, vaultH, 2).fillOpacity(0).strokeColor(COLORS.creamLight).lineWidth(1.2).stroke();
+  doc.strokeColor(COLORS.creamLight).lineWidth(1.2);
+  doc.rect(vaultX, vaultY, vaultW, vaultH, 2).stroke();
   
   // Divider line through vault
   const dividerY = y + (21 * scale);
-  doc.moveTo(x + (11 * scale), dividerY).lineTo(x + (33 * scale), dividerY).strokeColor(COLORS.creamLight).lineWidth(1).stroke();
+  doc.strokeColor(COLORS.creamLight).lineWidth(1);
+  doc.moveTo(x + (11 * scale), dividerY).lineTo(x + (33 * scale), dividerY).stroke();
   
   // Left key slot
-  doc.rect(x + (14 * scale), y + (25 * scale), 6 * scale, 4 * scale, 0.5).fillColor(COLORS.accentGreen).fill();
+  doc.fillColor(COLORS.accentGreen);
+  doc.rect(x + (14 * scale), y + (25 * scale), 6 * scale, 4 * scale, 0.5).fill();
   
   // Right key slot (semi-transparent)
-  doc.fillOpacity(0.45);
-  doc.rect(x + (22 * scale), y + (25 * scale), 6 * scale, 4 * scale, 0.5).fillColor(COLORS.accentGreen).fill();
-  doc.fillOpacity(1);
+  doc.fillColor(COLORS.accentGreen).fillOpacity(0.45);
+  doc.rect(x + (22 * scale), y + (25 * scale), 6 * scale, 4 * scale, 0.5).fill();
+  doc.fillOpacity(1); // Reset opacity
   
   // Shackle (vertical line)
   const shackleX = x + (31 * scale);
-  doc.moveTo(shackleX, y + (9 * scale)).lineTo(shackleX, y + (14 * scale)).strokeColor(COLORS.creamLight).lineWidth(1.5).stroke();
+  doc.strokeColor(COLORS.creamLight).lineWidth(1.5);
+  doc.moveTo(shackleX, y + (9 * scale)).lineTo(shackleX, y + (14 * scale)).stroke();
   
   // Lock top (circle)
-  doc.circle(x + (31 * scale), y + (8 * scale), 2.5 * scale).fillColor(COLORS.creamLight).fill();
+  doc.fillColor(COLORS.creamLight);
+  doc.circle(x + (31 * scale), y + (8 * scale), 2.5 * scale).fill();
 }
 
 
@@ -121,32 +132,39 @@ function drawHeaderBlock(doc, user, willId) {
   const pageWidth = 595; // A4 width
   const headerHeight = 140;
   
-  // Background
-  doc.rect(0, 0, pageWidth, headerHeight).fill(COLORS.forestDeep);
+  // Draw background - SET COLOR FIRST
+  doc.fillColor(COLORS.forestDeep);
+  doc.rect(0, 0, pageWidth, headerHeight).fill();
   
   // Draw vault icon
   drawVaultIcon(doc, margin, 22, 40);
   
   // Logo text next to icon
-  doc.font('Helvetica-Bold').fontSize(24).fillColor(COLORS.creamLight);
+  doc.fillColor(COLORS.creamLight);
+  doc.font('Helvetica-Bold').fontSize(24);
   doc.text('DIGIPASS', margin + 50, 28, { width: 150 });
   
   // Subtitle and description
-  doc.font('Helvetica-Bold').fontSize(16).fillColor(COLORS.accentGreen);
+  doc.fillColor(COLORS.accentGreen);
+  doc.font('Helvetica-Bold').fontSize(16);
   doc.text('Digital Will & Estate Declaration', margin, 62, { width: 300 });
   
-  doc.font('Helvetica').fontSize(9).fillColor(COLORS.cream);
+  doc.fillColor(COLORS.cream);
+  doc.font('Helvetica').fontSize(9);
   doc.text('A structured record of digital assets, executor assignments, and final instructions', margin, 84, { width: 400 });
   
   // Legal Document badge (top right)
   const badgeX = pageWidth - margin - 80;
   const badgeY = 20;
-  doc.rect(badgeX, badgeY, 70, 24).fill(COLORS.accentAmber);
-  doc.font('Helvetica-Bold').fontSize(9).fillColor(COLORS.textDark);
+  doc.fillColor(COLORS.accentAmber);
+  doc.rect(badgeX, badgeY, 70, 24).fill();
+  doc.fillColor(COLORS.textDark);
+  doc.font('Helvetica-Bold').fontSize(9);
   doc.text('Legal\nDocument', badgeX + 5, badgeY + 4, { width: 60, align: 'center' });
   
   // Meta info (bottom of header)
-  doc.font('Helvetica').fontSize(9).fillColor(COLORS.sand);
+  doc.fillColor(COLORS.sand);
+  doc.font('Helvetica').fontSize(9);
   const metaY = headerHeight - 20;
   
   const dateStr = formatDate(new Date());
@@ -162,17 +180,22 @@ function drawHeaderBlock(doc, user, willId) {
 function drawSectionTitle(doc, sectionNum, title, y) {
   const margin = 48;
   
-  // Numbered circle
+  // Numbered circle - SET COLOR FIRST
   const circleX = margin - 25;
   const circleY = y + 3;
   const circleRadius = 8;
   
-  doc.circle(circleX, circleY, circleRadius).fillColor(COLORS.forestDeep).fill();
-  doc.font('Helvetica-Bold').fontSize(10).fillColor(COLORS.creamLight);
+  doc.fillColor(COLORS.forestDeep);
+  doc.circle(circleX, circleY, circleRadius).fill();
+  
+  // White text inside
+  doc.fillColor(COLORS.creamLight);
+  doc.font('Helvetica-Bold').fontSize(10);
   doc.text(sectionNum.toString(), circleX - 3, circleY - 5, { width: 6, align: 'center' });
   
   // Title
-  doc.font('Helvetica-Bold').fontSize(13).fillColor(COLORS.forestDeep);
+  doc.fillColor(COLORS.forestDeep);
+  doc.font('Helvetica-Bold').fontSize(13);
   doc.text(title, margin + 15, y, { width: 400 });
   
   // Underline
@@ -246,19 +269,25 @@ function drawAssetCard(doc, asset, index, y) {
   const tagX = margin + cardWidth - tagWidth - 85;
   const tagY = contentY - 2;
   
-  doc.rect(tagX, tagY, tagWidth, tagHeight).fill(categoryColors.bg);
-  doc.font('Helvetica-Bold').fontSize(8).fillColor(categoryColors.text);
+  // Category tag - SET COLOR FIRST
+  doc.fillColor(categoryColors.bg);
+  doc.rect(tagX, tagY, tagWidth, tagHeight).fill();
+  doc.fillColor(categoryColors.text);
+  doc.font('Helvetica-Bold').fontSize(8);
   doc.text(asset.category.substring(0, 12), tagX + 3, tagY + 5, { width: tagWidth - 6, align: 'center' });
   
-  // Secured status badge (top right)
+  // Secured status badge (top right) - SET COLOR FIRST
   const securedBadgeX = margin + cardWidth - 68;
   const securedBadgeWidth = 60;
-  doc.rect(securedBadgeX, tagY, securedBadgeWidth, tagHeight).fill(COLORS.accentGreen);
-  doc.font('Helvetica-Bold').fontSize(8).fillColor('#ffffff');
+  doc.fillColor(COLORS.accentGreen);
+  doc.rect(securedBadgeX, tagY, securedBadgeWidth, tagHeight).fill();
+  doc.fillColor('#ffffff');
+  doc.font('Helvetica-Bold').fontSize(8);
   doc.text('✓ Secured', securedBadgeX + 2, tagY + 5, { width: securedBadgeWidth - 4, align: 'center' });
   
   // Better date format
-  doc.font('Helvetica').fontSize(8).fillColor(COLORS.textMuted);
+  doc.fillColor(COLORS.textMuted);
+  doc.font('Helvetica').fontSize(8);
   const formattedDate = asset.created_at ? new Date(asset.created_at).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -380,13 +409,15 @@ function drawExecutorCard(doc, executor, index, y) {
   doc.font('Helvetica').fontSize(9).fillColor(COLORS.textMuted);
   doc.text(executor.relationship || 'Not specified', col3X, detailY + 10);
   
-  // Access badge (bottom left)
+  // Access badge (bottom left) - SET COLOR FIRST
   const accessBg = executor.access_granted ? COLORS.forestMid : COLORS.accentAmber;
   const accessText = executor.access_granted ? 'Full Access Granted' : 'Access Pending';
   const badgeY = y + cardHeight - 18;
   
-  doc.rect(contentX, badgeY, 110, 14).fill(accessBg);
-  doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.creamLight);
+  doc.fillColor(accessBg);
+  doc.rect(contentX, badgeY, 110, 14).fill();
+  doc.fillColor(COLORS.creamLight);
+  doc.font('Helvetica-Bold').fontSize(8);
   doc.text(accessText, contentX + 3, badgeY + 2, { width: 104, align: 'center' });
   
   return y + cardHeight + 12;
@@ -417,9 +448,13 @@ function drawInstructionsSection(doc, user, assets, executors, y) {
   instructions.forEach((instruction) => {
     const circleX = contentX;
     const circleY = currentY + 2;
-    doc.circle(circleX, circleY, 3).fillColor(COLORS.forestMid).fill();
     
-    doc.font('Helvetica').fontSize(9).fillColor(COLORS.textDark);
+    // Draw bullet circle - SET COLOR FIRST
+    doc.fillColor(COLORS.forestMid);
+    doc.circle(circleX, circleY, 3).fill();
+    
+    doc.fillColor(COLORS.textDark);
+    doc.font('Helvetica').fontSize(9);
     doc.text(instruction, contentX + 18, currentY, { width: 440 });
     
     currentY = doc.y + 8;
@@ -489,9 +524,13 @@ function drawFooter(doc, user) {
   const margin = 48;
   const pageWidth = 595;
   
-  doc.rect(0, footerY - 5, pageWidth, 40).fill(COLORS.forestDeep);
+  // Draw footer background - SET COLOR FIRST
+  doc.fillColor(COLORS.forestDeep);
+  doc.rect(0, footerY - 5, pageWidth, 40).fill();
   
-  doc.font('Helvetica').fontSize(8).fillColor(COLORS.sand);
+  // Footer text
+  doc.fillColor(COLORS.sand);
+  doc.font('Helvetica').fontSize(8);
   
   doc.text('Digipass · Digital Estate', margin, footerY, { width: 150 });
   
