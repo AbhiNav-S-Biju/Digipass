@@ -262,39 +262,24 @@ async function resendExecutorVerification(req, res) {
     
     const fallbackVerificationUrl = getExecutorVerificationUrl(verificationToken);
 
-    // Send email asynchronously (non-blocking)
-    // If email fails, executor token is still updated - they can still use the link
-    console.log('[Executor Controller] Queuing resend verification email to send in background...');
-    setImmediate(async () => {
-      try {
-        console.log('[Executor Controller] [Background] Calling sendExecutorVerificationEmail...');
-        const delivery = await sendExecutorVerificationEmail({
-          executorName: executor.executor_name,
-          executorEmail: executor.executor_email,
-          token: verificationToken
-        });
-
-        console.log('[Executor Controller] [Background] Resend email sent successfully');
-        console.log(`  - delivered: ${delivery.delivered}`);
-        console.log(`  - messageId: ${delivery.messageId || '(none)'}`);
-      } catch (mailError) {
-        // Email failed but executor token was updated successfully
-        // This is not a critical error - the verification link is still valid
-        console.warn('[Executor Controller] [Background] Resend email failed (non-critical)');
-        console.warn(`  - executor_id: ${executor.executor_id}`);
-        console.warn(`  - executor_email: ${executor.executor_email}`);
-        console.warn(`  - message: ${mailError.message}`);
-        console.warn(`  - code: ${mailError.code || '(none)'}`);
-        console.warn(`  - fallback: verification URL is logged above and available via API response`);
-      }
-    });
+    // Generate QR code for verification
+    let qrCodeDataUrl = null;
+    try {
+      console.log('[Executor Controller] Generating QR code...');
+      qrCodeDataUrl = await generateExecutorVerificationQR(verificationToken);
+      console.log('[Executor Controller] QR code generated successfully');
+    } catch (qrError) {
+      console.warn('[Executor Controller] QR code generation failed (non-critical)');
+      console.warn(`  - error: ${qrError.message}`);
+    }
 
     return res.status(200).json({
       success: true,
-      message: 'Executor verification email will be sent shortly.',
+      message: 'QR code and verification link generated. Share with executor to complete setup.',
       data: {
         executor_id: executor.executor_id,
-        verification_email_sent: 'pending',
+        verification_qr_code: qrCodeDataUrl,
+        verification_link: fallbackVerificationUrl,
         verification_preview_url: process.env.NODE_ENV === 'development' ? fallbackVerificationUrl : undefined
       }
     });
@@ -302,7 +287,7 @@ async function resendExecutorVerification(req, res) {
     console.error('Resend Executor Verification Error:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to resend executor verification email'
+      message: 'Failed to generate verification QR code'
     });
   }
 }

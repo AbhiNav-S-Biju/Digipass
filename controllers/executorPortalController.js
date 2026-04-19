@@ -33,7 +33,7 @@ async function executorLogin(req, res) {
     if (rows.length === 0) {
       return res.status(401).json({
         success: false,
-        message: 'No executor account found with this email. Please check your email address or ask your administrator to add you as an executor.'
+        message: 'No executor account found with this email. Ask your administrator to add you and share the QR code for setup.'
       });
     }
 
@@ -44,7 +44,7 @@ async function executorLogin(req, res) {
       console.log(`[Executor Login] No password set for executor ${executor.executor_email}`);
       return res.status(401).json({
         success: false,
-        message: 'Your account is not yet activated. Please click the verification link in your email to set your password.'
+        message: 'Your account is not yet activated. Ask your administrator to share the QR code or verification link to set up your password.'
       });
     }
     
@@ -62,7 +62,7 @@ async function executorLogin(req, res) {
       console.log(`[Executor Login] Verification failed for executor ${executor.executor_id}: status is '${executor.verification_status}'`);
       return res.status(403).json({
         success: false,
-        message: 'Please click the verification link in your email to complete setup. If you did not receive an email, ask your administrator to send you a new verification link.'
+        message: 'Your account verification is pending. Scan the QR code your administrator shared or ask them to resend the verification link.'
       });
     }
 
