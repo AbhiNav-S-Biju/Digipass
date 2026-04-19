@@ -199,17 +199,8 @@ async function getExecutorAssets(req, res) {
          WHERE user_id = $1`,
         [ownerUserId]
       ),
-      // Query with COALESCE to handle both old and new schemas
       pool.query(
-        `SELECT 
-          asset_id,
-          COALESCE(platform_name, asset_name) as platform_name,
-          COALESCE(category, asset_type) as category,
-          account_identifier,
-          action_type,
-          last_message,
-          encrypted_data,
-          created_at
+        `SELECT asset_id, platform_name, category, account_identifier, action_type, last_message, created_at
          FROM digital_assets
          WHERE user_id = $1
          ORDER BY created_at DESC`,
@@ -227,39 +218,17 @@ async function getExecutorAssets(req, res) {
       });
     }
 
-    // Transform assets to ensure consistency
-    const transformedAssets = assetsResult.rows
-      .map(asset => {
-        // Handle both old and new schema
-        let accountIdentifier = asset.account_identifier;
-        let actionType = asset.action_type;
-        let lastMessage = asset.last_message;
+    const transformedAssets = assetsResult.rows.map(asset => ({
+      asset_id: asset.asset_id,
+      platform_name: asset.platform_name,
+      category: asset.category,
+      account_identifier: asset.account_identifier,
+      action_type: asset.action_type,
+      last_message: asset.last_message,
+      created_at: asset.created_at
+    }));
 
-        // If using old schema, parse encrypted_data to extract account info
-        if (!accountIdentifier && asset.encrypted_data) {
-          try {
-            const decrypted = JSON.parse(asset.encrypted_data);
-            accountIdentifier = decrypted.account || null;
-            actionType = decrypted.action || null;
-            lastMessage = decrypted.message || null;
-          } catch (e) {
-            console.warn(`[Executor Assets] Failed to parse encrypted_data for asset ${asset.asset_id}`);
-          }
-        }
-
-        return {
-          asset_id: asset.asset_id,
-          platform_name: asset.platform_name,
-          category: asset.category,
-          account_identifier: accountIdentifier,
-          action_type: actionType,
-          last_message: lastMessage,
-          created_at: asset.created_at
-        };
-      })
-      .filter(asset => asset.platform_name !== null && asset.platform_name !== undefined);
-
-    console.log(`[Executor Assets] Transformed ${transformedAssets.length} assets (filtered nulls)`);
+    console.log(`[Executor Assets] Retrieved ${transformedAssets.length} assets`);
 
     return res.status(200).json({
       success: true,

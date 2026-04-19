@@ -814,9 +814,6 @@
 
                 const data = await response.json();
 
-                console.log('[LoadAssets] Response status:', response.status);
-                console.log('[LoadAssets] Response data:', JSON.stringify(data, null, 2));
-
                 // Handle authentication errors
                 if (response.status === 401) {
                     console.warn('Unauthorized - redirecting to login');

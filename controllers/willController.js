@@ -68,15 +68,8 @@ async function generateWill(req, res, next) {
         [userId]
       ),
       pool.query(
-        `SELECT asset_id,
-                COALESCE(platform_name, asset_name) as platform_name,
-                COALESCE(category, asset_type) as category,
-                account_identifier,
-                account_password,
-                action_type,
-                last_message,
-                encrypted_data,
-                created_at
+        `SELECT asset_id, platform_name, category, account_identifier, 
+                account_password, action_type, last_message, created_at
          FROM digital_assets
          WHERE user_id = $1
          ORDER BY created_at DESC`,
@@ -100,39 +93,7 @@ async function generateWill(req, res, next) {
     }
 
     const user = userResult.rows[0];
-    
-    // Transform assets to handle both old and new schemas
-    const assets = assetsResult.rows.map(asset => {
-      let accountIdentifier = asset.account_identifier;
-      let accountPassword = asset.account_password;
-      let actionType = asset.action_type;
-      let lastMessage = asset.last_message;
-
-      // If using old schema, parse encrypted_data to extract account info
-      if (!accountIdentifier && asset.encrypted_data) {
-        try {
-          const decrypted = JSON.parse(asset.encrypted_data);
-          accountIdentifier = decrypted.account || null;
-          accountPassword = decrypted.password || null;
-          actionType = decrypted.action || null;
-          lastMessage = decrypted.message || null;
-        } catch (e) {
-          console.warn(`Failed to parse encrypted_data for asset ${asset.asset_id}`);
-        }
-      }
-
-      return {
-        asset_id: asset.asset_id,
-        platform_name: asset.platform_name,
-        category: asset.category,
-        account_identifier: accountIdentifier,
-        account_password: accountPassword,
-        action_type: actionType,
-        last_message: lastMessage,
-        created_at: asset.created_at
-      };
-    });
-    
+    const assets = assetsResult.rows;
     const executors = executorsResult.rows;
     const actions = buildActions(user, assets, executors);
 
