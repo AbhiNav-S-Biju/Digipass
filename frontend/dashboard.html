@@ -473,13 +473,40 @@
         }
 
         .summary-count {
-            font-size: clamp(2rem, 8vw, 2.5rem);
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--forest-deep);
             margin: 0;
-            white-space: nowrap;
+        }
+
+        /* Will status bar */
+        .will-status-bar {
+            display: none;
+            width: 100%;
+            height: 6px;
+            background: var(--sand);
+            border-radius: 3px;
             overflow: hidden;
-            text-overflow: ellipsis;
+            margin-top: 8px;
+        }
+
+        .will-status-bar.active {
+            display: block;
+        }
+
+        .will-status-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--forest-light));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .will-status-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            text-align: center;
         }
 
         /* Modal */
@@ -945,6 +972,10 @@
                                     <div class="summary-item">
                                         <h4>Status</h4>
                                         <p class="summary-count" id="willStatus">Ready</p>
+                                        <div class="will-status-bar" id="willStatusBar">
+                                            <div class="will-status-fill" id="willStatusFill"></div>
+                                        </div>
+                                        <div class="will-status-text" id="willStatusText"></div>
                                     </div>
                                 </div>
                             </div>

@@ -340,16 +340,35 @@ function renderWillContent(assets, executors) {
 async function handleGenerateWill() {
   const generateBtn = document.getElementById('generateWillBtn');
   const willStatus = document.getElementById('willStatus');
+  const willStatusBar = document.getElementById('willStatusBar');
+  const willStatusFill = document.getElementById('willStatusFill');
+  const willStatusText = document.getElementById('willStatusText');
 
   generateBtn.disabled = true;
   generateBtn.textContent = 'Generating...';
-  willStatus.textContent = 'Generating PDF...';
-  willStatus.style.color = '#f59e0b';
+  willStatus.textContent = 'Generating...';
+  willStatusBar.classList.add('active');
+  willStatusText.textContent = '0%';
+  willStatusFill.style.width = '0%';
+
+  // Simulate progress
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    progress += Math.random() * 30;
+    progress = Math.min(progress, 90); // Cap at 90% until complete
+    willStatusFill.style.width = progress + '%';
+    willStatusText.textContent = Math.round(progress) + '%';
+  }, 300);
 
   try {
     const response = await apiCall('/generate-will', 'GET');
 
     if (response.success && response.data) {
+      // Update progress to 95%
+      clearInterval(progressInterval);
+      willStatusFill.style.width = '95%';
+      willStatusText.textContent = '95%';
+      
       // Use download URL from response
       const downloadUrl = response.data.download_url;
       
@@ -379,9 +398,17 @@ async function handleGenerateWill() {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(blobUrl);
 
+        // Complete progress
+        willStatusFill.style.width = '100%';
+        willStatusText.textContent = '100%';
         showNotification('Digital will generated and downloaded successfully!', 'success');
-        willStatus.textContent = '✓ Generated';
-        willStatus.style.color = '#10b981';
+        willStatus.textContent = '✓ Ready';
+
+        // Hide progress bar after 2 seconds
+        setTimeout(() => {
+          willStatusBar.classList.remove('active');
+          willStatusText.textContent = '';
+        }, 2000);
       } else {
         throw new Error('No download URL provided');
       }
@@ -390,8 +417,10 @@ async function handleGenerateWill() {
     }
   } catch (error) {
     console.error('Will generation error:', error);
+    clearInterval(progressInterval);
+    willStatusBar.classList.remove('active');
     willStatus.textContent = '✗ Error';
-    willStatus.style.color = '#ef4444';
+    willStatusText.textContent = 'Failed';
     showNotification(error.message || 'Failed to generate digital will', 'error');
   } finally {
     generateBtn.disabled = false;
