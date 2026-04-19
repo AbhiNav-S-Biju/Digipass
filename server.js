@@ -12,7 +12,8 @@ const {
   initializeDigitalAssetsTable,
   initializeExecutorsTable,
   initializeDeadMansSwitchTable,
-  initializeDigitalWillTable
+  initializeDigitalWillTable,
+  initializeActivityTable
 } = require('./utils/dbInit');
 
 const app = express();
@@ -67,6 +68,7 @@ app.use(async (req, res, next) => {
       await initializeExecutorsTable();
       await initializeDeadMansSwitchTable();
       await initializeDigitalWillTable();
+      await initializeActivityTable();
       console.log('[DB] ✓ Database initialization complete');
       dbInitialized = true;
     } catch (err) {
@@ -102,6 +104,7 @@ const executorsRoutes = require('./routes/executorsRoutes');
 const executorPortalRoutes = require('./routes/executorPortalRoutes');
 const willRoutes = require('./routes/willRoutes');
 const deadMansSwitchRoutes = require('./routes/deadMansSwitchRoutes');
+const activityRoutes = require('./routes/activityRoutes');
 
 // Disable ETags for API routes (prevents 304 responses)
 app.use('/api', (req, res, next) => {
@@ -137,6 +140,9 @@ app.use('/api', willRoutes);
 
 // Dead man's switch routes
 app.use('/api/dead-mans-switch', deadMansSwitchRoutes);
+
+// Activity routes
+app.use('/api/activity', activityRoutes);
 app.use((req, res) => {
   res.status(404).json({
     success: false,

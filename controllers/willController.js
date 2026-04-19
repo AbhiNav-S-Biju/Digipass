@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const pool = require('../db');
 const { generateWillPdf } = require('../utils/willPdf');
+const { logActivity } = require('../utils/activityLogger');
 
 function buildActions(user, assets, executors) {
   const actions = [];
@@ -120,17 +121,28 @@ async function generateWill(req, res, next) {
       [userId, storedFilePath]
     );
 
+    const will = rows[0];
+    
+    // Log activity
+    await logActivity(
+      userId,
+      'will_created',
+      'Digital will created/updated',
+      'will',
+      will.will_id
+    );
+
     // Return download URL instead of file path
-    const downloadUrl = `${process.env.BACKEND_URL}/api/download-will/${rows[0].will_id}`;
+    const downloadUrl = `${process.env.BACKEND_URL}/api/download-will/${will.will_id}`;
 
     return res.status(200).json({
       success: true,
       message: 'Digital will generated successfully',
       data: {
-        will_id: rows[0].will_id,
+        will_id: will.will_id,
         download_url: downloadUrl,
-        file_path: rows[0].file_path,
-        created_at: rows[0].created_at,
+        file_path: will.file_path,
+        created_at: will.created_at,
         summary: {
           user: {
             user_id: user.user_id,

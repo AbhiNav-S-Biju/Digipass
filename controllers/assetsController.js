@@ -1,4 +1,5 @@
 const pool = require('../db');
+const { logActivity } = require('../utils/activityLogger');
 
 // Valid platforms mapped to categories
 const PLATFORM_CATEGORIES = {
@@ -100,10 +101,21 @@ async function addAsset(req, res) {
     }
 
     const { rows } = result;
+    const asset = rows[0];
+    
+    // Log activity
+    await logActivity(
+      userId,
+      'asset_created',
+      `Asset created: ${platform_name}`,
+      'asset',
+      asset.asset_id
+    );
+    
     return res.status(201).json({
       success: true,
       message: 'Asset added successfully',
-      data: buildAssetResponse(rows[0])
+      data: buildAssetResponse(asset)
     });
   } catch (error) {
     console.error('Add Asset Error:', error);
@@ -192,10 +204,21 @@ async function deleteAsset(req, res) {
       });
     }
 
+    const deletedAsset = rows[0];
+    
+    // Log activity
+    await logActivity(
+      userId,
+      'asset_deleted',
+      `Asset deleted: ${deletedAsset.asset_name || 'Unknown'}`,
+      'asset',
+      assetId
+    );
+
     return res.status(200).json({
       success: true,
       message: 'Asset deleted successfully',
-      data: rows[0]
+      data: deletedAsset
     });
   } catch (error) {
     console.error('Delete Asset Error:', error);

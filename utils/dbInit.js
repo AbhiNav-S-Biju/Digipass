@@ -336,6 +336,37 @@ const updateDigitalAssetsSchema = async () => {
   }
 };
 
+/**
+ * Initialize user activity log table
+ */
+const initializeActivityTable = async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS user_activity (
+        activity_id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        action_type VARCHAR(100) NOT NULL,
+        description TEXT NOT NULL,
+        entity_type VARCHAR(50),
+        entity_id INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+      )
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_user_activity_user_id 
+      ON user_activity(user_id, created_at DESC)
+    `);
+
+    console.log('✓ User activity table initialized successfully');
+    return true;
+  } catch (err) {
+    console.error('Error initializing user activity table:', err.message);
+    return false;
+  }
+};
+
 module.exports = {
   initializeUsersTable,
   initializeUserActivityColumns,
@@ -343,5 +374,6 @@ module.exports = {
   updateDigitalAssetsSchema,
   initializeExecutorsTable,
   initializeDeadMansSwitchTable,
-  initializeDigitalWillTable
+  initializeDigitalWillTable,
+  initializeActivityTable
 };

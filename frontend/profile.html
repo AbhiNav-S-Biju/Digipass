@@ -1087,6 +1087,9 @@
                 const willsData = await willsRes.json();
                 const willCount = willsData.data ? 1 : 0;
                 document.getElementById('statWills').textContent = willCount;
+
+                // Fetch activities
+                await fetchActivities(token);
             } catch (e) {
                 console.warn('Could not fetch profile stats:', e);
                 // Set to 0 on error
@@ -1094,6 +1097,87 @@
                 document.getElementById('statExecutors').textContent = '0';
                 document.getElementById('statWills').textContent = '0';
             }
+        }
+
+        // Fetch and display user activities
+        async function fetchActivities(token) {
+            try {
+                const apiUrl = 'https://digipass-3l63.onrender.com';
+                const activitiesRes = await fetch(`${apiUrl}/api/activity?limit=10`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!activitiesRes.ok) {
+                    console.warn('Could not fetch activities');
+                    return;
+                }
+
+                const activitiesData = await activitiesRes.json();
+                const activities = Array.isArray(activitiesData.data) ? activitiesData.data : [];
+
+                const container = document.getElementById('activityContainer');
+                
+                if (activities.length === 0) {
+                    container.innerHTML = '<p style="font-size: 13px; color: var(--text-muted); text-align: center; padding: 20px 0;">No activity yet</p>';
+                    return;
+                }
+
+                // Build activity items HTML
+                let html = '';
+                activities.forEach(activity => {
+                    const date = new Date(activity.created_at);
+                    const timeAgo = getTimeAgo(date);
+                    const dotClass = getActivityDotClass(activity.action_type);
+                    
+                    html += `
+                        <div class="activity-item">
+                            <div class="activity-dot ${dotClass}"></div>
+                            <div class="activity-content">
+                                <div class="activity-title">${escapeHtml(activity.description)}</div>
+                                <div class="activity-time">${timeAgo}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            } catch (e) {
+                console.warn('Could not fetch activities:', e);
+                // Show empty state on error
+                document.getElementById('activityContainer').innerHTML = '<p style="font-size: 13px; color: var(--text-muted); text-align: center; padding: 20px 0;">No activity yet</p>';
+            }
+        }
+
+        // Get time ago string (e.g., "2 days ago")
+        function getTimeAgo(date) {
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+            
+            if (seconds < 60) return 'Just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            if (days < 30) return `${days}d ago`;
+            const months = Math.floor(days / 30);
+            if (months < 12) return `${months}mo ago`;
+            return date.toLocaleDateString();
+        }
+
+        // Get activity dot color based on action type
+        function getActivityDotClass(actionType) {
+            if (actionType.includes('created') || actionType.includes('added')) return 'success';
+            if (actionType.includes('updated') || actionType.includes('modified')) return 'info';
+            if (actionType.includes('deleted') || actionType.includes('removed')) return 'warning';
+            return 'info';
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // Handle tab query parameter

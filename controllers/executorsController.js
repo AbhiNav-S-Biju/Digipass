@@ -7,6 +7,7 @@ const { sendExecutorVerificationEmail } = require('../utils/mailer');
 const { errors } = require('../utils/errorHandler');
 const { validateEmail, validateName, validatePassword, validatePhone } = require('../utils/validation');
 const { logExecutorAction, logError } = require('../utils/logger');
+const { logActivity } = require('../utils/activityLogger');
 
 function buildExecutorResponse(executor) {
   return {
@@ -94,6 +95,15 @@ async function addExecutor(req, res, next) {
     console.log('[Executor Controller] Executor created in database');
     console.log(`  - executor_id: ${executor.executor_id}`);
     console.log(`  - verification link will be sent to: ${executor.executor_email}`);
+    
+    // Log activity
+    await logActivity(
+      userId,
+      'executor_added',
+      `Added executor: ${executor.executor_name}`,
+      'executor',
+      executor.executor_id
+    );
     
     const fallbackVerificationUrl = getExecutorVerificationUrl(verificationToken);
 
