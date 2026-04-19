@@ -190,6 +190,8 @@ async function getExecutorAssets(req, res) {
   try {
     const { ownerUserId, executor } = req;
 
+    console.log(`[Executor Assets] Fetching assets for owner user_id: ${ownerUserId}, executor_id: ${executor.executor_id}`);
+
     const [ownerResult, assetsResult] = await Promise.all([
       pool.query(
         `SELECT user_id, full_name, email
@@ -215,7 +217,10 @@ async function getExecutorAssets(req, res) {
       })
     ]);
 
+    console.log(`[Executor Assets] Owner found: ${ownerResult.rows.length > 0}, Assets found: ${assetsResult.rows.length}`);
+
     if (ownerResult.rows.length === 0) {
+      console.log(`[Executor Assets] Owner user_id ${ownerUserId} not found in database`);
       return res.status(404).json({
         success: false,
         message: 'Asset owner not found'
