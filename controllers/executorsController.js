@@ -395,10 +395,13 @@ async function grantAccess(req, res) {
       });
     }
 
+    // If access is already granted, return success (idempotent operation)
     if (executor.access_granted) {
-      return res.status(400).json({
-        success: false,
-        message: 'Access is already granted to this executor'
+      console.log('[Executor Controller] Access already granted, returning existing state');
+      return res.status(200).json({
+        success: true,
+        message: 'Access is already granted to this executor',
+        data: buildExecutorResponse(executor)
       });
     }
 
@@ -476,10 +479,13 @@ async function revokeAccess(req, res) {
 
     const executor = executorRows[0];
 
+    // If access is not granted, return success (idempotent operation)
     if (!executor.access_granted) {
-      return res.status(400).json({
-        success: false,
-        message: 'Access is not currently granted to this executor'
+      console.log('[Executor Controller] Access already revoked, returning existing state');
+      return res.status(200).json({
+        success: true,
+        message: 'Access is not currently granted to this executor',
+        data: buildExecutorResponse(executor)
       });
     }
 
