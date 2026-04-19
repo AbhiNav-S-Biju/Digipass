@@ -62,20 +62,23 @@ async function generateWill(req, res, next) {
 
     const [userResult, assetsResult, executorsResult] = await Promise.all([
       pool.query(
-        `SELECT user_id, full_name, email
+        `SELECT user_id, full_name, email, phone
          FROM users
          WHERE user_id = $1`,
         [userId]
       ),
       pool.query(
-        `SELECT asset_id, asset_name, asset_type, created_at
+        `SELECT asset_id, asset_name, asset_type, username, email, 
+                password_encrypted, recovery_email, two_factor_method, 
+                access_instructions, preferred_action, created_at
          FROM digital_assets
          WHERE user_id = $1
          ORDER BY created_at DESC`,
         [userId]
       ),
       pool.query(
-        `SELECT executor_id, executor_name, executor_email, executor_phone, relationship, verification_status, access_granted, created_at
+        `SELECT executor_id, executor_name, executor_email, executor_phone, 
+                relationship, verification_status, access_granted, created_at
          FROM executors
          WHERE user_id = $1
          ORDER BY created_at DESC`,
