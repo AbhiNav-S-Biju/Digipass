@@ -22,7 +22,7 @@ function buildActions(user, assets, executors) {
   if (assets.length === 0) {
     actions.push('No digital assets are currently recorded. Add assets so they can be referenced in future will exports.');
   } else {
-    const assetTypes = [...new Set(assets.map((asset) => asset.asset_type))];
+    const assetTypes = [...new Set(assets.map((asset) => asset.category))];
     actions.push(`Asset categories covered: ${assetTypes.join(', ')}.`);
   }
 
