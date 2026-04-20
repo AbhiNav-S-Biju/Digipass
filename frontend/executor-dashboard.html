@@ -873,18 +873,18 @@
         .workflow-preview-panel {
             background: var(--cream-light);
             padding: 32px;
-            overflow-y: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 0;
+            overflow-y: auto;
         }
 
         #previewContent {
             width: 100%;
             display: flex;
             flex-direction: column;
-            min-height: 0;
+            flex: 1;
+            overflow-y: auto;
         }
 
         .step-preview-container {
@@ -892,8 +892,7 @@
             max-width: 700px;
             display: flex;
             flex-direction: column;
-            gap: 0;
-            min-height: 100%;
+            flex: 1;
         }
 
         .step-preview-header {
@@ -903,6 +902,7 @@
             margin-bottom: 24px;
             padding-bottom: 16px;
             border-bottom: 1px solid var(--sand-deep);
+            flex-shrink: 0;
         }
 
         .step-preview-header h3 {
@@ -1003,6 +1003,7 @@
 
         .step-details {
             flex: 1;
+            overflow-y: auto;
             min-height: 0;
         }
 
@@ -1222,11 +1223,7 @@
             padding: 16px;
             border-top: 1px solid var(--sand-deep);
             background: white;
-            position: relative;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
+            flex-shrink: 0;
         }
 
         .workflow-btn {
