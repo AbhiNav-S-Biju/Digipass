@@ -480,6 +480,26 @@ function openWorkflowWithAction(assetId, platformName, accountIdentifier, action
 }
 
 /**
+ * Open workflow directly with action type (no action selector - for executor side)
+ * This is used when the user has already chosen the action
+ */
+function openWorkflowDirect(assetId, platformName, accountIdentifier, actionType) {
+  if (!actionType) {
+    console.error('Action type is required for openWorkflowDirect');
+    return;
+  }
+  
+  const mockCredentials = {
+    email: accountIdentifier,
+    password: '••••••••••',
+    username: accountIdentifier.split('@')[0],
+    apple_id: accountIdentifier
+  };
+  
+  workflowEngine.openWorkflow(assetId, platformName, accountIdentifier, mockCredentials, actionType);
+}
+
+/**
  * Show action selector modal
  */
 function showActionSelector(platformName, actions, callback) {
