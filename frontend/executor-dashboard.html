@@ -1733,7 +1733,7 @@
                                 </div>
                                 <div class="asset-card-footer">
                                     <span class="asset-card-date">Added ${assetDate}</span>
-                                    <button class="btn-view-instructions" data-asset-id="${asset.asset_id}" data-platform="${asset.platform_name}" data-account="${asset.account_identifier || asset.asset_id}" onclick="openWorkflowDirect(${asset.asset_id}, '${asset.platform_name}', '${asset.account_identifier || 'user'}', '${asset.action_type}', ${asset.last_message ? `'${asset.last_message.replace(/'/g, "\\'")}'` : 'null'})">
+                                    <button class="btn-view-instructions" data-asset-id="${asset.asset_id}" data-platform="${asset.platform_name}" data-account="${asset.account_identifier || asset.asset_id}" data-action="${asset.action_type}" data-message="${asset.last_message ? asset.last_message.replace(/"/g, '&quot;') : ''}">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                             <polyline points="14 2 14 8 20 8"></polyline>
@@ -1747,6 +1747,21 @@
                             </div>
                         `;
                     }).join('');
+                    
+                    // Add event listener for view instructions buttons
+                    const assetListContainer = document.getElementById('assetsList');
+                    assetListContainer.addEventListener('click', (e) => {
+                        const btn = e.target.closest('.btn-view-instructions');
+                        if (btn) {
+                            const assetId = btn.dataset.assetId;
+                            const platform = btn.dataset.platform;
+                            const account = btn.dataset.account;
+                            const action = btn.dataset.action;
+                            const message = btn.dataset.message || null;
+                            
+                            openWorkflowDirect(parseInt(assetId), platform, account, action, message || null);
+                        }
+                    });
                     
                     // Update asset count in profile stats
                     document.getElementById('assetCount').textContent = assets.length;

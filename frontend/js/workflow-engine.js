@@ -529,29 +529,6 @@ function openWorkflowWithAction(assetId, platformName, accountIdentifier, action
   workflowEngine.openWorkflow(assetId, platformName, accountIdentifier, mockCredentials, actionType);
 }
 
-  /**
-   * Open workflow directly with action type (no action selector - for executor side)
-   * This is used when the user has already chosen the action
-   */
-  openWorkflowWithMessage(assetId, platformName, accountIdentifier, actionType, lastMessage = null) {
-    if (!actionType) {
-      console.error('Action type is required for openWorkflowWithMessage');
-      return;
-    }
-    
-    const credentials = {
-      email: accountIdentifier,
-      password: '••••••••••',
-      username: accountIdentifier.split('@')[0],
-      apple_id: accountIdentifier
-    };
-    
-    // Store the message for last_message action
-    this.lastMessage = lastMessage;
-    
-    workflowEngine.openWorkflow(assetId, platformName, accountIdentifier, credentials, actionType);
-  }
-
 /**
  * Open workflow directly with action type (no action selector - for executor side)
  * This is used when the user has already chosen the action
