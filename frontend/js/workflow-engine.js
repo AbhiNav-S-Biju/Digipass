@@ -198,14 +198,13 @@ class WorkflowEngine {
         </div>
 
         <div class="video-container" id="videoContainer-${this.currentStepIndex}">
-          <video controls autoplay muted loop onerror="this.parentElement.innerHTML='<div class=\\'video-fallback\\'><i class=\\'fas fa-play-circle\\'></i><p>Demo Video</p><small>${step.description}</small></div>'">
-            <source src="${step.videoUrl}" type="video/mp4">
-            <div class="video-fallback">
-              <i class="fas fa-play-circle"></i>
-              <p>Demo Video</p>
-              <small>${step.description}</small>
-            </div>
-          </video>
+          <iframe 
+            class="youtube-video"
+            src="https://www.youtube.com/embed/${step.videoUrl}?autoplay=1&mute=1&controls=1"
+            title="${step.title}"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
         </div>
 
         <div class="step-details">
