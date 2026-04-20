@@ -936,6 +936,26 @@
             border-radius: 8px;
         }
 
+        .image-container {
+            width: 100%;
+            height: 360px;
+            background: var(--sand);
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
         .video-fallback {
             width: 100%;
             height: 100%;
@@ -1157,6 +1177,125 @@
         .workflow-btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
+        }
+
+        /* Action Selector Modal */
+        .action-selector-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .action-selector-content {
+            background: var(--cream-light);
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+
+        .action-selector-header {
+            background: linear-gradient(135deg, var(--forest-deep), var(--forest-mid));
+            color: var(--cream-light);
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-selector-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-family: 'DM Serif Display', serif;
+        }
+
+        .action-selector-close {
+            background: transparent;
+            border: none;
+            color: var(--cream-light);
+            font-size: 28px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-selector-close:hover {
+            opacity: 1;
+        }
+
+        .action-selector-body {
+            padding: 24px;
+        }
+
+        .action-selector-body p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .action-btn {
+            padding: 14px 20px;
+            background: white;
+            border: 2px solid var(--sand);
+            border-radius: 8px;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .action-btn:hover {
+            background: var(--sand);
+            border-color: var(--forest-mid);
+            transform: translateX(4px);
+        }
+
+        .action-btn:active {
+            transform: translateX(4px) scale(0.98);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .workflow-btn-complete {
@@ -1703,7 +1842,7 @@
     </script>
 
     <!-- Workflow Steps & Engine -->
-    <script src="js/workflow-steps.js"></script>
+    <script src="js/workflow-steps-v2.js"></script>
     <script src="js/workflow-engine.js"></script>
 
 </body>

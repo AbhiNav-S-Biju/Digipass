@@ -61,16 +61,26 @@ class WorkflowEngine {
   }
 
   /**
-   * Open workflow for a specific asset
+   * Open workflow for a specific asset with action type
    */
-  openWorkflow(assetId, platformName, accountIdentifier, credentials = {}) {
-    this.currentWorkflow = getWorkflow(platformName);
+  openWorkflow(assetId, platformName, accountIdentifier, credentials = {}, actionType = null) {
+    // Get workflow with action type support
+    this.currentWorkflow = getWorkflow(platformName, actionType);
+    
+    if (!this.currentWorkflow) {
+      console.error(`Workflow not found for ${platformName} with action ${actionType}`);
+      return;
+    }
+
     this.currentStepIndex = 0;
     this.completedSteps.clear();
 
-    // Store credentials temporarily
+    // Store credentials and metadata
     this.credentials = credentials;
     this.accountIdentifier = accountIdentifier;
+    this.platformName = platformName;
+    this.actionType = actionType;
+    this.assetId = assetId;
 
     // Show workflow panel
     const panel = document.getElementById('workflowPanel');
@@ -190,13 +200,10 @@ class WorkflowEngine {
       </div>
     ` : '';
 
-    const content = `
-      <div class="step-preview-container">
-        <div class="step-preview-header">
-          <h3>${this.currentWorkflow.appName}</h3>
-          <span class="step-badge">${this.currentStepIndex + 1} of ${this.currentWorkflow.steps.length}</span>
-        </div>
-
+    // Video/Image container (optional - only if URL provided)
+    let mediaHtml = '';
+    if (step.videoUrl) {
+      mediaHtml = `
         <div class="video-container" id="videoContainer-${this.currentStepIndex}">
           <iframe 
             class="youtube-video"
@@ -206,6 +213,23 @@ class WorkflowEngine {
             allowfullscreen>
           </iframe>
         </div>
+      `;
+    } else if (step.imageUrl) {
+      mediaHtml = `
+        <div class="image-container" id="imageContainer-${this.currentStepIndex}">
+          <img src="${step.imageUrl}" alt="${step.title}" title="${step.title}" />
+        </div>
+      `;
+    }
+
+    const content = `
+      <div class="step-preview-container">
+        <div class="step-preview-header">
+          <h3>${this.currentWorkflow.appName}${this.currentWorkflow.title ? ` - ${this.currentWorkflow.title}` : ''}</h3>
+          <span class="step-badge">${this.currentStepIndex + 1} of ${this.currentWorkflow.steps.length}</span>
+        </div>
+
+        ${mediaHtml}
 
         <div class="step-details">
           <h4>${step.title}</h4>
@@ -414,22 +438,85 @@ let workflowEngine = new WorkflowEngine();
  * Open workflow from asset card button click
  */
 function openWorkflow(assetId, token, platformName, accountIdentifier) {
-  // In real implementation, you would fetch the asset details from API
-  // For now, we'll use data attributes from the button
-  
+  // Get platform and account from button
   const btn = event?.target.closest('.btn-view-instructions');
-  if (btn) {
-    const platform = btn.dataset.platform || platformName || 'Gmail';
-    const account = btn.dataset.account || accountIdentifier || 'user@example.com';
-    
-    // Mock credentials - in real app, these would come from backend encrypted
-    const mockCredentials = {
-      email: account,
-      password: '••••••••••',
-      username: account.split('@')[0],
-      apple_id: account
-    };
-    
-    workflowEngine.openWorkflow(assetId, platform, account, mockCredentials);
+  if (!btn) return;
+  
+  const platform = btn.dataset.platform || platformName || 'Gmail';
+  const account = btn.dataset.account || accountIdentifier || 'user@example.com';
+  
+  // Get available actions for this platform
+  const availableActions = getAvailableActions(platform);
+  
+  if (!availableActions || availableActions.length === 0) {
+    console.error(`No actions available for platform: ${platform}`);
+    return;
   }
+  
+  // If only one action available, open it directly
+  if (availableActions.length === 1) {
+    openWorkflowWithAction(assetId, platform, account, availableActions[0]);
+    return;
+  }
+  
+  // Show action selection modal
+  showActionSelector(platform, availableActions, (selectedAction) => {
+    openWorkflowWithAction(assetId, platform, account, selectedAction);
+  });
 }
+
+/**
+ * Open workflow with selected action
+ */
+function openWorkflowWithAction(assetId, platformName, accountIdentifier, actionType) {
+  const mockCredentials = {
+    email: accountIdentifier,
+    password: '••••••••••',
+    username: accountIdentifier.split('@')[0],
+    apple_id: accountIdentifier
+  };
+  
+  workflowEngine.openWorkflow(assetId, platformName, accountIdentifier, mockCredentials, actionType);
+}
+
+/**
+ * Show action selector modal
+ */
+function showActionSelector(platformName, actions, callback) {
+  // Create modal HTML
+  const actionLabels = {
+    'delete': '🗑️ Delete Account',
+    'pass': '📋 Pass to Executor',
+    'last_message': '💬 Send Last Message'
+  };
+  
+  const modalHtml = `
+    <div class="action-selector-modal" id="actionSelectorModal">
+      <div class="action-selector-content">
+        <div class="action-selector-header">
+          <h3>Select Action for ${platformName}</h3>
+          <button class="action-selector-close" onclick="document.getElementById('actionSelectorModal').remove()">×</button>
+        </div>
+        <div class="action-selector-body">
+          <p>Choose what you want to do with this account:</p>
+          <div class="action-buttons">
+            ${actions.map(action => `
+              <button class="action-btn" onclick="
+                document.getElementById('actionSelectorModal').remove();
+                (${callback.toString()}('${action}'));
+              ">
+                ${actionLabels[action] || action}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Add modal to DOM
+  const modal = document.createElement('div');
+  modal.innerHTML = modalHtml;
+  document.body.appendChild(modal.firstElementChild);
+}
+
