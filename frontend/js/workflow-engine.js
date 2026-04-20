@@ -144,6 +144,28 @@ class WorkflowEngine {
   }
 
   /**
+   * Get credential value by type (handles combined types like 'username/email')
+   */
+  getCredentialValue(credType) {
+    // If exact match exists, use it
+    if (this.credentials[credType]) {
+      return this.credentials[credType];
+    }
+    
+    // Handle combined credential types (e.g., 'username/email', 'email/phone')
+    if (credType.includes('/')) {
+      const options = credType.split('/').map(opt => opt.trim());
+      for (const option of options) {
+        if (this.credentials[option]) {
+          return this.credentials[option];
+        }
+      }
+    }
+    
+    return 'Not available';
+  }
+
+  /**
    * Render current step (right panel)
    */
   renderCurrentStep() {
@@ -161,7 +183,7 @@ class WorkflowEngine {
           </div>
           <div class="credentials-body">
             ${step.credentials.map(credType => {
-              const credValue = this.credentials[credType] || 'Not available';
+              const credValue = this.getCredentialValue(credType);
               const isPassword = credType.includes('password') || credType.includes('pass');
               const fieldId = `cred-${credType}-${this.currentStepIndex}`;
 
@@ -200,6 +222,24 @@ class WorkflowEngine {
       </div>
     ` : '';
 
+    // Display farewell message for last_message action
+    let messageHtml = '';
+    if (this.actionType === 'last_message' && this.lastMessage) {
+      messageHtml = `
+        <div class="farewell-message-box">
+          <div class="farewell-message-header">
+            <i class="fas fa-envelope"></i> User's Farewell Message
+          </div>
+          <div class="farewell-message-body">
+            <p>${this.lastMessage}</p>
+            <button class="credential-copy-btn" onclick="navigator.clipboard.writeText('${this.lastMessage.replace(/'/g, "\\'")}'); alert('✓ Message copied to clipboard!');">
+              <i class="fas fa-copy"></i> Copy Message
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
     // Video/Image container (optional - only if URL provided)
     let mediaHtml = '';
     if (step.videoUrl) {
@@ -234,6 +274,7 @@ class WorkflowEngine {
         <div class="step-details">
           <h4>${step.title}</h4>
           <p class="step-action"><strong>Action:</strong> ${step.action}</p>
+          ${messageHtml}
           ${credentialsHtml}
           ${tipsHtml}
         </div>
@@ -367,6 +408,15 @@ class WorkflowEngine {
    * Format credential label
    */
   formatCredentialLabel(credType) {
+    // Handle combined credential types (e.g., 'username/email' → 'Username or Email')
+    if (credType.includes('/')) {
+      const options = credType.split('/').map(opt => 
+        opt.trim().charAt(0).toUpperCase() + opt.trim().slice(1)
+      );
+      return options.join(' or ');
+    }
+    
+    // Handle underscore-separated labels
     return credType
       .split('_')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -479,11 +529,34 @@ function openWorkflowWithAction(assetId, platformName, accountIdentifier, action
   workflowEngine.openWorkflow(assetId, platformName, accountIdentifier, mockCredentials, actionType);
 }
 
+  /**
+   * Open workflow directly with action type (no action selector - for executor side)
+   * This is used when the user has already chosen the action
+   */
+  openWorkflowWithMessage(assetId, platformName, accountIdentifier, actionType, lastMessage = null) {
+    if (!actionType) {
+      console.error('Action type is required for openWorkflowWithMessage');
+      return;
+    }
+    
+    const credentials = {
+      email: accountIdentifier,
+      password: '••••••••••',
+      username: accountIdentifier.split('@')[0],
+      apple_id: accountIdentifier
+    };
+    
+    // Store the message for last_message action
+    this.lastMessage = lastMessage;
+    
+    workflowEngine.openWorkflow(assetId, platformName, accountIdentifier, credentials, actionType);
+  }
+
 /**
  * Open workflow directly with action type (no action selector - for executor side)
  * This is used when the user has already chosen the action
  */
-function openWorkflowDirect(assetId, platformName, accountIdentifier, actionType) {
+function openWorkflowDirect(assetId, platformName, accountIdentifier, actionType, lastMessage = null) {
   if (!actionType) {
     console.error('Action type is required for openWorkflowDirect');
     return;
@@ -495,6 +568,9 @@ function openWorkflowDirect(assetId, platformName, accountIdentifier, actionType
     username: accountIdentifier.split('@')[0],
     apple_id: accountIdentifier
   };
+  
+  // Store the message for last_message action
+  workflowEngine.lastMessage = lastMessage;
   
   workflowEngine.openWorkflow(assetId, platformName, accountIdentifier, mockCredentials, actionType);
 }

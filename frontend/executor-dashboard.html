@@ -1102,6 +1102,65 @@
         .credential-toggle-btn:hover,
         .credential-copy-btn:hover {
             background: var(--sand);
+            color: var(--forest-deep);
+            border-color: var(--forest-deep);
+        }
+
+        /* Farewell Message Box */
+        .farewell-message-box {
+            margin-bottom: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #E50914;
+            background: white;
+        }
+
+        .farewell-message-header {
+            background: #ffe0e6;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: #c41e3a;
+            font-size: 13px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .farewell-message-header i {
+            font-size: 14px;
+        }
+
+        .farewell-message-body {
+            background: white;
+            padding: 16px;
+            border-top: 1px solid #f0d5dd;
+        }
+
+        .farewell-message-body p {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-dark);
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .farewell-message-body .credential-copy-btn {
+            margin-top: 8px;
+            background: #ffe0e6;
+            border-color: #f0d5dd;
+            color: #c41e3a;
+        }
+
+        .farewell-message-body .credential-copy-btn:hover {
+            background: #ffc5d2;
+            border-color: #c41e3a;
+        }
+
+        .credential-toggle-btn:hover,
+        .credential-copy-btn:hover {
+            background: var(--sand);
             color: var(--text-dark);
         }
 
@@ -1674,7 +1733,7 @@
                                 </div>
                                 <div class="asset-card-footer">
                                     <span class="asset-card-date">Added ${assetDate}</span>
-                                    <button class="btn-view-instructions" data-asset-id="${asset.asset_id}" data-platform="${asset.platform_name}" data-account="${asset.account_identifier || asset.asset_id}" onclick="openWorkflowDirect(${asset.asset_id}, '${asset.platform_name}', '${asset.account_identifier || 'user'}', '${asset.action_type}')">
+                                    <button class="btn-view-instructions" data-asset-id="${asset.asset_id}" data-platform="${asset.platform_name}" data-account="${asset.account_identifier || asset.asset_id}" onclick="openWorkflowDirect(${asset.asset_id}, '${asset.platform_name}', '${asset.account_identifier || 'user'}', '${asset.action_type}', ${asset.last_message ? `'${asset.last_message.replace(/'/g, "\\'")}'` : 'null'})">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                             <polyline points="14 2 14 8 20 8"></polyline>
