@@ -197,10 +197,14 @@ class WorkflowEngine {
           <span class="step-badge">${this.currentStepIndex + 1} of ${this.currentWorkflow.steps.length}</span>
         </div>
 
-        <div class="video-container">
-          <video controls autoplay muted loop>
+        <div class="video-container" id="videoContainer-${this.currentStepIndex}">
+          <video controls autoplay muted loop onerror="this.parentElement.innerHTML='<div class=\\'video-fallback\\'><i class=\\'fas fa-play-circle\\'></i><p>Demo Video</p><small>${step.description}</small></div>'">
             <source src="${step.videoUrl}" type="video/mp4">
-            Your browser does not support the video tag.
+            <div class="video-fallback">
+              <i class="fas fa-play-circle"></i>
+              <p>Demo Video</p>
+              <small>${step.description}</small>
+            </div>
           </video>
         </div>
 

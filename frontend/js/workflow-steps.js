@@ -4,13 +4,14 @@
  * Includes animated demo videos, credentials, and visual guides
  */
 
-// Demo video URLs - using high-quality stock videos from Pixabay/Pexels CDN
+// Demo video URLs - using Pixabay videos (CORS-friendly)
+// Fallback to data URL if video fails
 const DEMO_VIDEOS = {
-  open: 'https://videos.pexels.com/video-files/8448760/8448760-sd_640_360_24fps.mp4', // Computer screen
-  login: 'https://videos.pexels.com/video-files/7974881/7974881-sd_640_360_24fps.mp4', // Typing
-  navigate: 'https://videos.pexels.com/video-files/8091386/8091386-sd_640_360_24fps.mp4', // Mouse click
-  document: 'https://videos.pexels.com/video-files/8644013/8644013-sd_640_360_24fps.mp4', // Screenshot
-  logout: 'https://videos.pexels.com/video-files/8610934/8610934-sd_640_360_24fps.mp4' // Exit
+  open: 'https://cdn.pixabay.com/vimeo/645837558/desktop-645837558.mp4', // Desktop/screen
+  login: 'https://cdn.pixabay.com/vimeo/776840503/desktop-776840503.mp4', // Typing/login
+  navigate: 'https://cdn.pixabay.com/vimeo/683788877/desktop-683788877.mp4', // Navigation
+  document: 'https://cdn.pixabay.com/vimeo/771788314/desktop-771788314.mp4', // Documenting/screenshot
+  logout: 'https://cdn.pixabay.com/vimeo/672945346/desktop-672945346.mp4' // Exit/logout
 };
 
 const WORKFLOWS = {
