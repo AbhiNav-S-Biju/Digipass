@@ -431,6 +431,168 @@
             background: var(--sand);
         }
 
+        /* Custom Platform Dropdown */
+        .custom-platform-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .platform-dropdown-trigger {
+            width: 100%;
+            padding: 0.85rem;
+            background: linear-gradient(135deg, var(--cream-light) 0%, var(--cream) 100%);
+            border: 2px solid var(--sand-deep);
+            border-radius: 7px;
+            color: var(--text-dark);
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            position: relative;
+            text-align: left;
+        }
+
+        .platform-dropdown-trigger:hover {
+            border-color: var(--forest-mid);
+            background: linear-gradient(135deg, var(--sand) 0%, var(--cream-light) 100%);
+        }
+
+        .platform-dropdown-trigger:focus {
+            outline: none;
+            border-color: var(--forest-deep);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(45, 90, 66, 0.15);
+        }
+
+        .platform-icon-display {
+            font-size: 1.2rem;
+            color: var(--forest-deep);
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .platform-text-display {
+            flex: 1;
+            color: var(--text-dark);
+        }
+
+        .platform-dropdown-trigger:focus .dropdown-arrow {
+            color: var(--forest-deep);
+        }
+
+        .dropdown-arrow {
+            margin-left: auto;
+            color: var(--sand-deep);
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .platform-dropdown-trigger[aria-expanded="true"] .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .platform-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--cream-light);
+            border: 2px solid var(--forest-deep);
+            border-radius: 7px;
+            margin-top: 0.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            animation: slideDown 0.3s ease;
+        }
+
+        .platform-dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-section {
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-section-title {
+            padding: 0.75rem 1rem;
+            color: var(--forest-deep);
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, var(--sand) 0%, transparent 100%);
+            border-bottom: 1px solid var(--sand-deep);
+        }
+
+        .platform-option {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-align: left;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .platform-option:hover {
+            background: var(--sand);
+            padding-left: 1.25rem;
+        }
+
+        .platform-option:active {
+            background: var(--sand-deep);
+        }
+
+        .platform-option i {
+            font-size: 1.1rem;
+            color: var(--forest-deep);
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .platform-option span {
+            flex: 1;
+        }
+
+        .platform-dropdown-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .platform-dropdown-menu::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .platform-dropdown-menu::-webkit-scrollbar-thumb {
+            background: var(--sand-deep);
+            border-radius: 3px;
+        }
+
+        .platform-dropdown-menu::-webkit-scrollbar-thumb:hover {
+            background: var(--forest-mid);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Asset Cards */
         .asset-card {
             background-color: var(--cream-light);
@@ -826,30 +988,97 @@
                                 <!-- Platform Selection -->
                                 <div class="mb-3">
                                     <label for="platformName" class="form-label">Platform/Service</label>
-                                    <select class="form-select platform-select" id="platformName" name="platformName" required>
+                                    <!-- Hidden native select for form submission -->
+                                    <select class="form-select platform-select" id="platformName" name="platformName" required style="display: none;">
                                         <option value="">Choose a platform...</option>
-                                        <optgroup label="Social Media">
-                                            <option value="Instagram">📷 Instagram</option>
-                                            <option value="Facebook">👥 Facebook</option>
-                                            <option value="Twitter">𝕏 Twitter (X)</option>
-                                            <option value="LinkedIn">💼 LinkedIn</option>
-                                        </optgroup>
-                                        <optgroup label="Email">
-                                            <option value="Gmail">✉️ Gmail</option>
-                                            <option value="Outlook">📧 Outlook</option>
-                                        </optgroup>
-                                        <optgroup label="Finance">
-                                            <option value="PayPal">💳 PayPal</option>
-                                            <option value="Google Pay">💰 Google Pay</option>
-                                        </optgroup>
-                                        <optgroup label="Storage">
-                                            <option value="Google Drive">☁️ Google Drive</option>
-                                        </optgroup>
-                                        <optgroup label="Entertainment">
-                                            <option value="Netflix">🎬 Netflix</option>
-                                            <option value="Disney+">🏰 Disney+</option>
-                                        </optgroup>
+                                        <option value="Instagram">Instagram</option>
+                                        <option value="Facebook">Facebook</option>
+                                        <option value="Twitter">Twitter</option>
+                                        <option value="LinkedIn">LinkedIn</option>
+                                        <option value="Gmail">Gmail</option>
+                                        <option value="Outlook">Outlook</option>
+                                        <option value="PayPal">PayPal</option>
+                                        <option value="Google Pay">Google Pay</option>
+                                        <option value="Google Drive">Google Drive</option>
+                                        <option value="Netflix">Netflix</option>
+                                        <option value="Disney+">Disney+</option>
                                     </select>
+
+                                    <!-- Custom Dropdown -->
+                                    <div class="custom-platform-dropdown">
+                                        <button type="button" class="platform-dropdown-trigger" id="platformDropdownTrigger">
+                                            <span class="platform-icon-display">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </span>
+                                            <span class="platform-text-display">Choose a platform...</span>
+                                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+                                        </button>
+                                        <div class="platform-dropdown-menu" id="platformDropdownMenu">
+                                            <div class="dropdown-section">
+                                                <div class="dropdown-section-title">Social Media</div>
+                                                <button type="button" class="platform-option" data-value="Instagram" data-icon="fab fa-instagram">
+                                                    <i class="fab fa-instagram"></i>
+                                                    <span>Instagram</span>
+                                                </button>
+                                                <button type="button" class="platform-option" data-value="Facebook" data-icon="fab fa-facebook">
+                                                    <i class="fab fa-facebook"></i>
+                                                    <span>Facebook</span>
+                                                </button>
+                                                <button type="button" class="platform-option" data-value="Twitter" data-icon="fab fa-twitter">
+                                                    <i class="fab fa-twitter"></i>
+                                                    <span>Twitter (X)</span>
+                                                </button>
+                                                <button type="button" class="platform-option" data-value="LinkedIn" data-icon="fab fa-linkedin">
+                                                    <i class="fab fa-linkedin"></i>
+                                                    <span>LinkedIn</span>
+                                                </button>
+                                            </div>
+
+                                            <div class="dropdown-section">
+                                                <div class="dropdown-section-title">Email</div>
+                                                <button type="button" class="platform-option" data-value="Gmail" data-icon="fas fa-envelope">
+                                                    <i class="fas fa-envelope"></i>
+                                                    <span>Gmail</span>
+                                                </button>
+                                                <button type="button" class="platform-option" data-value="Outlook" data-icon="fas fa-envelope">
+                                                    <i class="fas fa-envelope"></i>
+                                                    <span>Outlook</span>
+                                                </button>
+                                            </div>
+
+                                            <div class="dropdown-section">
+                                                <div class="dropdown-section-title">Finance</div>
+                                                <button type="button" class="platform-option" data-value="PayPal" data-icon="fab fa-paypal">
+                                                    <i class="fab fa-paypal"></i>
+                                                    <span>PayPal</span>
+                                                </button>
+                                                <button type="button" class="platform-option" data-value="Google Pay" data-icon="fab fa-google">
+                                                    <i class="fab fa-google"></i>
+                                                    <span>Google Pay</span>
+                                                </button>
+                                            </div>
+
+                                            <div class="dropdown-section">
+                                                <div class="dropdown-section-title">Storage</div>
+                                                <button type="button" class="platform-option" data-value="Google Drive" data-icon="fab fa-google-drive">
+                                                    <i class="fab fa-google-drive"></i>
+                                                    <span>Google Drive</span>
+                                                </button>
+                                            </div>
+
+                                            <div class="dropdown-section">
+                                                <div class="dropdown-section-title">Entertainment</div>
+                                                <button type="button" class="platform-option" data-value="Netflix" data-icon="fas fa-tv">
+                                                    <i class="fas fa-tv"></i>
+                                                    <span>Netflix</span>
+                                                </button>
+                                                <button type="button" class="platform-option" data-value="Disney+" data-icon="fas fa-play-circle">
+                                                    <i class="fas fa-play-circle"></i>
+                                                    <span>Disney+</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Account Identifier -->

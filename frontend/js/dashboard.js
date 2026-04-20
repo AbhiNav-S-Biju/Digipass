@@ -440,6 +440,9 @@ function bindAssetActions() {
     loadAssetsData();
   });
 
+  // Initialize custom platform dropdown
+  initCustomPlatformDropdown();
+
   // Update available actions when platform changes
   platformSelect.addEventListener('change', (e) => {
     const selectedPlatform = e.target.value;
@@ -515,6 +518,65 @@ function updateAvailableActions(platformName) {
       }
     }
   }
+}
+
+// Initialize custom platform dropdown
+function initCustomPlatformDropdown() {
+  const trigger = document.getElementById('platformDropdownTrigger');
+  const menu = document.getElementById('platformDropdownMenu');
+  const platformSelect = document.getElementById('platformName');
+  const options = document.querySelectorAll('.platform-option');
+  const displayIcon = document.querySelector('.platform-icon-display');
+  const displayText = document.querySelector('.platform-text-display');
+
+  if (!trigger || !menu) return;
+
+  // Toggle dropdown menu
+  trigger.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const isOpen = menu.classList.contains('show');
+    menu.classList.toggle('show', !isOpen);
+    trigger.setAttribute('aria-expanded', !isOpen);
+  });
+
+  // Handle option selection
+  options.forEach(option => {
+    option.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const value = option.getAttribute('data-value');
+      const icon = option.getAttribute('data-icon');
+      const text = option.querySelector('span').textContent;
+
+      // Update hidden select
+      platformSelect.value = value;
+
+      // Update display
+      if (displayIcon) {
+        displayIcon.innerHTML = `<i class="${icon}"></i>`;
+      }
+      if (displayText) {
+        displayText.textContent = text;
+      }
+
+      // Close menu
+      menu.classList.remove('show');
+      trigger.setAttribute('aria-expanded', 'false');
+
+      // Trigger change event for validation
+      platformSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!trigger.contains(e.target) && !menu.contains(e.target)) {
+      menu.classList.remove('show');
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+  });
 }
 
 function bindExecutorActions() {
