@@ -433,10 +433,17 @@ function bindAssetActions() {
   const refreshAssetsBtn = document.getElementById('refreshAssetsBtn');
   const messageContainer = document.getElementById('messageContainer');
   const actionTypeRadios = document.querySelectorAll('input[name="actionType"]');
+  const platformSelect = document.getElementById('platformName');
 
   assetForm.addEventListener('submit', handleAssetSubmit);
   refreshAssetsBtn.addEventListener('click', () => {
     loadAssetsData();
+  });
+
+  // Update available actions when platform changes
+  platformSelect.addEventListener('change', (e) => {
+    const selectedPlatform = e.target.value;
+    updateAvailableActions(selectedPlatform);
   });
 
   // Show/hide message field based on action type selection
@@ -451,6 +458,63 @@ function bindAssetActions() {
   });
 
   document.getElementById('assetsList').addEventListener('click', handleAssetDelete);
+}
+
+// Update available action buttons based on selected platform
+function updateAvailableActions(platformName) {
+  const availableActions = APP_ACTIONS[platformName] || [];
+  const actionButtons = {
+    'pass': document.getElementById('actionPass'),
+    'delete': document.getElementById('actionDelete'),
+    'last_message': document.getElementById('actionMessage')
+  };
+
+  // Show/hide action buttons based on what's available for this platform
+  Object.keys(actionButtons).forEach(actionKey => {
+    const button = actionButtons[actionKey];
+    const label = button ? button.nextElementSibling : null;
+    
+    if (availableActions.includes(actionKey)) {
+      // Show button
+      if (button) {
+        button.style.display = '';
+        button.disabled = false;
+      }
+      if (label) {
+        label.style.display = '';
+        label.classList.remove('d-none');
+      }
+    } else {
+      // Hide button
+      if (button) {
+        button.style.display = 'none';
+        button.disabled = true;
+        button.checked = false; // Uncheck if hidden
+      }
+      if (label) {
+        label.style.display = 'none';
+        label.classList.add('d-none');
+      }
+    }
+  });
+
+  // If the currently selected action is no longer available, clear the selection
+  const checkedRadio = document.querySelector('input[name="actionType"]:checked');
+  if (checkedRadio && !availableActions.includes(checkedRadio.value)) {
+    checkedRadio.checked = false;
+    messageContainer.style.display = 'none';
+  }
+
+  // Automatically select first available action
+  if (!document.querySelector('input[name="actionType"]:checked') && availableActions.length > 0) {
+    const firstAvailableButton = actionButtons[availableActions[0]];
+    if (firstAvailableButton) {
+      firstAvailableButton.checked = true;
+      if (availableActions[0] === 'last_message') {
+        messageContainer.style.display = 'block';
+      }
+    }
+  }
 }
 
 function bindExecutorActions() {
