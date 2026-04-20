@@ -685,6 +685,582 @@
                 padding: 6px 12px;
             }
         }
+
+        /* ============================================
+           WORKFLOW PANEL STYLES
+           ============================================ */
+
+        .workflow-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            background: var(--cream);
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .workflow-panel-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .workflow-panel-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Left Panel: Steps */
+        .workflow-steps-panel {
+            background: var(--forest-deep);
+            color: var(--cream-light);
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .steps-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .steps-header h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--cream-light);
+            margin: 0;
+        }
+
+        .workflow-close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--cream-light);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .workflow-close-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .steps-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+            border: 1px solid transparent;
+            align-items: flex-start;
+        }
+
+        .step-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .step-item-active {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--sand);
+            border-left: 4px solid var(--sand);
+            padding-left: 10px;
+        }
+
+        .step-item-completed {
+            opacity: 0.75;
+        }
+
+        .step-item-number {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .step-item-completed .step-item-number {
+            background: #8cbf9c;
+            color: var(--forest-deep);
+        }
+
+        .step-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .step-item-content h5 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--cream-light);
+            margin: 0 0 2px 0;
+        }
+
+        .step-item-content p {
+            font-size: 11px;
+            color: rgba(245, 234, 216, 0.65);
+            margin: 0;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .steps-footer {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--sand), #8cbf9c);
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 2px;
+        }
+
+        .progress-text {
+            font-size: 11px;
+            color: rgba(245, 234, 216, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+        }
+
+        /* Right Panel: Preview */
+        .workflow-preview-panel {
+            background: var(--cream-light);
+            padding: 32px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .step-preview-container {
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .step-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--sand-deep);
+        }
+
+        .step-preview-header h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .step-badge {
+            background: var(--sand);
+            color: var(--text-dark);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .video-container {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 14px;
+            overflow: hidden;
+            background: var(--sand);
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .step-details {
+            margin-bottom: 24px;
+        }
+
+        .step-details h4 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0 0 12px 0;
+        }
+
+        .step-action {
+            font-size: 14px;
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin: 0 0 20px 0;
+            padding: 14px 16px;
+            background: var(--sand);
+            border-radius: 10px;
+            border-left: 4px solid var(--forest-deep);
+        }
+
+        /* Credentials Section */
+        .credentials-section {
+            margin-bottom: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .credentials-header {
+            background: var(--sand);
+            padding: 12px 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 13px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .credentials-header i {
+            font-size: 14px;
+        }
+
+        .credentials-body {
+            background: white;
+            padding: 16px;
+            border-top: 1px solid var(--sand-deep);
+        }
+
+        .credential-item {
+            margin-bottom: 14px;
+        }
+
+        .credential-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .credential-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .credential-value-wrapper {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .credential-value {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--sand-deep);
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            background: var(--cream);
+            color: var(--text-dark);
+            cursor: text;
+            transition: all 0.2s ease;
+        }
+
+        .credential-value:focus {
+            outline: none;
+            border-color: var(--forest-deep);
+            box-shadow: 0 0 0 3px rgba(27, 58, 45, 0.1);
+        }
+
+        .credential-toggle-btn,
+        .credential-copy-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--sand-deep);
+            background: var(--cream);
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .credential-toggle-btn:hover,
+        .credential-copy-btn:hover {
+            background: var(--sand);
+            color: var(--text-dark);
+        }
+
+        /* Tips Section */
+        .step-tips {
+            background: rgba(140, 191, 156, 0.1);
+            border: 1px solid #8cbf9c;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+        }
+
+        .step-tips h6 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--forest-deep);
+            margin: 0 0 10px 0;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .step-tips ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .step-tips li {
+            font-size: 12px;
+            color: var(--forest-mid);
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+
+        .step-tips li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Navigation */
+        .step-navigation {
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--sand-deep);
+        }
+
+        .workflow-btn {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid var(--sand-deep);
+            background: white;
+            color: var(--text-dark);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .workflow-btn:hover:not(:disabled) {
+            background: var(--sand);
+            border-color: var(--sand-deep);
+        }
+
+        .workflow-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .workflow-btn-complete {
+            background: var(--forest-deep);
+            color: var(--cream-light);
+            border-color: var(--forest-deep);
+        }
+
+        .workflow-btn-complete:hover:not(:disabled) {
+            background: var(--forest-mid);
+            border-color: var(--forest-mid);
+        }
+
+        /* Toast Notification */
+        .workflow-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--forest-deep);
+            color: var(--cream-light);
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 4px 16px rgba(27, 58, 45, 0.2);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 3000;
+        }
+
+        .workflow-toast-show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .workflow-panel {
+                grid-template-columns: 280px 1fr;
+            }
+
+            .workflow-steps-panel {
+                padding: 16px;
+            }
+
+            .workflow-preview-panel {
+                padding: 24px;
+            }
+
+            .step-preview-container {
+                max-width: 600px;
+            }
+        }
+
+        @media (max-width: 860px) {
+            .workflow-panel {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+
+            .workflow-steps-panel {
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 12px;
+            }
+
+            .steps-list {
+                flex-direction: row;
+                gap: 8px;
+                overflow-x: auto;
+            }
+
+            .step-item {
+                flex-shrink: 0;
+                width: 90px;
+                flex-direction: column;
+                gap: 6px;
+                padding: 10px 8px;
+            }
+
+            .step-item-content h5,
+            .step-item-content p {
+                display: none;
+            }
+
+            .workflow-preview-panel {
+                padding: 20px;
+            }
+
+            .step-preview-header {
+                margin-bottom: 16px;
+            }
+
+            .video-container {
+                margin-bottom: 16px;
+            }
+
+            .step-navigation {
+                flex-direction: column;
+            }
+
+            .workflow-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .workflow-close-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+            .steps-header h3 {
+                font-size: 16px;
+            }
+
+            .step-preview-header h3 {
+                font-size: 18px;
+            }
+
+            .step-details h4 {
+                font-size: 16px;
+            }
+
+            .workflow-preview-panel {
+                padding: 16px;
+            }
+
+            .video-container {
+                aspect-ratio: 4 / 3;
+            }
+
+            .step-navigation {
+                gap: 8px;
+            }
+
+            .workflow-btn {
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -768,6 +1344,35 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Panel - Dynamic Step-by-Step Guide -->
+        <div id="workflowPanel" class="workflow-panel workflow-panel-hidden">
+            <!-- Left Panel: Steps Navigation -->
+            <div class="workflow-steps-panel">
+                <div class="steps-header">
+                    <h3 id="appName">App Name</h3>
+                    <button class="workflow-close-btn" title="Close workflow">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="steps-list" id="stepsList">
+                    <!-- Steps dynamically generated -->
+                </div>
+                <div class="steps-footer">
+                    <div class="progress-bar">
+                        <div id="progressBar" class="progress-fill"></div>
+                    </div>
+                    <p id="progressText" class="progress-text">Step 1 of 5</p>
+                </div>
+            </div>
+
+            <!-- Right Panel: Preview & Instructions -->
+            <div class="workflow-preview-panel">
+                <div id="previewContent">
+                    <!-- Preview content dynamically generated -->
                 </div>
             </div>
         </div>
@@ -890,7 +1495,7 @@
                                 </div>
                                 <div class="asset-card-footer">
                                     <span class="asset-card-date">Added ${assetDate}</span>
-                                    <button class="btn-view-instructions" data-asset-id="${asset.asset_id}" data-platform="${asset.platform_name}" data-action="${asset.action_type}" onclick="openWorkflow(${asset.asset_id}, '${token}')">
+                                    <button class="btn-view-instructions" data-asset-id="${asset.asset_id}" data-platform="${asset.platform_name}" data-account="${asset.account_identifier || asset.asset_id}" onclick="openWorkflow(${asset.asset_id}, '${token}', '${asset.platform_name}', '${asset.account_identifier || 'user'}')">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                             <polyline points="14 2 14 8 20 8"></polyline>
@@ -898,6 +1503,7 @@
                                             <line x1="9" y1="14" x2="15" y2="14"></line>
                                         </svg>
                                         View Instructions
+                                    </button>
                                     </button>
                                 </div>
                             </div>
@@ -1055,6 +1661,10 @@
 
         loadAssets();
     </script>
+
+    <!-- Workflow Steps & Engine -->
+    <script src="js/workflow-steps.js"></script>
+    <script src="js/workflow-engine.js"></script>
 
     <!-- Workflow Popup -->
     <div id="workflowPopup" class="workflow-popup workflow-popup-hidden">
