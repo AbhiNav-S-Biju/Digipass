@@ -1966,7 +1966,15 @@ const WORKFLOWS = {
 function getWorkflow(platformName, actionType) {
   const workflow = WORKFLOWS[platformName];
   if (!workflow) return null;
-  return workflow.actions[actionType] || null;
+  const actionWorkflow = workflow.actions[actionType];
+  if (!actionWorkflow) return null;
+  
+  // Return combined object with appName from platform level
+  return {
+    appName: workflow.appName,
+    title: actionWorkflow.title,
+    steps: actionWorkflow.steps
+  };
 }
 
 function getAvailableActions(platformName) {
