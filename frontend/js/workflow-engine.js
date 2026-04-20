@@ -533,7 +533,7 @@ function openWorkflowWithAction(assetId, platformName, accountIdentifier, action
  * Open workflow directly with action type (no action selector - for executor side)
  * This is used when the user has already chosen the action
  */
-function openWorkflowDirect(assetId, platformName, accountIdentifier, actionType, lastMessage = null) {
+function openWorkflowDirect(assetId, platformName, accountIdentifier, actionType, lastMessage = null, password = null) {
   if (!actionType) {
     console.error('Action type is required for openWorkflowDirect');
     return;
@@ -541,7 +541,7 @@ function openWorkflowDirect(assetId, platformName, accountIdentifier, actionType
   
   const mockCredentials = {
     email: accountIdentifier,
-    password: '••••••••••',
+    password: password || 'Password not provided',
     username: accountIdentifier.split('@')[0],
     apple_id: accountIdentifier
   };

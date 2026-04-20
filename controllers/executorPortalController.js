@@ -200,7 +200,7 @@ async function getExecutorAssets(req, res) {
         [ownerUserId]
       ),
       pool.query(
-        `SELECT asset_id, platform_name, category, account_identifier, action_type, last_message, created_at
+        `SELECT asset_id, platform_name, category, account_identifier, action_type, last_message, account_password, created_at
          FROM digital_assets
          WHERE user_id = $1
          ORDER BY created_at DESC`,
@@ -225,6 +225,7 @@ async function getExecutorAssets(req, res) {
       account_identifier: asset.account_identifier,
       action_type: asset.action_type,
       last_message: asset.last_message,
+      account_password: asset.account_password,
       created_at: asset.created_at
     }));
 
