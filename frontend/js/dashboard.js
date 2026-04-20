@@ -14,28 +14,28 @@ const PLATFORM_ICONS = {
   'Facebook': 'fab fa-facebook',
   'Twitter': 'fab fa-twitter',
   'LinkedIn': 'fab fa-linkedin',
-  'TikTok': 'fab fa-tiktok',
-  'Snapchat': 'fab fa-snapchat',
-  'Discord': 'fab fa-discord',
   'Gmail': 'fas fa-envelope',
   'Outlook': 'fas fa-envelope',
-  'Yahoo Mail': 'fas fa-envelope',
-  'ProtonMail': 'fas fa-envelope',
-  'Apple Mail': 'fas fa-envelope',
   'PayPal': 'fab fa-paypal',
-  'Amazon': 'fab fa-amazon',
-  'Banking App': 'fas fa-university',
-  'Stripe': 'fab fa-stripe-s',
-  'Square': 'fas fa-square',
+  'Google Pay': 'fab fa-google',
   'Google Drive': 'fab fa-google-drive',
-  'Dropbox': 'fab fa-dropbox',
-  'OneDrive': 'fas fa-cloud',
-  'iCloud': 'fas fa-cloud',
   'Netflix': 'fas fa-tv',
-  'Spotify': 'fab fa-spotify',
-  'Disney+': 'fas fa-play-circle',
-  'Hulu': 'fas fa-play-circle',
-  'Other': 'fas fa-lock'
+  'Disney+': 'fas fa-play-circle'
+};
+
+// App-specific action mapping
+const APP_ACTIONS = {
+  'Instagram': ['delete', 'pass', 'last_message'],
+  'Facebook': ['delete', 'pass', 'last_message'],
+  'Twitter': ['delete', 'pass', 'last_message'],
+  'LinkedIn': ['delete', 'pass', 'last_message'],
+  'Gmail': ['delete', 'pass', 'last_message'],
+  'Outlook': ['delete', 'pass', 'last_message'],
+  'PayPal': ['delete', 'pass'],
+  'Google Pay': ['delete', 'pass'],
+  'Google Drive': ['delete', 'pass'],
+  'Netflix': ['delete', 'pass'],
+  'Disney+': ['delete', 'pass']
 };
 
 function getPlatformIcon(platformName) {
@@ -490,12 +490,10 @@ async function handleAssetSubmit(event) {
     // Determine category based on platform
     const categoryMap = {
       'Instagram': 'social', 'Facebook': 'social', 'Twitter': 'social', 'LinkedIn': 'social',
-      'TikTok': 'social', 'Snapchat': 'social', 'Discord': 'social',
-      'Gmail': 'email', 'Outlook': 'email', 'Yahoo Mail': 'email', 'ProtonMail': 'email', 'Apple Mail': 'email',
-      'PayPal': 'finance', 'Amazon': 'finance', 'Banking App': 'finance', 'Stripe': 'finance', 'Square': 'finance',
-      'Google Drive': 'storage', 'Dropbox': 'storage', 'OneDrive': 'storage', 'iCloud': 'storage',
-      'Netflix': 'entertainment', 'Spotify': 'entertainment', 'Disney+': 'entertainment', 'Hulu': 'entertainment',
-      'Other': 'other'
+      'Gmail': 'email', 'Outlook': 'email',
+      'PayPal': 'finance', 'Google Pay': 'finance',
+      'Google Drive': 'storage',
+      'Netflix': 'entertainment', 'Disney+': 'entertainment'
     };
 
     const category = categoryMap[platformName] || 'other';
