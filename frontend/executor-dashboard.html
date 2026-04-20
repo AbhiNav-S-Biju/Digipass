@@ -882,6 +882,9 @@
         .step-preview-container {
             width: 100%;
             max-width: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
         }
 
         .step-preview-header {
@@ -990,7 +993,8 @@
         }
 
         .step-details {
-            margin-bottom: 24px;
+            flex: 1;
+            min-height: 0;
         }
 
         .step-details h4 {
@@ -1205,11 +1209,11 @@
             display: flex;
             gap: 12px;
             justify-content: space-between;
-            margin-top: 24px;
+            margin-top: auto;
             padding: 16px;
             border-top: 1px solid var(--sand-deep);
             background: white;
-            position: sticky;
+            position: relative;
             bottom: 0;
             left: 0;
             right: 0;
