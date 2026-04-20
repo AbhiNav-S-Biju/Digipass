@@ -386,6 +386,51 @@
             box-shadow: 0 0 0 3px rgba(27, 58, 45, 0.1);
         }
 
+        /* Platform Select Dropdown Styling */
+        .platform-select {
+            background: linear-gradient(135deg, var(--cream-light) 0%, var(--cream) 100%);
+            border: 2px solid var(--sand-deep);
+            font-weight: 500;
+            padding: 0.85rem 2.5rem 0.85rem 0.85rem;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231b3a2d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+            padding-right: 2.5rem;
+            appearance: none;
+        }
+
+        .platform-select:hover {
+            border-color: var(--forest-mid);
+            background: linear-gradient(135deg, var(--sand) 0%, var(--cream-light) 100%);
+        }
+
+        .platform-select:focus {
+            border-color: var(--forest-deep);
+            background: white;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231b3a2d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+            box-shadow: 0 0 0 3px rgba(45, 90, 66, 0.15);
+        }
+
+        .platform-select option {
+            padding: 0.5rem;
+            color: var(--text-dark);
+            background: var(--cream-light);
+        }
+
+        .platform-select option:hover {
+            background: var(--sand);
+        }
+
+        .platform-select optgroup {
+            color: var(--forest-deep);
+            font-weight: 600;
+            background: var(--sand);
+        }
+
         /* Asset Cards */
         .asset-card {
             background-color: var(--cream-light);
@@ -781,28 +826,28 @@
                                 <!-- Platform Selection -->
                                 <div class="mb-3">
                                     <label for="platformName" class="form-label">Platform/Service</label>
-                                    <select class="form-select" id="platformName" name="platformName" required>
+                                    <select class="form-select platform-select" id="platformName" name="platformName" required>
                                         <option value="">Choose a platform...</option>
                                         <optgroup label="Social Media">
-                                            <option value="Instagram">Instagram</option>
-                                            <option value="Facebook">Facebook</option>
-                                            <option value="Twitter">Twitter (X)</option>
-                                            <option value="LinkedIn">LinkedIn</option>
+                                            <option value="Instagram">📷 Instagram</option>
+                                            <option value="Facebook">👥 Facebook</option>
+                                            <option value="Twitter">𝕏 Twitter (X)</option>
+                                            <option value="LinkedIn">💼 LinkedIn</option>
                                         </optgroup>
                                         <optgroup label="Email">
-                                            <option value="Gmail">Gmail</option>
-                                            <option value="Outlook">Outlook</option>
+                                            <option value="Gmail">✉️ Gmail</option>
+                                            <option value="Outlook">📧 Outlook</option>
                                         </optgroup>
                                         <optgroup label="Finance">
-                                            <option value="PayPal">PayPal</option>
-                                            <option value="Google Pay">Google Pay</option>
+                                            <option value="PayPal">💳 PayPal</option>
+                                            <option value="Google Pay">💰 Google Pay</option>
                                         </optgroup>
                                         <optgroup label="Storage">
-                                            <option value="Google Drive">Google Drive</option>
+                                            <option value="Google Drive">☁️ Google Drive</option>
                                         </optgroup>
                                         <optgroup label="Entertainment">
-                                            <option value="Netflix">Netflix</option>
-                                            <option value="Disney+">Disney+</option>
+                                            <option value="Netflix">🎬 Netflix</option>
+                                            <option value="Disney+">🏰 Disney+</option>
                                         </optgroup>
                                     </select>
                                 </div>
