@@ -46,41 +46,40 @@ const WORKFLOWS = {
             stepNumber: 3,
             title: 'Navigate to Account Settings',
             description: 'Access the settings menu',
-            action: 'In top right corner, click your profile picture/avatar → Click three horizontal lines icon (menu icon) → Scroll down and click "Settings" at the bottom → Click "Settings" again',
+            action: 'Click "More" in the bottom-left sidebar → Click "Settings" → In the left sidebar, click "Accounts Center"',
             credentials: null,
             tips: [
-              'Profile picture is in the bottom right of the navigation bar',
-              'The menu icon looks like ☰ (three horizontal lines)',
-              'You may need to scroll down in the menu to see "Settings"',
-              'Make sure you clicked "Settings" not "Accounts" or "Privacy"'
+              'On web, "More" is in the bottom-left navigation sidebar (not top right)',
+              '"Accounts Center" manages settings across all Meta apps',
+              'If you do not see Accounts Center, scroll down in Settings'
             ]
           },
           {
             stepNumber: 4,
             title: 'Access Account Deletion Page',
             description: 'Find the permanent delete option',
-            action: 'In Settings → Look for "Help" section → Click "Help" or "Help Center" → In search box, type "delete account" → Click on "Delete Your Account" link → You will see the deletion form',
+            action: 'In Accounts Center → Click "Personal details" → Click "Account ownership and control" → Click "Deactivation or deletion" → Select your Instagram account → Select "Delete account" → Click "Continue"',
             credentials: null,
             tips: [
-              'Alternative: Go directly to instagram.com/accounts/delete/',
-              'You should see a red button that says "Permanently delete my account"',
-              'The page will warn you that deletion is permanent',
-              'Read the warning carefully before proceeding'
+              'The old instagram.com/accounts/remove URL no longer works — it redirects to Accounts Center',
+              'If you have multiple Instagram accounts, select the correct one',
+              'Do NOT choose "Deactivate account" — that is only temporary',
+              'You can download your data from Accounts Center before proceeding'
             ]
           },
           {
             stepNumber: 5,
             title: 'Confirm Permanent Deletion',
             description: 'Complete the account deletion process',
-            action: 'On the deletion form → Enter your password in the text field → Click dropdown "Why are you deleting your account?" → Select a reason → Click red "Permanently delete [username]" button → Confirm "Yes, permanently delete my account" on the next screen',
+            action: 'Select a reason for deletion (select "Privacy concerns" or similar to avoid being shown alternatives) → Click "Continue" → Re-enter your password → Click "Delete account" → Confirm on the final screen',
             credentials: ['password'],
             tips: [
-              'You MUST enter your password again for security',
-              'Selecting a reason is optional but helpful',
-              'After clicking delete, account will be disabled immediately',
-              'Full deletion happens after 30 days - cannot be undone after that',
-              'Your profile, photos, posts, comments will all be removed permanently',
-              'You will receive a confirmation email'
+              'Selecting "Privacy concerns" as reason helps move the flow forward without showing retention offers',
+              'You MUST re-enter your password to confirm',
+              'Your account is hidden immediately but fully deleted after 30 days',
+              'If you log back in within 30 days, deletion is automatically cancelled',
+              'Full deletion takes up to 90 days to clear from servers and backups',
+              'Linked Facebook or Threads accounts are NOT deleted — handle those separately'
             ]
           }
         ]
@@ -267,41 +266,39 @@ const WORKFLOWS = {
             stepNumber: 3,
             title: 'Access Settings & Privacy',
             description: 'Open account settings',
-            action: 'In top right corner, click downward-pointing arrow (▼) → From dropdown menu, click "Settings & privacy" → Click "Settings"',
+            action: 'In top right corner, click your profile picture → Click "Settings & Privacy" from the dropdown → Click "Settings" → In the left sidebar, click "Accounts Center"',
             credentials: null,
             tips: [
-              'Arrow is next to your name in top right',
-              'Do not click "Help & support" or "Report a problem"',
-              'Settings page should load with left sidebar menu',
-              'You should see your name in page header'
+              'Facebook moved all account ownership controls into Accounts Center in 2023',
+              'Do not click "Help & Support" — go to Accounts Center instead',
+              'Accounts Center manages your Facebook, Instagram, and Messenger settings together'
             ]
           },
           {
             stepNumber: 4,
             title: 'Find Account Deactivation & Deletion',
             description: 'Locate the deletion option',
-            action: 'In left sidebar, scroll down → Look for "Deactivation and deletion" or "Personal information" → Click "Deactivation and deletion"',
+            action: 'In Accounts Center → Click "Personal details" → Click "Account ownership and control" → Click "Deactivation or deletion" → Select your Facebook account',
             credentials: null,
             tips: [
-              'May appear under "Personal information" section first',
-              'Page will show two options: Deactivate Account or Delete Account',
-              'Choose "Delete Account" (not Deactivate)',
-              'Deactivate is temporary, Delete is permanent'
+              'This path is inside Accounts Center, not the old Settings sidebar',
+              'Select the specific Facebook account if you have multiple Meta accounts linked',
+              'Next screen will let you choose between Deactivate and Delete'
             ]
           },
           {
             stepNumber: 5,
             title: 'Confirm Permanent Deletion',
             description: 'Complete the deletion process',
-            action: 'Click "Delete Account" option → Click "Continue" → Enter your password again in the dialog box → Complete any security check (CAPTCHA) if prompted → Click "Delete Account" button → Confirm on final screen',
+            action: 'Select "Delete account" → Click "Continue" → Optionally select a reason → Review alternatives shown (download data, archive posts) → Click "Continue" → Re-enter your password → Click "Delete account" → Confirm on final screen',
             credentials: ['password'],
             tips: [
-              'Must verify password for security',
-              'You may need to solve a CAPTCHA (click images)',
-              'After deletion, account will be gone after 30 days',
-              'Cannot restore account after 30 days',
-              'All messages, photos, posts will be permanently removed',
-              'Check email for deletion confirmation'
+              'Must re-enter password for security',
+              'Deletion is permanent after 30 days — you can cancel by logging in within that window',
+              'Full data purge takes up to 90 days from servers and backups',
+              'Deleting Facebook also deletes your Messenger account and messages',
+              'Any third-party apps using Facebook Login will lose access',
+              'If you are the admin of Facebook Pages or Groups, transfer ownership first'
             ]
           }
         ]
@@ -477,39 +474,39 @@ const WORKFLOWS = {
             stepNumber: 3,
             title: 'Open Settings & Privacy',
             description: 'Access account settings',
-            action: 'Click profile icon (top left, looks like avatar) → Click "More" (3 dots or "...") → Click "Settings and Privacy"',
+            action: 'Click "More" (three-dot icon in a circle) in the left sidebar → Click "Settings and Support" from the dropdown → Click "Settings and privacy"',
             credentials: null,
             tips: [
-              'Profile icon is in top left corner',
-              'Settings menu should open on left side',
-              'Look for gear icon or "Settings" text'
+              '"More" icon is in the left navigation sidebar on the web version',
+              'On mobile: tap your profile photo → tap "Settings and Support" → tap "Settings and privacy"',
+              'The icon may appear as three dots in a circle'
             ]
           },
           {
             stepNumber: 4,
             title: 'Navigate to Account Deactivation',
             description: 'Find deletion option',
-            action: 'In Settings → Scroll down in left menu → Click "Account" or "Deactivation and Deletion" section → Scroll down page to find "Deactivate your account" button',
+            action: 'Click "Your account" at the top of the Settings menu → Click "Deactivate your account" → Read the deactivation details carefully',
             credentials: null,
             tips: [
-              'May need to scroll through several options',
-              'Look for red/warning colored button',
-              'Button text should say "Deactivate your account"',
-              'This is permanent deletion, not temporary deactivation'
+              'The option is called "Deactivate your account" — X uses deactivation as the first step to permanent deletion',
+              'Do NOT log back in within 30 days or deletion will be cancelled automatically',
+              'Before deactivating, revoke any third-party app access — these apps can auto-login and accidentally reactivate your account',
+              'If you have an active X Premium subscription, cancel it separately first'
             ]
           },
           {
             stepNumber: 5,
             title: 'Confirm Account Deletion',
             description: 'Complete the deletion',
-            action: 'Click "Deactivate your account" button → Read the warning carefully → Click "Yes, I want to deactivate my account" → Enter your password → Complete security check if prompted → Account is deactivated',
+            action: 'Click "Deactivate" → Read the warning → Enter your password → Click "Deactivate" again to confirm → Account is immediately deactivated. Do NOT log in again for 30 days — after 30 days of inactivity, the account is permanently deleted',
             credentials: ['password'],
             tips: [
-              'You must enter password to confirm',
-              'Account is gone after 30 days',
-              'Cannot undo after 30 days',
-              'All posts, followers, following will be removed',
-              'Twitter sends confirmation email'
+              'Deactivation is immediate — your profile disappears from public view right away',
+              'Permanent deletion happens automatically after 30 days of NOT logging in',
+              'Even opening the app and viewing your timeline can trigger accidental reactivation',
+              'Download your data archive BEFORE deactivating: Settings → Your account → Download an archive of your data',
+              'X sends a confirmation of deactivation but NOT a separate confirmation of permanent deletion'
             ]
           }
         ]
@@ -681,39 +678,40 @@ const WORKFLOWS = {
             stepNumber: 3,
             title: 'Access Account Settings',
             description: 'Open settings menu',
-            action: 'Click profile photo (top right) → Click "Settings & privacy" from dropdown → Click "Settings"',
+            action: 'Click your profile photo ("Me" icon) in the top right → Click "Settings & Privacy" from the dropdown → In the left sidebar, click "Account preferences"',
             credentials: null,
             tips: [
-              'Photo is in top right corner',
-              'Should open with navigation menu',
-              'Look for gear icon next to Settings'
+              'Profile photo / Me icon is in the top right navigation bar',
+              'Settings & Privacy opens into the Account preferences section by default',
+              'On mobile: tap your profile picture → tap Settings (bottom-left on iOS, gear icon on Android)'
             ]
           },
           {
             stepNumber: 4,
             title: 'Find Account Closure Option',
             description: 'Locate deletion section',
-            action: 'In left sidebar, scroll down → Look for "Account management" section → Click "Close account"',
+            action: 'In Account preferences → Scroll down to the "Account management" section → Click "Close account"',
             credentials: null,
             tips: [
-              'May be at bottom of Settings menu',
-              'Button says "Close account" not "Delete"',
-              'This will permanently delete everything'
+              'The option is called "Close account", not "Delete account"',
+              'If you have a Premium subscription, cancel it separately first — deleting your account does not automatically cancel Premium billing',
+              'If you are the sole admin of a Company Page, assign a new admin or close the page first',
+              'You can download your data first: Settings & Privacy → Data privacy → Get a copy of your data'
             ]
           },
           {
             stepNumber: 5,
             title: 'Confirm Account Closure',
             description: 'Complete deletion',
-            action: 'Read the warning message → Enter your password to confirm → Check "I understand the consequences" checkbox → Click "Yes, close my account" → Confirm on final screen',
+            action: 'Click "Continue" on the warning screen → Select a reason for leaving from the list → Click "Next" → Enter your account password → Click "Done" → Account is immediately deactivated',
             credentials: ['password'],
             tips: [
-              'Must verify password',
-              'Must check understanding checkbox',
-              'Account deletes immediately',
-              'Cannot restore account',
-              'All profile info, connections, messages removed',
-              'Get confirmation email'
+              'Must enter password for verification',
+              'Account is deactivated immediately and permanently deleted after a 14-day grace period (shorter than most platforms)',
+              'You can reactivate within 14 days by logging back in',
+              'After 14 days, restoration is NOT possible',
+              'Recommendations, endorsements, connections, and messages are all permanently removed',
+              'Your profile may still appear in search engine caches for a short period after deletion'
             ]
           }
         ]
@@ -885,39 +883,39 @@ const WORKFLOWS = {
             stepNumber: 3,
             title: 'Navigate to Data & Privacy',
             description: 'Access data deletion options',
-            action: 'In left sidebar, click "Data & privacy" tab → Scroll down to find "Delete a Google Account or your data" section',
+            action: 'In the left sidebar on myaccount.google.com, click "Data & privacy" → Scroll down to the "Download or delete your data" section',
             credentials: null,
             tips: [
-              'Left sidebar has different tabs',
-              'Click "Data & privacy" not "Security"',
-              'Section may say "Delete your data" or similar'
+              'Click "Data & privacy" NOT "Security" — these are separate tabs',
+              'Before deleting, use Google Takeout (takeout.google.com) to download all your data including emails, Drive files, and Photos',
+              'Deleting Gmail only removes the Gmail service — you can keep your Google Account active for YouTube, Drive, etc. if you prefer'
             ]
           },
           {
             stepNumber: 4,
             title: 'Choose Delete Google Account',
             description: 'Select account deletion option',
-            action: 'In "Delete your data or account" section → Click "Delete your account" or "Delete a Google account" → Read warnings carefully → Click "Continue"',
+            action: 'To delete only Gmail: Click "Delete a Google service" → Enter your password → Click the trash icon next to Gmail → Provide an alternate email address (non-Gmail) for your remaining Google Account → Click "Send verification email" → Verify the alternate email to confirm. To delete entire Google Account: Scroll down and click "Delete your Google Account" → Read all warnings → Click "Continue"',
             credentials: null,
             tips: [
-              'Will warn you about losing access to all Google services',
-              'Gmail, Drive, Photos, YouTube, etc.',
-              'All data deleted permanently',
-              'Cannot restore after deletion'
+              'Deleting Gmail does NOT delete your entire Google Account — they are separate options',
+              'Deleting your entire Google Account removes: Gmail, Drive, Photos, YouTube, Calendar, Play purchases, and all other Google services',
+              'You MUST provide an alternate non-Gmail email if deleting only Gmail but keeping your Google Account',
+              'Cannot restore after the 20-30 day recovery window expires'
             ]
           },
           {
             stepNumber: 5,
             title: 'Confirm Account Deletion',
             description: 'Complete the deletion',
-            action: 'Verify your identity → Enter password to confirm → Check acceptance checkbox ("I want to permanently delete my account...") → Click "Delete account"',
+            action: 'Verify your identity → Enter your password → Check the "I want to permanently delete my account" checkbox → Click "Delete account" → Check your alternate email for a verification link if deleting Gmail only',
             credentials: ['password'],
             tips: [
-              'Must enter password for security',
-              'Google will delete Gmail, Drive, Photos, YouTube account',
-              'Takes time to fully delete (can be weeks)',
-              'Check email for final confirmation',
-              'All stored emails permanently deleted'
+              'Must verify with password',
+              'Google retains data for approximately 30 days — there is a recovery window if you change your mind',
+              'Full deletion from all Google servers and backups may take additional weeks',
+              'Your Gmail address becomes permanently unavailable — no one else can ever claim it',
+              'Deleting the full Google Account also cancels all Google Play and YouTube purchases'
             ]
           }
         ]
@@ -1090,38 +1088,39 @@ const WORKFLOWS = {
             stepNumber: 3,
             title: 'Access Privacy & Data',
             description: 'Go to privacy settings',
-            action: 'In left menu, click "Privacy" → Look for "Delete your data or Microsoft account" section',
+            action: 'Go to account.microsoft.com → In the left menu, look for "Privacy" or navigate directly to the account closure page at: account.live.com/closeaccount.aspx',
             credentials: null,
             tips: [
-              'Privacy section in left menu',
-              'May need to scroll down'
+              'The direct closure URL is account.live.com/closeaccount.aspx',
+              'Before closing: cancel any Microsoft 365/Xbox/OneDrive subscriptions, download OneDrive files, and save important emails',
+              'If you use this Microsoft account to sign in to Windows, switch your Windows sign-in to a local account first'
             ]
           },
           {
             stepNumber: 4,
             title: 'Choose Delete Account Option',
-            description: 'Select account deletion',
-            action: 'In data deletion section → Click "Delete account and data" or similar → Read warning about losing Outlook, OneDrive, Office, etc.',
+            description: 'Select account deletion option',
+            action: 'On the Close Account page → Verify all pre-closure checklist items → Click "Next" → Review the list of services that will be closed (Outlook, OneDrive, Xbox, Skype, Microsoft 365, etc.) → Check each acknowledgement checkbox → Click "Mark account for closure"',
             credentials: null,
             tips: [
-              'Will lose access to all Microsoft services',
-              'Outlook, OneDrive, Office 365, Skype, etc.',
-              'All data permanently deleted',
-              'Cannot undo after deletion'
+              'Microsoft shows a checklist of things to do before closing — review each item',
+              'Closing the Microsoft account closes Outlook.com, OneDrive, Xbox, Skype, and all linked Microsoft services',
+              'The Outlook.com email address is permanently deleted and cannot be reused or reclaimed by anyone',
+              'After marking for closure, there is a reopen window (typically 30-60 days) before permanent deletion'
             ]
           },
           {
             stepNumber: 5,
             title: 'Confirm Account Deletion',
             description: 'Complete the deletion',
-            action: 'Verify identity → Enter password → Check "I understand my account will be deleted" → Click "Delete account" → Confirm on final page',
-            credentials: ['password'],
+            action: 'Check all required acknowledgement boxes → Click "Mark account for closure" → Microsoft sends a confirmation email → Account enters a closure period before permanent deletion',
+            credentials: null,
             tips: [
-              'Must verify with password',
-              'Microsoft sends confirmation email',
-              'Deletion takes time to process',
-              'All Outlook emails permanently deleted',
-              'OneDrive files permanently deleted'
+              'All checkboxes must be checked to proceed',
+              'Microsoft confirms closure via email',
+              'There is a reopen window — log in during this period to cancel closure if you change your mind',
+              'After the window closes, all data is permanently deleted per Microsoft Services Agreement',
+              'Your Outlook/Hotmail/Live email address can never be used again by anyone'
             ]
           }
         ]
@@ -1292,38 +1291,39 @@ const WORKFLOWS = {
             stepNumber: 3,
             title: 'Access Account Settings',
             description: 'Open settings menu',
-            action: 'In top right, click your name or profile icon → Click "Account settings" or "Settings"',
+            action: 'Click the gear icon (Settings) in the top right corner of the screen',
             credentials: null,
             tips: [
-              'Dropdown menu from profile icon',
-              'Look for gear icon or Settings'
+              'Settings icon looks like a gear/cog in the top navigation bar',
+              'Before proceeding: withdraw all remaining balance to your bank — PayPal will not let you close an account with funds remaining',
+              'Also resolve any open disputes, pending transactions, or chargebacks before attempting closure'
             ]
           },
           {
             stepNumber: 4,
             title: 'Find Account Closure Option',
             description: 'Locate deletion section',
-            action: 'In Settings → Look for "Account" or "Closing your account" section → May need to scroll → Find link that says "Close your account"',
+            action: 'In Settings → Scroll down to the "Account options" section → Click "Close your account"',
             credentials: null,
             tips: [
-              'May be under "Account management"',
-              'PayPal calls it "Closing" not "Deleting"',
-              'Should be at bottom of Settings options'
+              'The link is labeled "Close your account" under Account options',
+              'If you cannot see the option, ensure your balance is zero and all disputes are resolved',
+              'Cancel any active recurring payments or subscriptions linked to your PayPal before closing',
+              'Remove linked bank accounts and cards first if desired'
             ]
           },
           {
             stepNumber: 5,
             title: 'Confirm Account Closure',
             description: 'Complete account deletion',
-            action: 'Click "Close your account" → Read terms and warnings → Enter password to confirm → PayPal will close account immediately → Receive confirmation email',
-            credentials: ['password'],
+            action: 'Click "Close your account" → Read the warning that closure is permanent and irreversible → PayPal may prompt you to request data deletion at this point → Click "Close Account" to confirm → Receive confirmation email',
+            credentials: null,
             tips: [
-              'Account closes immediately',
-              'All access to PayPal services ends',
-              'Cannot reverse closure',
-              'Money must be transferred out first',
-              'Seller account may have restrictions',
-              'Get confirmation email within 24 hours'
+              'Closure is immediate and permanent — account cannot be reopened',
+              'You CAN open a brand new PayPal account with the same email address afterwards, but all history is lost',
+              'Export your transaction history before closing: Activity → Download section',
+              'PayPal will not let you close if there is any remaining balance, negative balance, or unresolved disputes',
+              'Confirmation email is sent to your registered email address'
             ]
           }
         ]
@@ -1722,27 +1722,28 @@ const WORKFLOWS = {
             stepNumber: 4,
             title: 'Find Account Cancellation/Deletion',
             description: 'Locate account closure option',
-            action: 'In Account page → Scroll down to find "Membership & Billing" or similar section → Look for "Cancel Membership" or "Delete Account" button',
+            action: 'In the Account page → Scroll to the "Membership & Billing" section → Click "Cancel Membership". Alternatively, go directly to netflix.com/cancelplan',
             credentials: null,
             tips: [
-              'May say "Cancel Membership"',
-              'Cancellation also deletes account',
-              'Should be in Billing section',
-              'Read warnings carefully'
+              'The direct URL netflix.com/cancelplan takes you straight to the cancellation page',
+              'Netflix calls this "Cancel Membership" not "Delete Account"',
+              'Simply deleting the Netflix app or signing out does NOT cancel your account — you must do this through account settings or netflix.com/cancelplan',
+              'Netflix may offer you a pause option (up to 3 months) as an alternative'
             ]
           },
           {
             stepNumber: 5,
             title: 'Confirm Account Cancellation',
             description: 'Complete deletion',
-            action: 'Click "Cancel Membership" → Read why you\'re leaving options → Click "Finish Cancellation" → Confirm email → Account is deleted',
+            action: 'Click "Cancel Membership" → Netflix shows alternatives (pausing, downgrading) → Click "Finish Cancellation" to confirm → Receive confirmation email → Access continues until end of current billing period',
             credentials: null,
             tips: [
-              'May ask reason for cancellation',
-              'Netflix sends confirmation email',
-              'Access ends immediately',
-              'Cannot restore account',
-              'Any remaining balance is non-refundable'
+              'You keep access until the end of your current billing cycle — no immediate cutoff',
+              'Netflix retains your viewing history, recommendations, and preferences for 10 months after cancellation',
+              'If you resubscribe within 10 months, your history and preferences are restored',
+              'For permanent account deletion (not just cancellation), contact Netflix support at privacy@netflix.com or via live chat at help.netflix.com',
+              'If you subscribed through Apple, you must cancel via iPhone Settings → Apple ID → Subscriptions → Netflix',
+              'If you subscribed through Google Play, cancel through Play Store → Subscriptions'
             ]
           }
         ]
