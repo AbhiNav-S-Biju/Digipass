@@ -222,9 +222,9 @@ class WorkflowEngine {
       </div>
     ` : '';
 
-    // Display farewell message for last_message action
+    // Display farewell message only on specific steps marked with showFarewellMessage: true
     let messageHtml = '';
-    if (this.actionType === 'last_message' && this.lastMessage) {
+    if (step.showFarewellMessage && this.lastMessage) {
       messageHtml = `
         <div class="farewell-message-box">
           <div class="farewell-message-header">

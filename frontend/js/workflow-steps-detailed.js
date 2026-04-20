@@ -211,6 +211,7 @@ const WORKFLOWS = {
             description: 'Compose and send your last message',
             action: 'Click in the message text field → Type your farewell message (example: "I wanted to let you know how much you mean to me...") → Click the send button (arrow icon on right) → Message is sent immediately',
             credentials: null,
+            showFarewellMessage: true,
             tips: [
               'Keep message thoughtful but not too long',
               'Explain that you\'re preparing your digital estate',
@@ -422,6 +423,7 @@ const WORKFLOWS = {
             description: 'Write and send your last message',
             action: 'Click message input field at bottom → Type your farewell message (e.g., "I wanted you to know how important you are to me...") → Click send button (airplane icon ✈️) → Message is sent',
             credentials: null,
+            showFarewellMessage: true,
             tips: [
               'Keep message heartfelt but appropriate',
               'Can include executor contact info if desired',
@@ -626,6 +628,7 @@ const WORKFLOWS = {
             description: 'Compose and send last message',
             action: 'Click message field → Type your farewell (e.g., "I wanted to reach out and let you know...") → Click send button → Message is delivered',
             credentials: null,
+            showFarewellMessage: true,
             tips: [
               'Keep message sincere',
               'Can include executor contact if helpful',
@@ -832,6 +835,7 @@ const WORKFLOWS = {
             description: 'Write and send last message',
             action: 'Click message field → Type your message (e.g., "I wanted to connect one more time...") → Click send button → Message delivered',
             credentials: null,
+            showFarewellMessage: true,
             tips: [
               'Keep message professional',
               'Can be heartfelt but appropriate for workplace',
@@ -1037,6 +1041,7 @@ const WORKFLOWS = {
             description: 'Write and send farewell email',
             action: 'Click in email body → Type your message (e.g., "Dear [Name], I wanted to reach out...") → Click "Send" button → Email is sent immediately',
             credentials: null,
+            showFarewellMessage: true,
             tips: [
               'Keep message heartfelt',
               'Can be as long as needed',
@@ -1239,6 +1244,7 @@ const WORKFLOWS = {
             description: 'Write and send farewell email',
             action: 'Click message body → Type your farewell message → Click "Send" button → Email is sent',
             credentials: null,
+            showFarewellMessage: true,
             tips: [
               'Keep message meaningful',
               'Can include executor contact info',
