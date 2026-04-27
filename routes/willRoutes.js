@@ -21,7 +21,7 @@ router.get('/download-will/:willId', downloadWill);
  */
 router.get('/will', async (req, res) => {
   try {
-    console.log('[WILL_ROUTE] GET / handler called for userId:', req.userId);
+    console.log('[WILL_ROUTE] GET /will handler called for userId:', req.userId);
     const userId = req.userId;
     
     const { rows } = await pool.query(
