@@ -177,7 +177,17 @@ async function loadDashboardData() {
       updateExecutorCount();
     }
 
-    document.getElementById('willCount').textContent = '0';
+    // Load will data
+    try {
+      const willRes = await apiCall('/will', 'GET');
+      if (willRes && willRes.data && willRes.data.will_id) {
+        document.getElementById('willCount').textContent = '1';
+      } else {
+        document.getElementById('willCount').textContent = '0';
+      }
+    } catch (err) {
+      document.getElementById('willCount').textContent = '0';
+    }
     
     // Load dead man's switch status
     try {
@@ -190,6 +200,11 @@ async function loadDashboardData() {
       }
     } catch (err) {
       document.getElementById('switchStatus').textContent = 'Inactive';
+    }
+
+    // Refresh dashboard widgets after loading data
+    if (window.updateDashboardWidgets) {
+      setTimeout(() => window.updateDashboardWidgets(), 500);
     }
   } catch (error) {
     console.error('Error loading dashboard data:', error);
@@ -267,6 +282,11 @@ async function loadWillData() {
   
   const refreshBtn = document.getElementById('refreshWillBtn');
   refreshBtn.addEventListener('click', loadWillData);
+
+  // Refresh dashboard widgets after loading will data
+  if (window.updateDashboardWidgets) {
+    setTimeout(() => window.updateDashboardWidgets(), 500);
+  }
 }
 
 function renderWillContent(assets, executors) {
@@ -403,6 +423,13 @@ async function handleGenerateWill() {
         willStatusText.textContent = '100%';
         showNotification('Digital will generated and downloaded successfully!', 'success');
         willStatus.textContent = '✓ Ready';
+
+        // Update dashboard widgets to reflect the new will
+        if (window.updateDashboardWidgets) {
+          setTimeout(() => {
+            window.updateDashboardWidgets();
+          }, 1000);
+        }
 
         // Hide progress bar after 2 seconds
         setTimeout(() => {
@@ -641,6 +668,13 @@ async function handleAssetSubmit(event) {
     event.target.reset();
     document.getElementById('messageContainer').style.display = 'none';
     showNotification('Asset added successfully.', 'success');
+
+    // Update dashboard widgets to reflect the new asset
+    if (window.updateDashboardWidgets) {
+      setTimeout(() => {
+        window.updateDashboardWidgets();
+      }, 500);
+    }
   } catch (error) {
     showNotification(error.message || 'Failed to add asset', 'error');
   } finally {
@@ -762,6 +796,13 @@ async function handleExecutorSubmit(event) {
 
     event.target.reset();
     showNotification('Executor added successfully.', 'success');
+    
+    // Update dashboard widgets to reflect the new executor
+    if (window.updateDashboardWidgets) {
+      setTimeout(() => {
+        window.updateDashboardWidgets();
+      }, 500);
+    }
     
     // Show QR code modal
     showQRModal(response.data);

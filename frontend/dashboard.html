@@ -953,6 +953,35 @@
             gap: 0.25rem;
         }
 
+        /* Tip Box */
+        .tip-box {
+            padding: 1.5rem;
+            border: 1px solid var(--sand-deep);
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background-color: #fafaf8;
+            height: 100%;
+        }
+
+        .tip-box:hover {
+            border-color: var(--forest-deep);
+            box-shadow: 0 2px 8px rgba(27, 58, 45, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .tip-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .tip-box h5 {
+            font-weight: 700;
+            color: var(--forest-deep);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
         /* Progress Bar */
         .progress-bar-custom {
             height: 8px;
@@ -1232,6 +1261,49 @@
                         <div class="card-body p-0">
                             <div id="activityFeed">
                                 <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips to Increase Score -->
+            <div class="row g-4 mt-2">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="mb-0">💡 Tips to Increase Your Health Score</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="tip-box">
+                                        <div class="tip-icon">📱</div>
+                                        <h5>Add More Assets</h5>
+                                        <p class="text-muted small mb-0">Add all your digital accounts (up to 4 assets = 20 points)</p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="tip-box">
+                                        <div class="tip-icon">👥</div>
+                                        <h5>Designate an Executor</h5>
+                                        <p class="text-muted small mb-0">Assign a trusted person to manage your estate (20 points)</p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="tip-box">
+                                        <div class="tip-icon">📄</div>
+                                        <h5>Generate Your Will</h5>
+                                        <p class="text-muted small mb-0">Create an official digital will PDF (30 points)</p>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="tip-box">
+                                        <div class="tip-icon">⏱️</div>
+                                        <h5>Activate Check-ins</h5>
+                                        <p class="text-muted small mb-0">Enable Dead Man's Switch (30 points)</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1697,7 +1769,7 @@
 
                 const assets = Array.isArray(assetsRes.data) ? assetsRes.data : [];
                 const executors = Array.isArray(executorsRes.data) ? executorsRes.data : [];
-                const willExists = willRes && willRes.data;
+                const willExists = willRes && willRes.data && willRes.data.will_id;
                 const switchActive = switchRes && switchRes.data && switchRes.data.status === 'active';
 
                 const checklist = [
@@ -1736,30 +1808,33 @@
                 const activityRes = await apiCall('/activity?limit=10', 'GET').catch(() => ({ data: [] }));
                 let activities = Array.isArray(activityRes.data) ? activityRes.data : [];
 
-                // If no activity from API, use default demo data
+                const feed = document.getElementById('activityFeed');
+                
+                // If no activity from API, show empty state
                 if (activities.length === 0) {
-                    activities = [
-                        {
-                            type: 'asset',
-                            title: 'Digital estate initialized',
-                            description: 'Getting started',
-                            time: 'Today',
-                            icon: '📱'
-                        }
-                    ];
+                    feed.innerHTML = `
+                        <div style="text-align: center; padding: 2rem 1rem; color: #999;">
+                            <p style="font-size: 0.9rem;">No activity yet. Start by adding digital assets, designating executors, or generating your digital will.</p>
+                        </div>
+                    `;
+                    return;
                 }
 
-                const feed = document.getElementById('activityFeed');
                 feed.innerHTML = activities.slice(0, 5).map(activity => {
-                    const timeStr = activity.created_at ? formatActivityTime(activity.created_at) : activity.time || 'Recently';
-                    const description = activity.description || activity.action_type || '';
-                    const title = activity.title || `${activity.activity_type} activity`;
-                    const activityType = activity.type || activity.activity_type || 'asset';
+                    // Parse API response - from database fields: action_type, description, entity_type, entity_id, created_at
+                    const actionType = activity.action_type || 'default';
+                    const description = activity.description || '';
+                    const createdAt = activity.created_at;
+                    
+                    const timeStr = createdAt ? formatActivityTime(createdAt) : 'Recently';
+                    const title = getActivityTitle(actionType, description);
+                    const displayType = getActivityTypeForIcon(actionType);
+                    const icon = getActivityIcon(actionType);
                     
                     return `
                         <div class="activity-item">
-                            <div class="activity-icon ${activityType}">
-                                ${getActivityIcon(activityType)}
+                            <div class="activity-icon ${displayType}">
+                                ${icon}
                             </div>
                             <div class="activity-content">
                                 <div class="activity-title">${title}</div>
@@ -1802,9 +1877,37 @@
                 'executor': '👤',
                 'will': '📄',
                 'switch': '⏱️',
+                'asset_created': '📱',
+                'executor_added': '👤',
+                'will_created': '📄',
+                'switch_checkin': '⏱️',
+                'switch_interval_updated': '⏱️',
                 'default': '✨'
             };
             return icons[type] || icons['default'];
+        }
+
+        // Helper function to get activity title from action_type
+        function getActivityTitle(actionType, description) {
+            if (!actionType) return 'Activity';
+            const titleMap = {
+                'asset_created': 'Asset Added',
+                'executor_added': 'Executor Assigned',
+                'will_created': 'Digital Will Generated',
+                'switch_checkin': 'Check-in Complete',
+                'switch_interval_updated': 'Check-in Interval Updated'
+            };
+            return titleMap[actionType] || description || 'Activity';
+        }
+
+        // Helper function to get activity type for icon categorization
+        function getActivityTypeForIcon(actionType) {
+            if (!actionType) return 'default';
+            if (actionType.includes('asset')) return 'asset';
+            if (actionType.includes('executor')) return 'executor';
+            if (actionType.includes('will')) return 'will';
+            if (actionType.includes('switch')) return 'switch';
+            return 'default';
         }
 
         // Initialize Health Score
@@ -1818,7 +1921,7 @@
 
                 const assets = Array.isArray(assetsRes.data) ? assetsRes.data : [];
                 const executors = Array.isArray(executorsRes.data) ? executorsRes.data : [];
-                const willExists = willRes && willRes.data;
+                const willExists = willRes && willRes.data && willRes.data.will_id;
                 const switchActive = switchRes && switchRes.data && switchRes.data.status === 'active';
 
                 // Score calculation: Assets (20) + Executors (20) + Will (30) + Switch (30)
