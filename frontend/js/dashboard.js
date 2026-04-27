@@ -424,10 +424,14 @@ async function handleGenerateWill() {
         showNotification('Digital will generated and downloaded successfully!', 'success');
         willStatus.textContent = '✓ Ready';
 
-        // Update dashboard widgets to reflect the new will
+        // Update dashboard widgets and data to reflect the new will
         if (window.updateDashboardWidgets) {
           setTimeout(() => {
             window.updateDashboardWidgets();
+            // Also refresh the dashboard data to update the willCount in overview
+            if (typeof loadDashboardData === 'function') {
+              loadDashboardData();
+            }
           }, 1000);
         }
 

@@ -1969,6 +1969,11 @@
 
         // Re-initialize when data updates
         window.updateDashboardWidgets = function() {
+            // Reload dashboard data first to update counts
+            if (typeof loadDashboardData === 'function') {
+              loadDashboardData();
+            }
+            // Then update the visual widgets
             initializeHealthScore();
             initializeChecklist();
             initializeActivityFeed();
