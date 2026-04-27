@@ -1,5 +1,6 @@
 const pool = require('../db');
 const { DEFAULT_CHECK_INTERVAL_DAYS } = require('../utils/deadMansSwitchScheduler');
+const { logActivity } = require('../utils/activityLogger');
 
 /**
  * Get dead man's switch status for logged-in user
@@ -101,6 +102,15 @@ const checkIn = async (req, res) => {
       [userId]
     );
 
+    // Log activity
+    await logActivity(
+      userId,
+      'switch_checkin',
+      'Dead Man\'s Switch check-in',
+      'switch',
+      dms.dms_id
+    );
+
     return res.status(200).json({
       success: true,
       message: 'Check-in successful',
@@ -154,6 +164,15 @@ const updateInterval = async (req, res) => {
 
     const dms = rows[0];
     const nextCheckInDue = new Date(new Date(dms.last_checkin).getTime() + check_interval_days * 24 * 60 * 60 * 1000);
+
+    // Log activity
+    await logActivity(
+      userId,
+      'switch_interval_updated',
+      `Check-in interval updated to ${check_interval_days} days`,
+      'switch',
+      dms.dms_id
+    );
 
     return res.status(200).json({
       success: true,

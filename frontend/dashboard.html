@@ -1687,131 +1687,174 @@
     <!-- Dashboard Widgets Initialization -->
     <script>
         // Initialize Checklist Widget
-        function initializeChecklist() {
-            const checklist = [
-                { id: 1, title: 'Add Digital Assets', description: 'Log your social media and email accounts', completed: true, icon: '📱' },
-                { id: 2, title: 'Designate Executors', description: 'Assign at least 1 trusted person', completed: true, icon: '👥' },
-                { id: 3, title: 'Set Asset Actions', description: 'Decide what happens to each account', completed: true, icon: '⚙️' },
-                { id: 4, title: 'Generate Digital Will', description: 'Create your official PDF document', completed: false, icon: '📄' },
-                { id: 5, title: 'Activate Dead Man\'s Switch', description: 'Set up automated check-ins', completed: false, icon: '🔄' }
-            ];
+        async function initializeChecklist() {
+            try {
+                // Fetch real data
+                const assetsRes = await apiCall('/assets', 'GET').catch(() => ({ data: [] }));
+                const executorsRes = await apiCall('/executors', 'GET').catch(() => ({ data: [] }));
+                const willRes = await apiCall('/will', 'GET').catch(() => ({ data: null }));
+                const switchRes = await apiCall('/dead-mans-switch/status', 'GET').catch(() => ({ data: { status: 'inactive' } }));
 
-            const container = document.getElementById('checklistContainer');
-            const completed = checklist.filter(item => item.completed).length;
-            
-            document.getElementById('checklistProgress').textContent = `${completed}/${checklist.length}`;
-            
-            container.innerHTML = checklist.map(item => `
-                <div class="checklist-item ${item.completed ? 'completed' : ''}">
-                    <div class="checklist-checkbox ${item.completed ? 'completed' : ''}">
-                        ${item.completed ? '✓' : ''}
+                const assets = Array.isArray(assetsRes.data) ? assetsRes.data : [];
+                const executors = Array.isArray(executorsRes.data) ? executorsRes.data : [];
+                const willExists = willRes && willRes.data;
+                const switchActive = switchRes && switchRes.data && switchRes.data.status === 'active';
+
+                const checklist = [
+                    { id: 1, title: 'Add Digital Assets', description: 'Log your social media and email accounts', completed: assets.length > 0, icon: '📱' },
+                    { id: 2, title: 'Designate Executors', description: 'Assign at least 1 trusted person', completed: executors.length > 0, icon: '👥' },
+                    { id: 3, title: 'Set Asset Actions', description: 'Decide what happens to each account', completed: assets.some(a => a.action_type), icon: '⚙️' },
+                    { id: 4, title: 'Generate Digital Will', description: 'Create your official PDF document', completed: willExists, icon: '📄' },
+                    { id: 5, title: 'Activate Dead Man\'s Switch', description: 'Set up automated check-ins', completed: switchActive, icon: '🔄' }
+                ];
+
+                const container = document.getElementById('checklistContainer');
+                const completed = checklist.filter(item => item.completed).length;
+                
+                document.getElementById('checklistProgress').textContent = `${completed}/${checklist.length}`;
+                
+                container.innerHTML = checklist.map(item => `
+                    <div class="checklist-item ${item.completed ? 'completed' : ''}">
+                        <div class="checklist-checkbox ${item.completed ? 'completed' : ''}">
+                            ${item.completed ? '✓' : ''}
+                        </div>
+                        <div class="checklist-content">
+                            <div class="checklist-title">${item.title}</div>
+                            <div class="checklist-description">${item.description}</div>
+                        </div>
                     </div>
-                    <div class="checklist-content">
-                        <div class="checklist-title">${item.title}</div>
-                        <div class="checklist-description">${item.description}</div>
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+            } catch (error) {
+                console.error('Error initializing checklist:', error);
+            }
         }
 
         // Initialize Activity Feed
-        function initializeActivityFeed() {
-            const activities = [
-                {
-                    type: 'asset',
-                    title: 'Instagram account added',
-                    description: 'Pass to Executor',
-                    time: '2 days ago',
-                    icon: '📱'
-                },
-                {
-                    type: 'executor',
-                    title: 'Priya Sharma added as executor',
-                    description: 'Digital Estate Manager',
-                    time: '5 days ago',
-                    icon: '👤'
-                },
-                {
-                    type: 'asset',
-                    title: 'PayPal account configured',
-                    description: 'Delete Account action',
-                    time: '1 week ago',
-                    icon: '💳'
-                },
-                {
-                    type: 'switch',
-                    title: 'Dead Man\'s Switch activated',
-                    description: '30-day check-in interval',
-                    time: '2 weeks ago',
-                    icon: '⏱️'
-                },
-                {
-                    type: 'asset',
-                    title: 'Google Drive shared',
-                    description: 'Accessible to executors',
-                    time: '2 weeks ago',
-                    icon: '☁️'
-                }
-            ];
+        async function initializeActivityFeed() {
+            try {
+                // Fetch activity from backend
+                const activityRes = await apiCall('/activity?limit=10', 'GET').catch(() => ({ data: [] }));
+                let activities = Array.isArray(activityRes.data) ? activityRes.data : [];
 
-            const feed = document.getElementById('activityFeed');
-            feed.innerHTML = activities.map(activity => `
-                <div class="activity-item">
-                    <div class="activity-icon ${activity.type}">
-                        ${activity.icon}
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-title">${activity.title}</div>
-                        <div class="activity-meta">
-                            <span class="activity-description">${activity.description}</span>
-                            <span class="activity-time">
-                                <i class="fas fa-clock" style="font-size: 0.7rem;"></i> ${activity.time}
-                            </span>
+                // If no activity from API, use default demo data
+                if (activities.length === 0) {
+                    activities = [
+                        {
+                            type: 'asset',
+                            title: 'Digital estate initialized',
+                            description: 'Getting started',
+                            time: 'Today',
+                            icon: '📱'
+                        }
+                    ];
+                }
+
+                const feed = document.getElementById('activityFeed');
+                feed.innerHTML = activities.slice(0, 5).map(activity => {
+                    const timeStr = activity.created_at ? formatActivityTime(activity.created_at) : activity.time || 'Recently';
+                    const description = activity.description || activity.action_type || '';
+                    const title = activity.title || `${activity.activity_type} activity`;
+                    const activityType = activity.type || activity.activity_type || 'asset';
+                    
+                    return `
+                        <div class="activity-item">
+                            <div class="activity-icon ${activityType}">
+                                ${getActivityIcon(activityType)}
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">${title}</div>
+                                <div class="activity-meta">
+                                    <span class="activity-description">${description}</span>
+                                    <span class="activity-time">
+                                        <i class="fas fa-clock" style="font-size: 0.7rem;"></i> ${timeStr}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            `).join('');
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error initializing activity feed:', error);
+            }
+        }
+
+        // Helper function to format activity time
+        function formatActivityTime(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins} min ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        // Helper function to get activity icon
+        function getActivityIcon(type) {
+            const icons = {
+                'asset': '📱',
+                'executor': '👤',
+                'will': '📄',
+                'switch': '⏱️',
+                'default': '✨'
+            };
+            return icons[type] || icons['default'];
         }
 
         // Initialize Health Score
-        function initializeHealthScore() {
-            // Calculate health score based on setup completion
-            const assetCount = document.getElementById('assetCount')?.textContent || '4';
-            const executorCount = document.getElementById('executorCount')?.textContent || '1';
-            const willGenerated = document.getElementById('willCount')?.textContent || '0';
-            const switchActive = document.getElementById('switchStatus')?.textContent !== 'Inactive';
+        async function initializeHealthScore() {
+            try {
+                // Fetch real data
+                const assetsRes = await apiCall('/assets', 'GET').catch(() => ({ data: [] }));
+                const executorsRes = await apiCall('/executors', 'GET').catch(() => ({ data: [] }));
+                const willRes = await apiCall('/will', 'GET').catch(() => ({ data: null }));
+                const switchRes = await apiCall('/dead-mans-switch/status', 'GET').catch(() => ({ data: { status: 'inactive' } }));
 
-            // Score calculation: Assets (20) + Executors (20) + Will (30) + Switch (30)
-            let score = 0;
-            score += Math.min(assetCount * 5, 20); // max 20
-            score += Math.min(executorCount * 20, 20); // max 20
-            score += (willGenerated > 0 ? 30 : 0); // 30 if generated
-            score += (switchActive ? 30 : 0); // 30 if active
+                const assets = Array.isArray(assetsRes.data) ? assetsRes.data : [];
+                const executors = Array.isArray(executorsRes.data) ? executorsRes.data : [];
+                const willExists = willRes && willRes.data;
+                const switchActive = switchRes && switchRes.data && switchRes.data.status === 'active';
 
-            const healthScoreCircle = document.getElementById('healthScoreCircle');
-            const healthScoreStatus = document.getElementById('healthScoreStatus');
-            
-            healthScoreCircle.textContent = Math.min(score, 100);
-            
-            // Remove previous score class and add new one
-            healthScoreCircle.classList.remove('score-high', 'score-medium', 'score-low');
-            
-            if (score >= 70) {
-                healthScoreCircle.classList.add('score-high');
-                healthScoreStatus.textContent = 'Good Progress';
-            } else if (score >= 40) {
-                healthScoreCircle.classList.add('score-medium');
-                healthScoreStatus.textContent = 'In Progress';
-            } else {
-                healthScoreCircle.classList.add('score-low');
-                healthScoreStatus.textContent = 'Getting Started';
+                // Score calculation: Assets (20) + Executors (20) + Will (30) + Switch (30)
+                let score = 0;
+                score += Math.min(assets.length * 5, 20); // max 20
+                score += (executors.length > 0 ? 20 : 0); // 20 if at least 1
+                score += (willExists ? 30 : 0); // 30 if generated
+                score += (switchActive ? 30 : 0); // 30 if active
+
+                const healthScoreCircle = document.getElementById('healthScoreCircle');
+                const healthScoreStatus = document.getElementById('healthScoreStatus');
+                
+                healthScoreCircle.textContent = Math.min(score, 100);
+                
+                // Remove previous score class and add new one
+                healthScoreCircle.classList.remove('score-high', 'score-medium', 'score-low');
+                
+                if (score >= 70) {
+                    healthScoreCircle.classList.add('score-high');
+                    healthScoreStatus.textContent = 'Good Progress';
+                } else if (score >= 40) {
+                    healthScoreCircle.classList.add('score-medium');
+                    healthScoreStatus.textContent = 'In Progress';
+                } else {
+                    healthScoreCircle.classList.add('score-low');
+                    healthScoreStatus.textContent = 'Getting Started';
+                }
+
+                // Update breakdown
+                document.getElementById('scoreAssets').textContent = assets.length;
+                document.getElementById('scoreExecutors').textContent = executors.length;
+                const completionPercent = Math.round((score / 100) * 100);
+                document.getElementById('scoreCompletion').textContent = completionPercent + '%';
+            } catch (error) {
+                console.error('Error initializing health score:', error);
             }
-
-            // Update breakdown
-            document.getElementById('scoreAssets').textContent = assetCount;
-            document.getElementById('scoreExecutors').textContent = executorCount;
-            const completionPercent = Math.round((score / 100) * 100);
-            document.getElementById('scoreCompletion').textContent = completionPercent + '%';
         }
 
         // Initialize all widgets when DOM is ready
