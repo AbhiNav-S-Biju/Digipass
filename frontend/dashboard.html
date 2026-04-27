@@ -758,6 +758,217 @@
             image-rendering: pixelated;
         }
 
+        /* Health Score Card */
+        .health-score-container {
+            text-align: center;
+            padding: 2rem 1.25rem;
+        }
+
+        .health-score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: white;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .health-score-circle.score-high {
+            background: linear-gradient(135deg, #86c157 0%, #5da936 100%);
+        }
+
+        .health-score-circle.score-medium {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .health-score-circle.score-low {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .health-score-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .health-score-breakdown {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-around;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--sand-deep);
+        }
+
+        .health-score-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .health-score-item-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .health-score-item-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--forest-deep);
+        }
+
+        /* Checklist Widget */
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--sand-deep);
+            transition: background-color 0.2s ease;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-item:hover {
+            background-color: var(--sand);
+        }
+
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--sand-deep);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+            background-color: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checklist-checkbox.completed {
+            background-color: #86c157;
+            border-color: #86c157;
+            color: white;
+        }
+
+        .checklist-content {
+            flex: 1;
+        }
+
+        .checklist-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .checklist-description {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .checklist-item.completed .checklist-title {
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        /* Activity Feed */
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--sand-deep);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+
+        .activity-icon.asset {
+            background-color: rgba(139, 195, 107, 0.2);
+            color: #86c157;
+        }
+
+        .activity-icon.executor {
+            background-color: rgba(61, 122, 90, 0.2);
+            color: var(--forest-light);
+        }
+
+        .activity-icon.will {
+            background-color: rgba(232, 217, 192, 0.5);
+            color: var(--forest-deep);
+        }
+
+        .activity-icon.switch {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .activity-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .activity-time {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Progress Bar */
+        .progress-bar-custom {
+            height: 8px;
+            background-color: var(--sand);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #86c157 0%, #5da936 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
         /* Responsive: Tablet (560px - 900px) */
         @media (max-width: 900px) {
             .navbar {
@@ -967,6 +1178,62 @@
                         <h3>Dead Man's Switch</h3>
                         <p class="stat-status" id="switchStatus">Inactive</p>
                         <a data-page="switch" href="#switch" class="btn btn-primary btn-sm">Configure</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Health Score Widget -->
+            <div class="row g-4 mt-2">
+                <div class="col-12 col-lg-4">
+                    <div class="card">
+                        <div class="card-body health-score-container">
+                            <div class="health-score-label">Estate Health Score</div>
+                            <div class="health-score-circle score-high" id="healthScoreCircle">72</div>
+                            <p class="text-muted mb-3" id="healthScoreStatus">Good Progress</p>
+                            <div class="health-score-breakdown">
+                                <div class="health-score-item">
+                                    <div class="health-score-item-label">Assets</div>
+                                    <div class="health-score-item-value" id="scoreAssets">4</div>
+                                </div>
+                                <div class="health-score-item">
+                                    <div class="health-score-item-label">Executors</div>
+                                    <div class="health-score-item-value" id="scoreExecutors">1</div>
+                                </div>
+                                <div class="health-score-item">
+                                    <div class="health-score-item-label">Completion</div>
+                                    <div class="health-score-item-value" id="scoreCompletion">60%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Checklist Widget -->
+                <div class="col-12 col-lg-4">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h3 class="mb-0">Setup Checklist</h3>
+                            <span class="badge bg-primary" id="checklistProgress">3/5</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="checklistContainer">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Widget -->
+                <div class="col-12 col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="mb-0">Recent Activity</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="activityFeed">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1416,6 +1683,151 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/utils.js?v=9"></script>
     <script src="js/dashboard.js?v=9"></script>
+    
+    <!-- Dashboard Widgets Initialization -->
+    <script>
+        // Initialize Checklist Widget
+        function initializeChecklist() {
+            const checklist = [
+                { id: 1, title: 'Add Digital Assets', description: 'Log your social media and email accounts', completed: true, icon: '📱' },
+                { id: 2, title: 'Designate Executors', description: 'Assign at least 1 trusted person', completed: true, icon: '👥' },
+                { id: 3, title: 'Set Asset Actions', description: 'Decide what happens to each account', completed: true, icon: '⚙️' },
+                { id: 4, title: 'Generate Digital Will', description: 'Create your official PDF document', completed: false, icon: '📄' },
+                { id: 5, title: 'Activate Dead Man\'s Switch', description: 'Set up automated check-ins', completed: false, icon: '🔄' }
+            ];
+
+            const container = document.getElementById('checklistContainer');
+            const completed = checklist.filter(item => item.completed).length;
+            
+            document.getElementById('checklistProgress').textContent = `${completed}/${checklist.length}`;
+            
+            container.innerHTML = checklist.map(item => `
+                <div class="checklist-item ${item.completed ? 'completed' : ''}">
+                    <div class="checklist-checkbox ${item.completed ? 'completed' : ''}">
+                        ${item.completed ? '✓' : ''}
+                    </div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">${item.title}</div>
+                        <div class="checklist-description">${item.description}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize Activity Feed
+        function initializeActivityFeed() {
+            const activities = [
+                {
+                    type: 'asset',
+                    title: 'Instagram account added',
+                    description: 'Pass to Executor',
+                    time: '2 days ago',
+                    icon: '📱'
+                },
+                {
+                    type: 'executor',
+                    title: 'Priya Sharma added as executor',
+                    description: 'Digital Estate Manager',
+                    time: '5 days ago',
+                    icon: '👤'
+                },
+                {
+                    type: 'asset',
+                    title: 'PayPal account configured',
+                    description: 'Delete Account action',
+                    time: '1 week ago',
+                    icon: '💳'
+                },
+                {
+                    type: 'switch',
+                    title: 'Dead Man\'s Switch activated',
+                    description: '30-day check-in interval',
+                    time: '2 weeks ago',
+                    icon: '⏱️'
+                },
+                {
+                    type: 'asset',
+                    title: 'Google Drive shared',
+                    description: 'Accessible to executors',
+                    time: '2 weeks ago',
+                    icon: '☁️'
+                }
+            ];
+
+            const feed = document.getElementById('activityFeed');
+            feed.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon ${activity.type}">
+                        ${activity.icon}
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-meta">
+                            <span class="activity-description">${activity.description}</span>
+                            <span class="activity-time">
+                                <i class="fas fa-clock" style="font-size: 0.7rem;"></i> ${activity.time}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize Health Score
+        function initializeHealthScore() {
+            // Calculate health score based on setup completion
+            const assetCount = document.getElementById('assetCount')?.textContent || '4';
+            const executorCount = document.getElementById('executorCount')?.textContent || '1';
+            const willGenerated = document.getElementById('willCount')?.textContent || '0';
+            const switchActive = document.getElementById('switchStatus')?.textContent !== 'Inactive';
+
+            // Score calculation: Assets (20) + Executors (20) + Will (30) + Switch (30)
+            let score = 0;
+            score += Math.min(assetCount * 5, 20); // max 20
+            score += Math.min(executorCount * 20, 20); // max 20
+            score += (willGenerated > 0 ? 30 : 0); // 30 if generated
+            score += (switchActive ? 30 : 0); // 30 if active
+
+            const healthScoreCircle = document.getElementById('healthScoreCircle');
+            const healthScoreStatus = document.getElementById('healthScoreStatus');
+            
+            healthScoreCircle.textContent = Math.min(score, 100);
+            
+            // Remove previous score class and add new one
+            healthScoreCircle.classList.remove('score-high', 'score-medium', 'score-low');
+            
+            if (score >= 70) {
+                healthScoreCircle.classList.add('score-high');
+                healthScoreStatus.textContent = 'Good Progress';
+            } else if (score >= 40) {
+                healthScoreCircle.classList.add('score-medium');
+                healthScoreStatus.textContent = 'In Progress';
+            } else {
+                healthScoreCircle.classList.add('score-low');
+                healthScoreStatus.textContent = 'Getting Started';
+            }
+
+            // Update breakdown
+            document.getElementById('scoreAssets').textContent = assetCount;
+            document.getElementById('scoreExecutors').textContent = executorCount;
+            const completionPercent = Math.round((score / 100) * 100);
+            document.getElementById('scoreCompletion').textContent = completionPercent + '%';
+        }
+
+        // Initialize all widgets when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeChecklist();
+            initializeActivityFeed();
+            initializeHealthScore();
+        });
+
+        // Re-initialize when data updates
+        window.updateDashboardWidgets = function() {
+            initializeHealthScore();
+            initializeChecklist();
+            initializeActivityFeed();
+        };
+    </script>
     
     <!-- Profile Dropdown UI Script -->
     <script>
