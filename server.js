@@ -42,8 +42,8 @@ app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
-    // Get userId from either regular user auth or executor auth
-    const userId = req.user?.id || req.executor?.user_id || req.ownerUserId;
+    // Get userId from multiple auth sources: JWT middleware (req.userId), user object, executor auth, or owner
+    const userId = req.userId || req.user?.id || req.executor?.user_id || req.ownerUserId;
     logApiRequest(req.method, req.path, res.statusCode, duration, {
       userId: userId
     });
