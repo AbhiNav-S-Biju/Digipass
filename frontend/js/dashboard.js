@@ -724,9 +724,9 @@ function renderAssets() {
   assetsStatus.textContent = `${assetsState.items.length} asset(s) saved`;
   
   const actionEmojis = {
-    'pass': '📤',
-    'delete': '🗑️',
-    'last_message': '💬'
+    'pass': '',
+    'delete': '',
+    'last_message': ''
   };
 
   assetsList.innerHTML = assetsState.items.map((asset) => {
@@ -754,7 +754,6 @@ function renderAssets() {
         <button type="button" class="btn btn-sm btn-outline-danger" data-delete-id="${asset.asset_id}">Delete</button>
       </div>
       <div class="d-flex align-items-center gap-2 mt-2">
-        <span>${actionEmojis[asset.action_type] || '📋'}</span>
         <span class="fw-500">${actionLabel}</span>
       </div>
       ${asset.last_message ? `<div class="alert alert-info small mt-2 mb-0"><strong>Message:</strong> ${escapeHtml(asset.last_message.substring(0, 100))}${asset.last_message.length > 100 ? '...' : ''}</div>` : ''}
