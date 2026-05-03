@@ -1294,34 +1294,34 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="mb-0">💡 Tips to Increase Your Health Score</h3>
+                            <h3 class="mb-0">Tips to Increase Your Health Score</h3>
                         </div>
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-12 col-md-6 col-lg-3">
                                     <div class="tip-box">
-                                        <div class="tip-icon">📱</div>
+                                        <div class="tip-icon"></div>
                                         <h5>Add More Assets</h5>
                                         <p class="text-muted small mb-0">Add all your digital accounts (up to 4 assets = 20 points)</p>
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
                                     <div class="tip-box">
-                                        <div class="tip-icon">👥</div>
+                                        <div class="tip-icon"></div>
                                         <h5>Designate an Executor</h5>
                                         <p class="text-muted small mb-0">Assign a trusted person to manage your estate (20 points)</p>
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
                                     <div class="tip-box">
-                                        <div class="tip-icon">📄</div>
+                                        <div class="tip-icon"></div>
                                         <h5>Generate Your Will</h5>
                                         <p class="text-muted small mb-0">Create an official digital will PDF (30 points)</p>
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-3">
                                     <div class="tip-box">
-                                        <div class="tip-icon">⏱️</div>
+                                        <div class="tip-icon"></div>
                                         <h5>Activate Check-ins</h5>
                                         <p class="text-muted small mb-0">Enable Dead Man's Switch (30 points)</p>
                                     </div>
@@ -1795,11 +1795,11 @@
                 const switchActive = switchRes && switchRes.data && switchRes.data.status === 'active';
 
                 const checklist = [
-                    { id: 1, title: 'Add Digital Assets', description: 'Log your social media and email accounts', completed: assets.length > 0, icon: '📱' },
-                    { id: 2, title: 'Designate Executors', description: 'Assign at least 1 trusted person', completed: executors.length > 0, icon: '👥' },
-                    { id: 3, title: 'Set Asset Actions', description: 'Decide what happens to each account', completed: assets.some(a => a.action_type), icon: '⚙️' },
-                    { id: 4, title: 'Generate Digital Will', description: 'Create your official PDF document', completed: willExists, icon: '📄' },
-                    { id: 5, title: 'Activate Dead Man\'s Switch', description: 'Set up automated check-ins', completed: switchActive, icon: '🔄' }
+                    { id: 1, title: 'Add Digital Assets', description: 'Log your social media and email accounts', completed: assets.length > 0, icon: '' },
+                    { id: 2, title: 'Designate Executors', description: 'Assign at least 1 trusted person', completed: executors.length > 0, icon: '' },
+                    { id: 3, title: 'Set Asset Actions', description: 'Decide what happens to each account', completed: assets.some(a => a.action_type), icon: '' },
+                    { id: 4, title: 'Generate Digital Will', description: 'Create your official PDF document', completed: willExists, icon: '' },
+                    { id: 5, title: 'Activate Dead Man\'s Switch', description: 'Set up automated check-ins', completed: switchActive, icon: '' }
                 ];
 
                 const container = document.getElementById('checklistContainer');
@@ -1895,16 +1895,16 @@
         // Helper function to get activity icon
         function getActivityIcon(type) {
             const icons = {
-                'asset': '📱',
-                'executor': '👤',
-                'will': '📄',
-                'switch': '⏱️',
-                'asset_created': '📱',
-                'executor_added': '👤',
-                'will_created': '📄',
-                'switch_checkin': '⏱️',
-                'switch_interval_updated': '⏱️',
-                'default': '✨'
+                'asset': '',
+                'executor': '',
+                'will': '',
+                'switch': '',
+                'asset_created': '',
+                'executor_added': '',
+                'will_created': '',
+                'switch_checkin': '',
+                'switch_interval_updated': '',
+                'default': ''
             };
             return icons[type] || icons['default'];
         }
