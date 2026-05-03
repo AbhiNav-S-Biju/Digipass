@@ -360,6 +360,28 @@
             border: none !important;
         }
 
+        /* Action Button Styling - Asset Actions (Pass, Delete, Last Message) */
+        .btn-group .btn-check:checked + .btn-outline-primary {
+            background-color: var(--forest-deep) !important;
+            border-color: var(--forest-deep) !important;
+            color: var(--cream-light) !important;
+            font-weight: 600;
+        }
+
+        .btn-group .btn-outline-primary {
+            border: 2px solid var(--sand-deep) !important;
+            color: var(--text-dark) !important;
+            font-weight: 500;
+            background-color: var(--cream-light) !important;
+            transition: all 0.3s ease;
+        }
+
+        .btn-group .btn-outline-primary:hover {
+            border-color: var(--forest-mid) !important;
+            background-color: var(--sand) !important;
+            color: var(--forest-deep) !important;
+        }
+
         /* Forms */
         .form-label {
             font-weight: 600;
