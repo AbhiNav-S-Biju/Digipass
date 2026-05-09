@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindAssetActions();
   bindEditAssetHandlers();
   bindExecutorActions();
+  bindWillActions();
   loadDashboardData();
 });
 
@@ -458,6 +459,77 @@ async function handleGenerateWill() {
   } finally {
     generateBtn.disabled = false;
     generateBtn.textContent = 'Generate Digital Will (PDF)';
+  }
+}
+
+async function openEditWillModal() {
+  try {
+    // Load existing will content
+    const response = await apiCall('/will-content', 'GET');
+    
+    if (response.success && response.data && response.data.custom_content) {
+      document.getElementById('editWillContent').value = response.data.custom_content;
+    } else {
+      document.getElementById('editWillContent').value = '';
+    }
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('editWillModal'));
+    modal.show();
+  } catch (error) {
+    console.error('Error loading will content:', error);
+    showNotification('Failed to load will content', 'error');
+  }
+}
+
+async function handleEditWillSubmit() {
+  const submitBtn = document.getElementById('editWillSubmitBtn');
+  const willContent = document.getElementById('editWillContent').value.trim();
+  
+  if (!willContent) {
+    showNotification('Will content cannot be empty', 'error');
+    return;
+  }
+  
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Saving...';
+  
+  try {
+    const response = await apiCall('/will-content', 'POST', {
+      custom_content: willContent
+    });
+    
+    if (response.success) {
+      showNotification('Will content saved successfully!', 'success');
+      
+      // Close modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('editWillModal'));
+      modal.hide();
+      
+      // Refresh will data
+      loadWillData();
+    } else {
+      showNotification(response.message || 'Failed to save will content', 'error');
+    }
+  } catch (error) {
+    console.error('Error saving will content:', error);
+    showNotification(error.message || 'Failed to save will content', 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Save Changes';
+  }
+}
+
+function bindWillActions() {
+  const editWillBtn = document.getElementById('editWillBtn');
+  if (editWillBtn) {
+    // Modal trigger is already set via data-bs-toggle
+    // Just bind the submit button
+    const editWillSubmitBtn = document.getElementById('editWillSubmitBtn');
+    if (editWillSubmitBtn) {
+      editWillSubmitBtn.removeEventListener('click', handleEditWillSubmit);
+      editWillSubmitBtn.addEventListener('click', handleEditWillSubmit);
+    }
   }
 }
 

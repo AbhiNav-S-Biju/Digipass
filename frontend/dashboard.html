@@ -1601,6 +1601,9 @@
                             <button type="button" id="generateWillBtn" class="btn btn-primary w-100">
                                 Generate Digital Will (PDF)
                             </button>
+                            <button type="button" id="editWillBtn" class="btn btn-secondary w-100 mt-2" data-bs-toggle="modal" data-bs-target="#editWillModal">
+                                Edit Will Content
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1839,6 +1842,32 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="editAssetSubmitBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Will Modal -->
+    <div class="modal fade" id="editWillModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Edit Digital Will</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editWillForm">
+                        <div class="mb-3">
+                            <label for="editWillContent" class="form-label">Will Content <span class="text-danger">*</span></label>
+                            <p class="text-muted small mb-2">Add or edit your custom will content. This will be used in your generated PDF.</p>
+                            <textarea class="form-control" id="editWillContent" name="editWillContent" placeholder="Enter your will content here..." rows="10" required></textarea>
+                            <div class="form-text mt-2">Tip: You can include instructions for your executors, final wishes, or any additional information.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="editWillSubmitBtn">Save Changes</button>
                 </div>
             </div>
         </div>

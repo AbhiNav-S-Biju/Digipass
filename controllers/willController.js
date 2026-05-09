@@ -37,6 +37,7 @@ async function ensureDigitalWillTable() {
       will_id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL,
       file_path TEXT NOT NULL,
+      custom_content TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
@@ -47,6 +48,14 @@ async function ensureDigitalWillTable() {
     CREATE INDEX IF NOT EXISTS idx_digital_will_user_id
     ON digital_will(user_id)
   `);
+
+  // Add custom_content column if it doesn't exist
+  await pool.query(`
+    ALTER TABLE digital_will
+    ADD COLUMN IF NOT EXISTS custom_content TEXT
+  `).catch(() => {
+    // Column already exists, ignore error
+  });
 }
 
 async function generateWill(req, res, next) {
@@ -163,6 +172,126 @@ async function generateWill(req, res, next) {
   }
 }
 
+async function updateWillContent(req, res, next) {
+  try {
+    const userId = req.userId;
+    const { custom_content } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
+    }
+
+    if (!custom_content || custom_content.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Will content cannot be empty'
+      });
+    }
+
+    await ensureDigitalWillTable();
+
+    // Get the latest will or create a placeholder
+    const { rows: existingRows } = await pool.query(
+      `SELECT will_id FROM digital_will
+       WHERE user_id = $1
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [userId]
+    );
+
+    let willId;
+    
+    if (existingRows.length > 0) {
+      willId = existingRows[0].will_id;
+      // Update existing will
+      await pool.query(
+        `UPDATE digital_will
+         SET custom_content = $1, updated_at = NOW()
+         WHERE will_id = $2 AND user_id = $3`,
+        [custom_content.trim(), willId, userId]
+      );
+    } else {
+      // Create a new will entry with custom content
+      const { rows: newRows } = await pool.query(
+        `INSERT INTO digital_will (user_id, custom_content, file_path, created_at, updated_at)
+         VALUES ($1, $2, $3, NOW(), NOW())
+         RETURNING will_id`,
+        [userId, custom_content.trim(), 'custom-will']
+      );
+      willId = newRows[0].will_id;
+    }
+
+    // Log activity
+    await logActivity(
+      userId,
+      'will_updated',
+      'Digital will content updated',
+      'will',
+      willId
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: 'Will content updated successfully',
+      data: {
+        will_id: willId,
+        custom_content: custom_content.trim()
+      }
+    });
+  } catch (error) {
+    console.error('Update Will Content Error:', error);
+    next(error);
+  }
+}
+
+async function getWillContent(req, res, next) {
+  try {
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
+    }
+
+    await ensureDigitalWillTable();
+
+    const { rows } = await pool.query(
+      `SELECT will_id, custom_content, created_at, updated_at
+       FROM digital_will
+       WHERE user_id = $1
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: null,
+        message: 'No will exists'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        will_id: rows[0].will_id,
+        custom_content: rows[0].custom_content,
+        created_at: rows[0].created_at,
+        updated_at: rows[0].updated_at
+      }
+    });
+  } catch (error) {
+    console.error('Get Will Content Error:', error);
+    next(error);
+  }
+}
+
 async function downloadWill(req, res, next) {
   try {
     const userId = req.userId;
@@ -177,7 +306,7 @@ async function downloadWill(req, res, next) {
 
     // Verify will exists and belongs to user
     const { rows } = await pool.query(
-      `SELECT will_id, user_id, file_path
+      `SELECT will_id, user_id, file_path, custom_content
        FROM digital_will
        WHERE will_id = $1 AND user_id = $2`,
       [willId, userId]
@@ -231,5 +360,7 @@ async function downloadWill(req, res, next) {
 
 module.exports = {
   generateWill,
-  downloadWill
+  downloadWill,
+  updateWillContent,
+  getWillContent
 };

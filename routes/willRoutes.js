@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { generateWill, downloadWill } = require('../controllers/willController');
+const { generateWill, downloadWill, updateWillContent, getWillContent } = require('../controllers/willController');
 const { authenticateToken: authMiddleware } = require('../middleware/auth');
 const pool = require('../db');
 
@@ -14,6 +14,8 @@ router.use((req, res, next) => {
 
 router.get('/generate-will', generateWill);
 router.get('/download-will/:willId', downloadWill);
+router.get('/will-content', getWillContent);
+router.post('/will-content', updateWillContent);
 
 /**
  * Check if a digital will exists for the user
