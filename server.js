@@ -174,6 +174,7 @@ app.listen(PORT, () => {
   console.log(`  - GET    /api/health (public)`);
   console.log(`  - POST   /api/assets (protected)`);
   console.log(`  - GET    /api/assets (protected)`);
+  console.log(`  - PATCH  /api/assets/:id (protected)`);
   console.log(`  - DELETE /api/assets/:id (protected)`);
   console.log(`  - POST   /api/executors (protected)`);
   console.log(`  - GET    /api/executors (protected)`);

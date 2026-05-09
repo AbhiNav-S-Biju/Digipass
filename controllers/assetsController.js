@@ -122,6 +122,98 @@ async function getAssets(req, res) {
   }
 }
 
+async function updateAsset(req, res) {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    const assetId = Number.parseInt(req.params.id, 10);
+    const { platform_name, category, account_identifier, account_password, action_type, last_message } = req.body;
+
+    if (!Number.isInteger(assetId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'A valid asset id is required'
+      });
+    }
+
+    // Validation
+    if (!platform_name || !category || !account_identifier || !account_password || !action_type) {
+      return res.status(400).json({
+        success: false,
+        message: 'platform_name, category, account_identifier, account_password, and action_type are required'
+      });
+    }
+
+    if (!ACTION_TYPES.includes(action_type)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid action_type. Valid values: ${ACTION_TYPES.join(', ')}`
+      });
+    }
+
+    if (action_type === 'last_message' && !last_message) {
+      return res.status(400).json({
+        success: false,
+        message: 'last_message is required when action_type is "last_message"'
+      });
+    }
+
+    // Check if asset exists and belongs to user
+    const existingAsset = await pool.query(
+      `SELECT asset_id FROM digital_assets WHERE asset_id = $1 AND user_id = $2`,
+      [assetId, userId]
+    );
+
+    if (existingAsset.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Asset not found'
+      });
+    }
+
+    // Update asset
+    const result = await pool.query(
+      `UPDATE digital_assets 
+       SET platform_name = $1, category = $2, account_identifier = $3, 
+           account_password = $4, action_type = $5, last_message = $6, updated_at = NOW()
+       WHERE asset_id = $7 AND user_id = $8
+       RETURNING asset_id, platform_name, category, account_identifier, account_password, action_type, last_message, created_at`,
+      [
+        platform_name.trim(),
+        category,
+        account_identifier.trim(),
+        account_password.trim(),
+        action_type,
+        last_message || null,
+        assetId,
+        userId
+      ]
+    );
+
+    const asset = result.rows[0];
+
+    // Log activity
+    await logActivity(
+      userId,
+      'asset_updated',
+      `Asset updated: ${platform_name}`,
+      'asset',
+      assetId
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: 'Asset updated successfully',
+      data: buildAssetResponse(asset)
+    });
+  } catch (error) {
+    console.error('Update Asset Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to update asset'
+    });
+  }
+}
+
 async function deleteAsset(req, res) {
   try {
     const userId = getAuthenticatedUserId(req);
@@ -176,6 +268,7 @@ async function deleteAsset(req, res) {
 module.exports = {
   addAsset,
   getAssets,
+  updateAsset,
   deleteAsset,
   PLATFORM_CATEGORIES,
   ACTION_TYPES,

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { addAsset, getAssets, deleteAsset } = require('../controllers/assetsController');
+const { addAsset, getAssets, updateAsset, deleteAsset } = require('../controllers/assetsController');
 const { authenticateToken: authMiddleware } = require('../middleware/auth');
 
 // All digital asset endpoints require a logged-in user.
@@ -11,6 +11,9 @@ router.post('/', addAsset);
 
 // GET /api/assets
 router.get('/', getAssets);
+
+// PATCH /api/assets/:id
+router.patch('/:id', updateAsset);
 
 // DELETE /api/assets/:id
 router.delete('/:id', deleteAsset);

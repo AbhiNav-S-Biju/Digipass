@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize dashboard
   initDashboard();
   bindAssetActions();
+  bindEditAssetHandlers();
   bindExecutorActions();
   loadDashboardData();
 });
@@ -223,6 +224,7 @@ async function loadAssetsData() {
 
     renderAssets();
     updateAssetCount();
+    bindEditAssetHandlers();
   } catch (error) {
     assetsStatus.textContent = 'Unable to load assets right now.';
     showNotification(error.message || 'Failed to load assets', 'error');
@@ -751,7 +753,10 @@ function renderAssets() {
             <span class="badge bg-secondary">${asset.category}</span>
           </div>
         </div>
-        <button type="button" class="btn btn-sm btn-outline-danger" data-delete-id="${asset.asset_id}">Delete</button>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm btn-outline-primary" data-edit-id="${asset.asset_id}">Edit</button>
+          <button type="button" class="btn btn-sm btn-outline-danger" data-delete-id="${asset.asset_id}">Delete</button>
+        </div>
       </div>
       <div class="d-flex align-items-center gap-2 mt-2">
         <span class="fw-500">${actionLabel}</span>
@@ -761,10 +766,147 @@ function renderAssets() {
     </article>
     `;
   }).join('');
+
+  // Bind edit and delete buttons after rendering
+  bindAssetEditHandlers();
+}
+
+function bindAssetEditHandlers() {
+  const editButtons = document.querySelectorAll('[data-edit-id]');
+  editButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      const assetId = button.dataset.editId;
+      openEditAssetModal(assetId);
+    });
+  });
 }
 
 function updateAssetCount() {
   document.getElementById('assetCount').textContent = String(assetsState.items.length);
+}
+
+function openEditAssetModal(assetId) {
+  const asset = assetsState.items.find(a => String(a.asset_id) === String(assetId));
+  if (!asset) {
+    showNotification('Asset not found.', 'error');
+    return;
+  }
+
+  // Populate form with asset data
+  document.getElementById('editAssetId').value = asset.asset_id;
+  document.getElementById('editPlatformName').value = asset.platform_name;
+  document.getElementById('editAccountIdentifier').value = asset.account_identifier;
+  document.getElementById('editAccountPassword').value = asset.account_password || '';
+  
+  // Set action type
+  document.querySelector(`input[name="editActionType"][value="${asset.action_type}"]`).checked = true;
+  
+  // Set last message if applicable
+  document.getElementById('editLastMessage').value = asset.last_message || '';
+  
+  // Show/hide message container based on action type
+  const messageContainer = document.getElementById('editMessageContainer');
+  if (asset.action_type === 'last_message') {
+    messageContainer.style.display = 'block';
+  } else {
+    messageContainer.style.display = 'none';
+  }
+
+  // Show modal
+  const modal = new bootstrap.Modal(document.getElementById('editAssetModal'));
+  modal.show();
+}
+
+function bindEditAssetHandlers() {
+  // Handle action type radio button changes
+  const actionRadios = document.querySelectorAll('.edit-action-radio');
+  actionRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      const messageContainer = document.getElementById('editMessageContainer');
+      if (e.target.value === 'last_message') {
+        messageContainer.style.display = 'block';
+        document.getElementById('editLastMessage').required = true;
+      } else {
+        messageContainer.style.display = 'none';
+        document.getElementById('editLastMessage').required = false;
+      }
+    });
+  });
+
+  // Handle form submission
+  const editAssetSubmitBtn = document.getElementById('editAssetSubmitBtn');
+  editAssetSubmitBtn.addEventListener('click', handleEditAssetSubmit);
+}
+
+async function handleEditAssetSubmit() {
+  const submitButton = document.getElementById('editAssetSubmitBtn');
+  const assetId = document.getElementById('editAssetId').value;
+  const platformName = document.getElementById('editPlatformName').value.trim();
+  const accountIdentifier = document.getElementById('editAccountIdentifier').value.trim();
+  const accountPassword = document.getElementById('editAccountPassword').value.trim();
+  const actionType = document.querySelector('input[name="editActionType"]:checked')?.value;
+  const lastMessage = document.getElementById('editLastMessage').value.trim();
+
+  if (!platformName || !accountIdentifier || !accountPassword || !actionType) {
+    showNotification('Please fill in all required fields.', 'error');
+    return;
+  }
+
+  if (actionType === 'last_message' && !lastMessage) {
+    showNotification('Please write your final message.', 'error');
+    return;
+  }
+
+  submitButton.disabled = true;
+  submitButton.textContent = 'Saving...';
+
+  try {
+    // Determine category based on platform
+    const categoryMap = {
+      'Instagram': 'social', 'Facebook': 'social', 'Twitter': 'social', 'LinkedIn': 'social', 'TikTok': 'social', 'Snapchat': 'social', 'Discord': 'social',
+      'Gmail': 'email', 'Outlook': 'email', 'Yahoo Mail': 'email', 'ProtonMail': 'email', 'Apple Mail': 'email',
+      'PayPal': 'finance', 'Amazon': 'finance', 'Banking App': 'finance', 'Stripe': 'finance', 'Square': 'finance',
+      'Google Drive': 'storage', 'Dropbox': 'storage', 'OneDrive': 'storage', 'iCloud': 'storage',
+      'Netflix': 'entertainment', 'Spotify': 'entertainment', 'Disney+': 'entertainment', 'Hulu': 'entertainment'
+    };
+
+    const category = categoryMap[platformName] || 'other';
+
+    const response = await apiCall(`/assets/${assetId}`, 'PATCH', {
+      platform_name: platformName,
+      category: category,
+      account_identifier: accountIdentifier,
+      account_password: accountPassword,
+      action_type: actionType,
+      last_message: actionType === 'last_message' ? lastMessage : null
+    });
+
+    // Update asset in local state
+    const assetIndex = assetsState.items.findIndex(a => String(a.asset_id) === String(assetId));
+    if (assetIndex !== -1) {
+      assetsState.items[assetIndex] = response.data;
+    }
+
+    renderAssets();
+    updateAssetCount();
+    showNotification('Asset updated successfully.', 'success');
+
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById('editAssetModal')).hide();
+
+    // Update dashboard widgets to reflect the updated asset
+    if (window.updateDashboardWidgets) {
+      setTimeout(() => {
+        window.updateDashboardWidgets();
+      }, 500);
+    }
+  } catch (error) {
+    showNotification(error.message || 'Failed to update asset', 'error');
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = 'Save Changes';
+  }
 }
 
 async function handleExecutorSubmit(event) {
