@@ -1643,17 +1643,32 @@
         }
 
         const executor = JSON.parse(localStorage.getItem('executor') || '{}');
-        const executorName = executor.ownerName || 'Estate Owner';
-        const estateName = executor.ownerName || 'Your Estate';
-        
-        // Update profile banner
-        document.getElementById('executorName').textContent = executorName;
-        document.getElementById('inheritanceName').textContent = estateName;
-        document.getElementById('estateName').textContent = estateName.split(' ')[0];
-        
-        // Generate avatar initials
-        const initials = executorName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-        document.getElementById('executorAvatar').textContent = initials;
+
+        function getInitials(name) {
+            return String(name || 'Executor')
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean)
+                .map(part => part[0])
+                .join('')
+                .substring(0, 2)
+                .toUpperCase() || 'E';
+        }
+
+        function updateProfileBanner(executorData = {}, ownerData = {}) {
+            const executorName = executorData.executor_name || executor.executor_name || 'Executor';
+            const executorEmail = executorData.executor_email || executor.executor_email || '';
+            const ownerName = ownerData.full_name || executor.ownerName || 'Estate Owner';
+
+            document.getElementById('executorName').textContent = executorEmail
+                ? `${executorName} (${executorEmail})`
+                : executorName;
+            document.getElementById('inheritanceName').textContent = `Estate: ${ownerName}`;
+            document.getElementById('estateName').textContent = ownerName.split(' ')[0] || 'Estate';
+            document.getElementById('executorAvatar').textContent = getInitials(executorName);
+        }
+
+        updateProfileBanner();
 
         // Logout functionality
         document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -1704,6 +1719,19 @@
                         emptyState.classList.remove('d-none');
                     }
                     return;
+                }
+
+                const owner = data.data && data.data.owner ? data.data.owner : {};
+                const executorData = data.data && data.data.executor ? data.data.executor : {};
+                updateProfileBanner(executorData, owner);
+
+                if (executorData.executor_id) {
+                    localStorage.setItem('executor', JSON.stringify({
+                        ...executor,
+                        ...executorData,
+                        ownerName: owner.full_name || executor.ownerName || 'Estate Owner',
+                        ownerEmail: owner.email || executor.ownerEmail || ''
+                    }));
                 }
 
                 // Get assets from response

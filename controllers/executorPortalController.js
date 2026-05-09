@@ -26,7 +26,13 @@ async function executorLogin(req, res) {
         verification_status,
         access_granted
       FROM executors
-      WHERE LOWER(executor_email) = LOWER($1)`,
+      WHERE LOWER(executor_email) = LOWER($1)
+      ORDER BY
+        CASE WHEN access_granted = true THEN 0 ELSE 1 END,
+        CASE WHEN verification_status = 'verified' THEN 0 ELSE 1 END,
+        updated_at DESC,
+        executor_id DESC
+      LIMIT 1`,
       [executor_email.trim()]
     );
 
