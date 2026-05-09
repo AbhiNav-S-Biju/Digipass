@@ -8,7 +8,8 @@ const {
   setupExecutorPassword,
   executorLogin,
   grantAccess,
-  revokeAccess
+  revokeAccess,
+  deleteExecutor
 } = require('../controllers/executorsController');
 const { authenticateToken: authMiddleware } = require('../middleware/auth');
 
@@ -23,5 +24,6 @@ router.get('/', getExecutors);
 router.post('/:id/resend-verification', resendExecutorVerification);
 router.patch('/:id/grant-access', grantAccess);
 router.patch('/:id/revoke-access', revokeAccess);
+router.delete('/:id', deleteExecutor);
 
 module.exports = router;

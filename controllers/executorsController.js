@@ -685,6 +685,70 @@ async function executorLogin(req, res) {
   }
 }
 
+async function deleteExecutor(req, res) {
+  try {
+    const userId = req.userId;
+    const executorId = Number.parseInt(req.params.id, 10);
+
+    console.log('[Executor Controller] deleteExecutor called');
+    console.log(`  - userId: ${userId}`);
+    console.log(`  - executorId: ${executorId}`);
+
+    if (!Number.isInteger(executorId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'A valid executor id is required'
+      });
+    }
+
+    // Verify executor belongs to user
+    const { rows: executorRows } = await pool.query(
+      `SELECT executor_id, executor_name FROM executors
+       WHERE executor_id = $1 AND user_id = $2`,
+      [executorId, userId]
+    );
+
+    if (executorRows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Executor not found'
+      });
+    }
+
+    const executor = executorRows[0];
+
+    // Delete executor from database
+    await pool.query(
+      `DELETE FROM executors WHERE executor_id = $1`,
+      [executorId]
+    );
+
+    console.log('[Executor Controller] Executor deleted successfully');
+    console.log(`  - executor_id: ${executorId}`);
+    console.log(`  - executor_name: ${executor.executor_name}`);
+
+    // Log activity
+    await logActivity(
+      userId,
+      'executor_deleted',
+      `Removed executor: ${executor.executor_name}`,
+      'executor',
+      executorId
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: 'Executor removed successfully'
+    });
+  } catch (error) {
+    console.error('Delete Executor Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to delete executor'
+    });
+  }
+}
+
 module.exports = {
   addExecutor,
   getExecutors,
@@ -693,5 +757,6 @@ module.exports = {
   setupExecutorPassword,
   executorLogin,
   grantAccess,
-  revokeAccess
+  revokeAccess,
+  deleteExecutor
 };

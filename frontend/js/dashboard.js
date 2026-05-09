@@ -1025,7 +1025,12 @@ function getExecutorStatusBadgeClass(executor) {
 function getExecutorActionButtons(executor) {
   // Only show buttons if executor is verified
   if (executor.verification_status !== 'verified') {
-    return '<p class="executor-meta"><em>Waiting for verification...</em></p>';
+    return `
+      <div class="executor-actions">
+        <p class="executor-meta"><em>Waiting for verification...</em></p>
+        <button class="delete-btn" data-delete-id="${executor.executor_id}">Remove</button>
+      </div>
+    `;
   }
 
   // Ensure access_granted is treated as boolean
@@ -1036,6 +1041,7 @@ function getExecutorActionButtons(executor) {
       <div class="executor-actions">
         <button class="success-btn" disabled>✓ Access Granted</button>
         <button class="revoke-btn" data-revoke-id="${executor.executor_id}">Revoke Access</button>
+        <button class="delete-btn" data-delete-id="${executor.executor_id}">Remove</button>
       </div>
     `;
   }
@@ -1043,6 +1049,7 @@ function getExecutorActionButtons(executor) {
   return `
     <div class="executor-actions">
       <button class="access-btn" data-grant-id="${executor.executor_id}">Grant Access</button>
+      <button class="delete-btn" data-delete-id="${executor.executor_id}">Remove</button>
     </div>
   `;
 }
@@ -1061,6 +1068,12 @@ function bindExecutorButtons() {
     const revokeButton = e.target.closest('[data-revoke-id]');
     if (revokeButton) {
       await handleRevokeAccess(revokeButton);
+      return;
+    }
+
+    const deleteButton = e.target.closest('[data-delete-id]');
+    if (deleteButton) {
+      await handleDeleteExecutor(deleteButton);
     }
   });
 }
@@ -1123,6 +1136,33 @@ async function handleRevokeAccess(button) {
     button.disabled = false;
     button.textContent = 'Revoke Access';
     showNotification(error.message || 'Failed to revoke access', 'error');
+  }
+}
+
+async function handleDeleteExecutor(button) {
+  const executorId = button.dataset.deleteId;
+  
+  if (!confirm('Are you sure you want to remove this executor? This action cannot be undone.')) {
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = 'Removing...';
+
+  try {
+    await apiCall(`/executors/${executorId}`, 'DELETE');
+
+    // Remove from state
+    executorsState.items = executorsState.items.filter(
+      (e) => String(e.executor_id) !== String(executorId)
+    );
+
+    renderExecutors();
+    showNotification('Executor removed successfully!', 'success');
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = 'Remove';
+    showNotification(error.message || 'Failed to remove executor', 'error');
   }
 }
 
