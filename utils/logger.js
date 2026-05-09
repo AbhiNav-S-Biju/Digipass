@@ -14,6 +14,18 @@ const LOG_LEVELS = {
   ERROR: 'ERROR'
 };
 
+const shouldLogToConsole = (level, category) => {
+  if (process.env.LOG_TO_CONSOLE === 'true') {
+    return true;
+  }
+
+  if (category === 'API_REQUESTS') {
+    return process.env.API_REQUEST_LOGS_TO_CONSOLE === 'true';
+  }
+
+  return level === LOG_LEVELS.WARN || level === LOG_LEVELS.ERROR;
+};
+
 const formatLog = (level, category, message, data = {}) => {
   return JSON.stringify({
     timestamp: new Date().toISOString(),
@@ -35,7 +47,10 @@ const writeLog = (level, category, message, data) => {
   
   fs.appendFileSync(logFile, logEntry + '\n', 'utf8');
   
-  // Also console log
+  if (!shouldLogToConsole(level, category)) {
+    return;
+  }
+
   const prefix = `[${category}] [${level}]`;
   if (level === LOG_LEVELS.ERROR) {
     console.error(prefix, message, data);

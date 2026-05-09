@@ -1,12 +1,7 @@
 const sgMail = require('@sendgrid/mail');
+const { getExecutorVerificationUrl } = require('./qrCode');
 
 let sendgridInitialized = false;
-
-function getExecutorVerificationUrl(token) {
-  // Use FRONTEND_URL for frontend file, fallback to APP_BASE_URL for local dev
-  const frontendUrl = process.env.FRONTEND_URL || process.env.APP_BASE_URL || 'http://localhost:3000';
-  return `${frontendUrl}/executor-register.html?token=${encodeURIComponent(token)}`;
-}
 
 function initSendGrid() {
   const apiKey = process.env.SENDGRID_API_KEY;
@@ -17,7 +12,7 @@ function initSendGrid() {
   
   sgMail.setApiKey(apiKey);
   sendgridInitialized = true;
-  console.log('[Mailer] SendGrid initialized successfully');
+  console.log('[Mailer] SendGrid ready');
   return true;
 }
 
@@ -25,22 +20,16 @@ async function sendExecutorVerificationEmail({ executorName, executorEmail, toke
   const verificationUrl = getExecutorVerificationUrl(token);
   const fromAddress = process.env.EMAIL_FROM || 'noreply@digipass.com';
 
-  console.log('[Mailer] Preparing executor verification email via SendGrid...');
-  console.log(`  - to: ${executorEmail}`);
-  console.log(`  - from: ${fromAddress}`);
-  console.log(`  - verificationUrl: ${verificationUrl}`);
-
   if (!process.env.SENDGRID_API_KEY || !sendgridInitialized) {
-    console.warn('[Mailer Fallback] SendGrid not configured. Logging invite link instead.');
-    console.log(`  - invite link: ${verificationUrl}`);
+    console.warn(`[Email] Not sent to ${executorEmail}: SENDGRID_API_KEY is not configured`);
     return {
       delivered: false,
-      verificationUrl
+      verificationUrl,
+      reason: 'sendgrid_not_configured'
     };
   }
 
   try {
-    console.log('[Mailer] Sending executor verification email via SendGrid...');
     const msg = {
       to: executorEmail,
       from: fromAddress,
@@ -64,18 +53,20 @@ async function sendExecutorVerificationEmail({ executorName, executorEmail, toke
     };
 
     const response = await sgMail.send(msg);
+    const statusCode = response[0].statusCode;
+    const messageId = response[0].headers['x-message-id'];
     
-    console.log('[Mailer] Email sent successfully via SendGrid');
-    console.log(`  - status: ${response[0].statusCode}`);
+    console.log(`[Email] Sent executor verification to ${executorEmail} (status ${statusCode}, messageId ${messageId || 'n/a'})`);
 
     return {
       delivered: true,
       verificationUrl,
-      messageId: response[0].headers['x-message-id']
+      statusCode,
+      messageId
     };
   } catch (error) {
-    console.error('[Mailer] Email send failed via SendGrid');
-    console.error(`  - message: ${error.message}`);
+    const sendGridMessage = error.response?.body?.errors?.[0]?.message;
+    console.error(`[Email] Failed executor verification to ${executorEmail}: ${sendGridMessage || error.message}`);
     throw error;
   }
 }

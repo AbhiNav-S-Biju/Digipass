@@ -163,27 +163,7 @@ app.listen(PORT, () => {
   // Initialize SendGrid for email
   initSendGrid();
   
-  console.log('[Email Debug] Environment loaded:');
-  console.log(`  - APP_BASE_URL: ${process.env.APP_BASE_URL || '(missing)'}`);
-  console.log(`  - SENDGRID_API_KEY: ${process.env.SENDGRID_API_KEY ? 'loaded' : '(missing)'}`);
-  console.log(`  - EMAIL_FROM: ${process.env.EMAIL_FROM || '(missing)'}`);
-  console.log(`Available endpoints:`);
-  console.log(`  - POST   /api/auth/register (public)`);
-  console.log(`  - POST   /api/auth/login (public)`);
-  console.log(`  - GET    /api/auth/me (protected)`);
-  console.log(`  - GET    /api/health (public)`);
-  console.log(`  - POST   /api/assets (protected)`);
-  console.log(`  - GET    /api/assets (protected)`);
-  console.log(`  - PATCH  /api/assets/:id (protected)`);
-  console.log(`  - DELETE /api/assets/:id (protected)`);
-  console.log(`  - POST   /api/executors (protected)`);
-  console.log(`  - GET    /api/executors (protected)`);
-  console.log(`  - GET    /api/executors/verify?token=... (public)`);
-  console.log(`  - POST   /api/executors/:id/resend-verification (protected)`);
-  console.log(`  - POST   /api/executor/login (public with strict executor checks)`);
-  console.log(`  - POST   /api/executor/register (public token-based registration)`);
-  console.log(`  - GET    /api/executor/assets (executor protected)`);
-  console.log(`  - GET    /api/generate-will (protected)`);
+  console.log(`[Email] ${process.env.SENDGRID_API_KEY ? 'SendGrid key loaded' : 'SENDGRID_API_KEY missing'}; from ${process.env.EMAIL_FROM || '(missing)'}`);
   
   // Start dead man's switch scheduler asynchronously (non-blocking)
   setImmediate(() => {

@@ -6,12 +6,6 @@ const pool = require('../db');
 
 router.use(authMiddleware);
 
-// Debug middleware to log all authenticated requests to this router
-router.use((req, res, next) => {
-  console.log('[WILL_ROUTES] Incoming request:', req.method, req.path, 'userId:', req.userId);
-  next();
-});
-
 router.get('/generate-will', generateWill);
 router.get('/download-will/:willId', downloadWill);
 router.get('/will-content', getWillContent);
@@ -23,7 +17,6 @@ router.post('/will-content', updateWillContent);
  */
 router.get('/will', async (req, res) => {
   try {
-    console.log('[WILL_ROUTE] GET /will handler called for userId:', req.userId);
     const userId = req.userId;
     
     const { rows } = await pool.query(
@@ -33,8 +26,6 @@ router.get('/will', async (req, res) => {
        LIMIT 1`,
       [userId]
     );
-
-    console.log('[WILL_ROUTE] Query returned', rows.length, 'rows');
 
     if (rows.length === 0) {
       return res.status(200).json({

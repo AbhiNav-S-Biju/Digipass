@@ -2,7 +2,7 @@ const pool = require('../db');
 const { hashPassword, comparePassword } = require('../utils/bcrypt');
 const { generateToken, generateExecutorToken } = require('../utils/jwt');
 const { generateVerificationToken, hashVerificationToken, getVerificationExpiryDate } = require('../utils/executorVerification');
-const { getExecutorVerificationUrl } = require('../utils/qrCode');
+const { generateExecutorVerificationQR, getExecutorVerificationUrl } = require('../utils/qrCode');
 const { sendExecutorVerificationEmail } = require('../utils/mailer');
 const { errors } = require('../utils/errorHandler');
 const { validateEmail, validateName, validatePassword, validatePhone } = require('../utils/validation');
@@ -92,9 +92,7 @@ async function addExecutor(req, res, next) {
     );
 
     const executor = rows[0];
-    console.log('[Executor Controller] Executor created in database');
-    console.log(`  - executor_id: ${executor.executor_id}`);
-    console.log(`  - verification link will be sent to: ${executor.executor_email}`);
+    console.log(`[Executor] Created ${executor.executor_id} for ${executor.executor_email}`);
     
     // Log activity
     await logActivity(
@@ -105,39 +103,35 @@ async function addExecutor(req, res, next) {
       executor.executor_id
     );
     
-    // Send email asynchronously (non-blocking)
-    // If email fails, executor is still created - they can use the fallback URL
-    console.log('[Executor Controller] Queuing email to send in background...');
-    setImmediate(async () => {
-      try {
-        console.log('[Executor Controller] [Background] Calling sendExecutorVerificationEmail...');
-        const delivery = await sendExecutorVerificationEmail({
-          executorName: executor.executor_name,
-          executorEmail: executor.executor_email,
-          token: verificationToken
-        });
-
-        console.log('[Executor Controller] [Background] Email sent successfully');
-        console.log(`  - delivered: ${delivery.delivered}`);
-        console.log(`  - messageId: ${delivery.messageId || '(none)'}`);
-      } catch (mailError) {
-        // Email failed but executor was created successfully
-        // This is not a critical error - the verification link is still valid
-        console.warn('[Executor Controller] [Background] Email sending failed (non-critical)');
-        console.warn(`  - executor_id: ${executor.executor_id}`);
-        console.warn(`  - executor_email: ${executor.executor_email}`);
-        console.warn(`  - message: ${mailError.message}`);
-        console.warn(`  - code: ${mailError.code || '(none)'}`);
-        console.warn(`  - fallback: verification URL is logged above and available via API response`);
-      }
-    });
+    let emailDelivery;
+    try {
+      emailDelivery = await sendExecutorVerificationEmail({
+        executorName: executor.executor_name,
+        executorEmail: executor.executor_email,
+        token: verificationToken
+      });
+    } catch (mailError) {
+      emailDelivery = {
+        delivered: false,
+        reason: mailError.response?.body?.errors?.[0]?.message || mailError.message,
+        verificationUrl: getExecutorVerificationUrl(verificationToken)
+      };
+    }
 
     return res.status(201).json({
       success: true,
-      message: 'Executor added successfully. Verification email sent.',
+      message: emailDelivery.delivered
+        ? 'Executor added successfully. Verification email sent.'
+        : 'Executor added successfully, but the verification email was not sent.',
       data: {
         ...buildExecutorResponse(executor),
-        verification_email_sent: true
+        verification_email_sent: emailDelivery.delivered,
+        email_delivery: {
+          delivered: emailDelivery.delivered,
+          message_id: emailDelivery.messageId || null,
+          reason: emailDelivery.reason || null
+        },
+        verification_preview_url: process.env.NODE_ENV === 'development' ? emailDelivery.verificationUrl : undefined
       }
     });
   } catch (error) {

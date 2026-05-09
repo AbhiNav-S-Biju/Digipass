@@ -8,6 +8,13 @@ let executorsState = {
   loaded: false
 };
 
+const DASHBOARD_DEBUG = false;
+function dashboardDebug(...args) {
+  if (DASHBOARD_DEBUG) {
+    console.log(...args);
+  }
+}
+
 // Platform icon mapping
 const PLATFORM_ICONS = {
   'Instagram': 'fab fa-instagram',
@@ -66,13 +73,13 @@ function initDashboard() {
   const navLinks = document.querySelectorAll('a[data-page]');
   const pages = document.querySelectorAll('.page');
 
-  console.log('[Dashboard Init] Found navLinks:', navLinks.length, 'pages:', pages.length);
+  dashboardDebug('[Dashboard Init] Found navLinks:', navLinks.length, 'pages:', pages.length);
 
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const pageName = link.dataset.page;
-      console.log('[Link Click] Navigating to:', pageName);
+      dashboardDebug('[Link Click] Navigating to:', pageName);
       navigateToPage(pageName);
     });
   });
@@ -80,7 +87,7 @@ function initDashboard() {
   // Also listen for hash changes (for anchor links and back button)
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.slice(1); // Remove the # symbol
-    console.log('[Hash Change] New hash:', hash);
+    dashboardDebug('[Hash Change] New hash:', hash);
     if (hash) {
       navigateToPage(hash);
     }
@@ -88,7 +95,7 @@ function initDashboard() {
 
   // Load initial page from hash on page load
   const initialHash = window.location.hash.slice(1);
-  console.log('[Dashboard Init] Initial hash:', initialHash);
+  dashboardDebug('[Dashboard Init] Initial hash:', initialHash);
   if (initialHash) {
     navigateToPage(initialHash);
   }
@@ -96,36 +103,36 @@ function initDashboard() {
 
 // Navigate to a specific page
 function navigateToPage(pageName) {
-  console.log('[navigateToPage]', pageName);
+  dashboardDebug('[navigateToPage]', pageName);
   
   const navLinks = document.querySelectorAll('a[data-page]');
   const pages = document.querySelectorAll('.page');
 
-  console.log('[navigateToPage] Total pages:', pages.length);
+  dashboardDebug('[navigateToPage] Total pages:', pages.length);
 
   // Remove active class from all links and pages
   navLinks.forEach(l => l.classList.remove('active'));
   pages.forEach(p => {
     p.classList.remove('active');
-    console.log('[navigateToPage] Removed active from:', p.id);
+    dashboardDebug('[navigateToPage] Removed active from:', p.id);
   });
 
   // Find and activate the link and page for this pageName
   const activeLink = document.querySelector(`a[data-page="${pageName}"]`);
   if (activeLink) {
-    console.log('[navigateToPage] Found link for:', pageName);
+    dashboardDebug('[navigateToPage] Found link for:', pageName);
     activeLink.classList.add('active');
   } else {
-    console.log('[navigateToPage] NO LINK FOUND for:', pageName);
+    dashboardDebug('[navigateToPage] NO LINK FOUND for:', pageName);
   }
 
   const targetPageId = `${pageName}Page`;
   const targetPage = document.getElementById(targetPageId);
   if (targetPage) {
-    console.log('[navigateToPage] Found page:', targetPageId, '- adding active class');
+    dashboardDebug('[navigateToPage] Found page:', targetPageId, '- adding active class');
     targetPage.classList.add('active');
   } else {
-    console.log('[navigateToPage] NO PAGE FOUND with ID:', targetPageId);
+    dashboardDebug('[navigateToPage] NO PAGE FOUND with ID:', targetPageId);
   }
 
   // Close navbar menu on mobile using Bootstrap method
@@ -139,7 +146,7 @@ function navigateToPage(pageName) {
   }
 
   // Load page data
-  console.log('[navigateToPage] Loading data for:', pageName);
+  dashboardDebug('[navigateToPage] Loading data for:', pageName);
   loadPageData(pageName);
 }
 
@@ -1011,7 +1018,11 @@ async function handleExecutorSubmit(event) {
     updateExecutorCount();
 
     event.target.reset();
-    showNotification(`Executor added successfully. Verification email sent to ${response.data.executor_email}`, 'success');
+    if (response.data.verification_email_sent) {
+      showNotification(`Executor added successfully. Verification email sent to ${response.data.executor_email}`, 'success');
+    } else {
+      showNotification(`Executor added, but email was not sent: ${response.data.email_delivery?.reason || 'check SendGrid settings'}`, 'error', 7000);
+    }
     
     // Update dashboard widgets to reflect the new executor
     if (window.updateDashboardWidgets) {
@@ -1159,9 +1170,9 @@ async function handleGrantAccess(button) {
   try {
     const response = await apiCall(`/executors/${executorId}/grant-access`, 'PATCH');
 
-    console.log('[Dashboard] Grant Access Response:', response);
-    console.log('[Dashboard] Response data:', response.data);
-    console.log('[Dashboard] Access granted:', response.data?.access_granted);
+    dashboardDebug('[Dashboard] Grant Access Response:', response);
+    dashboardDebug('[Dashboard] Response data:', response.data);
+    dashboardDebug('[Dashboard] Access granted:', response.data?.access_granted);
 
     // Update state
     const executorIndex = executorsState.items.findIndex(
@@ -1169,7 +1180,7 @@ async function handleGrantAccess(button) {
     );
     if (executorIndex !== -1) {
       executorsState.items[executorIndex] = response.data;
-      console.log('[Dashboard] Updated executor in state:', executorsState.items[executorIndex]);
+      dashboardDebug('[Dashboard] Updated executor in state:', executorsState.items[executorIndex]);
     }
 
     renderExecutors();
@@ -1435,4 +1446,3 @@ async function updateCheckInterval(event) {
     submitBtn.textContent = originalText;
   }
 }
-
