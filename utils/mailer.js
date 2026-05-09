@@ -5,7 +5,7 @@ let sendgridInitialized = false;
 function getExecutorVerificationUrl(token) {
   // Use FRONTEND_URL for frontend file, fallback to APP_BASE_URL for local dev
   const frontendUrl = process.env.FRONTEND_URL || process.env.APP_BASE_URL || 'http://localhost:3000';
-  return `${frontendUrl}/executor-verify.html?token=${encodeURIComponent(token)}`;
+  return `${frontendUrl}/executor-register.html?token=${encodeURIComponent(token)}`;
 }
 
 function initSendGrid() {
