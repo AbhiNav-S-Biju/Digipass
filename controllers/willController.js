@@ -69,7 +69,7 @@ async function generateWill(req, res, next) {
       });
     }
 
-    const [userResult, assetsResult, executorsResult] = await Promise.all([
+    const [userResult, assetsResult, executorsResult, customContentResult] = await Promise.all([
       pool.query(
         `SELECT user_id, full_name, email
          FROM users
@@ -91,6 +91,13 @@ async function generateWill(req, res, next) {
          WHERE user_id = $1
          ORDER BY created_at DESC`,
         [userId]
+      ),
+      pool.query(
+        `SELECT custom_content FROM digital_will
+         WHERE user_id = $1
+         ORDER BY created_at DESC
+         LIMIT 1`,
+        [userId]
       )
     ]);
 
@@ -104,6 +111,7 @@ async function generateWill(req, res, next) {
     const user = userResult.rows[0];
     const assets = assetsResult.rows;
     const executors = executorsResult.rows;
+    const customContent = customContentResult.rows.length > 0 ? customContentResult.rows[0].custom_content : null;
     const actions = buildActions(user, assets, executors);
 
     const willDirectory = path.join(process.cwd(), 'generated-wills');
@@ -120,7 +128,8 @@ async function generateWill(req, res, next) {
       user,
       assets,
       executors,
-      actions
+      actions,
+      customContent
     });
 
     await ensureDigitalWillTable();

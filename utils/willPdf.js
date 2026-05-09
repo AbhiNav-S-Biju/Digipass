@@ -551,6 +551,24 @@ function drawInstructionsSection(doc, user, assets, executors, y) {
   return currentY;
 }
 
+function drawCustomContentSection(doc, customContent, y) {
+  if (!customContent || customContent.trim().length === 0) {
+    return y;
+  }
+
+  const margin = 48;
+  const contentX = margin + 15;
+  const maxWidth = 490;
+
+  doc.font('Helvetica-Bold').fontSize(10).fillColor(COLORS.textDark);
+  doc.text(customContent, contentX, y, { 
+    width: maxWidth,
+    align: 'left'
+  });
+
+  return doc.y + 15;
+}
+
 function drawDeclarationSection(doc, user, y) {
   const margin = 48;
   const contentX = margin + 15;
@@ -628,7 +646,7 @@ function drawFooter(doc, user) {
   doc.text('Page 1 of 1', pageWidth - margin - 100, footerY, { width: 100, align: 'right' });
 }
 
-function generateWillPdf({ outputPath, user, assets, executors, actions }) {
+function generateWillPdf({ outputPath, user, assets, executors, actions, customContent }) {
   return new Promise((resolve, reject) => {
     try {
       ensureDirectory(path.dirname(outputPath));
@@ -713,8 +731,21 @@ function generateWillPdf({ outputPath, user, assets, executors, actions }) {
         doc.addPage();
         currentY = 48;
       }
+
+      // Draw custom content section if available
+      if (customContent && customContent.trim().length > 0) {
+        currentY = drawSectionTitle(doc, 5, 'CUSTOM WILL CONTENT', currentY);
+        currentY = drawCustomContentSection(doc, customContent, currentY);
+        
+        currentY += 15;
+        
+        if (currentY > 550) {
+          doc.addPage();
+          currentY = 48;
+        }
+      }
       
-      currentY = drawSectionTitle(doc, 5, 'DECLARATION & SIGNATURE', currentY);
+      currentY = drawSectionTitle(doc, customContent ? 6 : 5, 'DECLARATION & SIGNATURE', currentY);
       currentY = drawDeclarationSection(doc, user, currentY);
       
       currentY += 15;
