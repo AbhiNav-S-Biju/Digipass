@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { startDeadMansSwitchScheduler } = require('./utils/deadMansSwitchScheduler');
-const { initResend } = require('./utils/mailer');
+const { initSendGrid } = require('./utils/mailer');
 const { errorHandler } = require('./utils/errorHandler');
 const { logApiRequest } = require('./utils/logger');
 const { createApiRateLimiter, createAuthRateLimiter } = require('./utils/rateLimiter');
@@ -160,12 +160,12 @@ app.listen(PORT, () => {
   console.log(`✅ DIGIPASS API running on port ${PORT}`);
   console.log(`📋 PDF Generation Engine: Enhanced Layout v1.1`);
   
-  // Initialize Resend for email
-  initResend();
+  // Initialize SendGrid for email
+  initSendGrid();
   
   console.log('[Email Debug] Environment loaded:');
   console.log(`  - APP_BASE_URL: ${process.env.APP_BASE_URL || '(missing)'}`);
-  console.log(`  - RESEND_API_KEY: ${process.env.RESEND_API_KEY ? 'loaded' : '(missing)'}`);
+  console.log(`  - SENDGRID_API_KEY: ${process.env.SENDGRID_API_KEY ? 'loaded' : '(missing)'}`);
   console.log(`  - EMAIL_FROM: ${process.env.EMAIL_FROM || '(missing)'}`);
   console.log(`Available endpoints:`);
   console.log(`  - POST   /api/auth/register (public)`);

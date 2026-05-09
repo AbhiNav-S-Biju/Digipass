@@ -1,6 +1,6 @@
-const { Resend } = require('resend');
+const sgMail = require('@sendgrid/mail');
 
-let resend = null;
+let sendgridInitialized = false;
 
 function getExecutorVerificationUrl(token) {
   // Use FRONTEND_URL for frontend file, fallback to APP_BASE_URL for local dev
@@ -8,29 +8,30 @@ function getExecutorVerificationUrl(token) {
   return `${frontendUrl}/executor-verify.html?token=${encodeURIComponent(token)}`;
 }
 
-function initResend() {
-  const apiKey = process.env.RESEND_API_KEY;
+function initSendGrid() {
+  const apiKey = process.env.SENDGRID_API_KEY;
   if (!apiKey) {
-    console.warn('[Mailer] RESEND_API_KEY not configured. Email will not be sent.');
+    console.warn('[Mailer] SENDGRID_API_KEY not configured. Email will not be sent.');
     return false;
   }
   
-  resend = new Resend(apiKey);
-  console.log('[Mailer] Resend initialized successfully');
+  sgMail.setApiKey(apiKey);
+  sendgridInitialized = true;
+  console.log('[Mailer] SendGrid initialized successfully');
   return true;
 }
 
 async function sendExecutorVerificationEmail({ executorName, executorEmail, token }) {
   const verificationUrl = getExecutorVerificationUrl(token);
-  const fromAddress = process.env.EMAIL_FROM || 'onboarding@resend.dev';
+  const fromAddress = process.env.EMAIL_FROM || 'noreply@digipass.com';
 
-  console.log('[Mailer] Preparing executor verification email via Resend...');
+  console.log('[Mailer] Preparing executor verification email via SendGrid...');
   console.log(`  - to: ${executorEmail}`);
   console.log(`  - from: ${fromAddress}`);
   console.log(`  - verificationUrl: ${verificationUrl}`);
 
-  if (!process.env.RESEND_API_KEY || !resend) {
-    console.warn('[Mailer Fallback] Resend not configured. Logging invite link instead.');
+  if (!process.env.SENDGRID_API_KEY || !sendgridInitialized) {
+    console.warn('[Mailer Fallback] SendGrid not configured. Logging invite link instead.');
     console.log(`  - invite link: ${verificationUrl}`);
     return {
       delivered: false,
@@ -39,10 +40,10 @@ async function sendExecutorVerificationEmail({ executorName, executorEmail, toke
   }
 
   try {
-    console.log('[Mailer] Sending executor verification email via Resend...');
-    const response = await resend.emails.send({
-      from: fromAddress,
+    console.log('[Mailer] Sending executor verification email via SendGrid...');
+    const msg = {
       to: executorEmail,
+      from: fromAddress,
       subject: 'DIGIPASS Executor Invitation',
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
@@ -60,31 +61,27 @@ async function sendExecutorVerificationEmail({ executorName, executorEmail, toke
           <p>This link expires in 24 hours.</p>
         </div>
       `
-    });
+    };
 
-    if (response.error) {
-      console.error('[Mailer] Email send failed via Resend');
-      console.error(`  - error: ${response.error.message}`);
-      throw new Error(response.error.message);
-    }
+    const response = await sgMail.send(msg);
     
-    console.log('[Mailer] Email sent successfully via Resend');
-    console.log(`  - messageId: ${response.data.id}`);
+    console.log('[Mailer] Email sent successfully via SendGrid');
+    console.log(`  - status: ${response[0].statusCode}`);
 
     return {
       delivered: true,
       verificationUrl,
-      messageId: response.data.id
+      messageId: response[0].headers['x-message-id']
     };
   } catch (error) {
-    console.error('[Mailer] Email send failed via Resend');
+    console.error('[Mailer] Email send failed via SendGrid');
     console.error(`  - message: ${error.message}`);
     throw error;
   }
 }
 
 module.exports = {
-  initResend,
+  initSendGrid,
   getExecutorVerificationUrl,
   sendExecutorVerificationEmail
 };
