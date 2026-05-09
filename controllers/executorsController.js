@@ -2,7 +2,7 @@ const pool = require('../db');
 const { hashPassword, comparePassword } = require('../utils/bcrypt');
 const { generateToken, generateExecutorToken } = require('../utils/jwt');
 const { generateVerificationToken, hashVerificationToken, getVerificationExpiryDate } = require('../utils/executorVerification');
-const { generateExecutorVerificationQR, getExecutorVerificationUrl } = require('../utils/qrCode');
+const { getExecutorVerificationUrl } = require('../utils/qrCode');
 const { sendExecutorVerificationEmail } = require('../utils/mailer');
 const { errors } = require('../utils/errorHandler');
 const { validateEmail, validateName, validatePassword, validatePhone } = require('../utils/validation');
@@ -105,19 +105,6 @@ async function addExecutor(req, res, next) {
       executor.executor_id
     );
     
-    const fallbackVerificationUrl = getExecutorVerificationUrl(verificationToken);
-
-    // Generate QR code for verification
-    let qrCodeDataUrl = null;
-    try {
-      console.log('[Executor Controller] Generating QR code...');
-      qrCodeDataUrl = await generateExecutorVerificationQR(verificationToken);
-      console.log('[Executor Controller] QR code generated successfully');
-    } catch (qrError) {
-      console.warn('[Executor Controller] QR code generation failed (non-critical)');
-      console.warn(`  - error: ${qrError.message}`);
-    }
-
     // Send email asynchronously (non-blocking)
     // If email fails, executor is still created - they can use the fallback URL
     console.log('[Executor Controller] Queuing email to send in background...');
@@ -147,12 +134,10 @@ async function addExecutor(req, res, next) {
 
     return res.status(201).json({
       success: true,
-      message: 'Executor added successfully. Share the QR code below.',
+      message: 'Executor added successfully. Verification email sent.',
       data: {
         ...buildExecutorResponse(executor),
-        verification_qr_code: qrCodeDataUrl,
-        verification_link: fallbackVerificationUrl,
-        verification_email_sent: 'pending'
+        verification_email_sent: true
       }
     });
   } catch (error) {
