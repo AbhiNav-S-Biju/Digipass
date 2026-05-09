@@ -493,7 +493,9 @@ function bindAssetActions() {
     });
   });
 
-  document.getElementById('assetsList').addEventListener('click', handleAssetDelete);
+  // Use event delegation for asset list actions (edit and delete)
+  const assetsList = document.getElementById('assetsList');
+  assetsList.addEventListener('click', handleAssetListClick);
 }
 
 // Update available action buttons based on selected platform
@@ -689,27 +691,35 @@ async function handleAssetSubmit(event) {
   }
 }
 
-async function handleAssetDelete(event) {
-  const deleteButton = event.target.closest('[data-delete-id]');
-  if (!deleteButton) {
+async function handleAssetListClick(event) {
+  // Handle edit button click
+  const editButton = event.target.closest('[data-edit-id]');
+  if (editButton) {
+    event.preventDefault();
+    const assetId = editButton.dataset.editId;
+    openEditAssetModal(assetId);
     return;
   }
 
-  const assetId = deleteButton.dataset.deleteId;
-  deleteButton.disabled = true;
-  deleteButton.textContent = 'Deleting...';
+  // Handle delete button click
+  const deleteButton = event.target.closest('[data-delete-id]');
+  if (deleteButton) {
+    const assetId = deleteButton.dataset.deleteId;
+    deleteButton.disabled = true;
+    deleteButton.textContent = 'Deleting...';
 
-  try {
-    await apiCall(`/assets/${assetId}`, 'DELETE');
+    try {
+      await apiCall(`/assets/${assetId}`, 'DELETE');
 
-    assetsState.items = assetsState.items.filter((asset) => String(asset.asset_id) !== String(assetId));
-    renderAssets();
-    updateAssetCount();
-    showNotification('Asset deleted successfully.', 'success');
-  } catch (error) {
-    deleteButton.disabled = false;
-    deleteButton.textContent = 'Delete';
-    showNotification(error.message || 'Failed to delete asset', 'error');
+      assetsState.items = assetsState.items.filter((asset) => String(asset.asset_id) !== String(assetId));
+      renderAssets();
+      updateAssetCount();
+      showNotification('Asset deleted successfully.', 'success');
+    } catch (error) {
+      deleteButton.disabled = false;
+      deleteButton.textContent = 'Delete';
+      showNotification(error.message || 'Failed to delete asset', 'error');
+    }
   }
 }
 
@@ -768,18 +778,7 @@ function renderAssets() {
   }).join('');
 
   // Bind edit and delete buttons after rendering
-  bindAssetEditHandlers();
-}
-
-function bindAssetEditHandlers() {
-  const editButtons = document.querySelectorAll('[data-edit-id]');
-  editButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      const assetId = button.dataset.editId;
-      openEditAssetModal(assetId);
-    });
-  });
+  // (Note: edit handler uses event delegation, no need to rebind)
 }
 
 function updateAssetCount() {
@@ -1054,28 +1053,33 @@ function getExecutorActionButtons(executor) {
   `;
 }
 
+async function executorClickHandler(e) {
+  const grantButton = e.target.closest('[data-grant-id]');
+  if (grantButton) {
+    await handleGrantAccess(grantButton);
+    return;
+  }
+
+  const revokeButton = e.target.closest('[data-revoke-id]');
+  if (revokeButton) {
+    await handleRevokeAccess(revokeButton);
+    return;
+  }
+
+  const deleteButton = e.target.closest('[data-delete-id]');
+  if (deleteButton) {
+    await handleDeleteExecutor(deleteButton);
+  }
+}
+
 function bindExecutorButtons() {
   const executorsList = document.getElementById('executorsList');
-
-  // Grant access buttons
-  executorsList.addEventListener('click', async (e) => {
-    const grantButton = e.target.closest('[data-grant-id]');
-    if (grantButton) {
-      await handleGrantAccess(grantButton);
-      return;
-    }
-
-    const revokeButton = e.target.closest('[data-revoke-id]');
-    if (revokeButton) {
-      await handleRevokeAccess(revokeButton);
-      return;
-    }
-
-    const deleteButton = e.target.closest('[data-delete-id]');
-    if (deleteButton) {
-      await handleDeleteExecutor(deleteButton);
-    }
-  });
+  
+  // Remove old listener to prevent duplicate triggers
+  executorsList.removeEventListener('click', executorClickHandler);
+  
+  // Add fresh listener
+  executorsList.addEventListener('click', executorClickHandler);
 }
 
 async function handleGrantAccess(button) {
