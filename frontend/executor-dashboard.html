@@ -1973,7 +1973,7 @@
 
             try {
                 const token = localStorage.getItem('executorToken');
-                const response = await fetch('https://digipass-3l63.onrender.com/api/will/executor/download-will', {
+                const response = await fetch('https://digipass-3l63.onrender.com/api/executor/download-will', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
