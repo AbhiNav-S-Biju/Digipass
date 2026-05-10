@@ -367,9 +367,141 @@ async function downloadWill(req, res, next) {
   }
 }
 
+async function executorDownloadWill(req, res, next) {
+  try {
+    const executorId = req.executorId;
+    const executorEmail = req.executorEmail;
+
+    if (!executorId || !executorEmail) {
+      return res.status(401).json({
+        success: false,
+        message: 'Executor authentication required'
+      });
+    }
+
+    // Get executor info and verify access is granted
+    const { rows: executorRows } = await pool.query(
+      `SELECT executor_id, user_id, access_granted, verification_status
+       FROM executors
+       WHERE executor_id = $1 AND executor_email = $2`,
+      [executorId, executorEmail]
+    );
+
+    if (executorRows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Executor not found'
+      });
+    }
+
+    const executor = executorRows[0];
+
+    // Check if executor has access
+    if (!executor.access_granted) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have access to this will'
+      });
+    }
+
+    const userId = executor.user_id;
+
+    // Get user, assets, executors, and custom content (same as generateWill)
+    const [userResult, assetsResult, executorsResult, customContentResult] = await Promise.all([
+      pool.query(
+        `SELECT user_id, full_name, email
+         FROM users
+         WHERE user_id = $1`,
+        [userId]
+      ),
+      pool.query(
+        `SELECT asset_id, platform_name, category, account_identifier, 
+                account_password, action_type, last_message, created_at
+         FROM digital_assets
+         WHERE user_id = $1
+         ORDER BY created_at DESC`,
+        [userId]
+      ),
+      pool.query(
+        `SELECT executor_id, executor_name, executor_email, executor_phone, 
+                relationship, verification_status, access_granted, created_at
+         FROM executors
+         WHERE user_id = $1
+         ORDER BY created_at DESC`,
+        [userId]
+      ),
+      pool.query(
+        `SELECT custom_content FROM digital_will
+         WHERE user_id = $1
+         ORDER BY created_at DESC
+         LIMIT 1`,
+        [userId]
+      )
+    ]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    const user = userResult.rows[0];
+    const assets = assetsResult.rows;
+    const executors = executorsResult.rows;
+    const customContent = customContentResult.rows.length > 0 ? customContentResult.rows[0].custom_content : null;
+    const actions = buildActions(user, assets, executors);
+
+    const willDirectory = path.join(process.cwd(), 'generated-wills');
+    if (!fs.existsSync(willDirectory)) {
+      fs.mkdirSync(willDirectory, { recursive: true });
+    }
+
+    const fileName = `digital-will-user-${userId}-executor-${executorId}-${Date.now()}.pdf`;
+    const absoluteFilePath = path.join(willDirectory, fileName);
+
+    // Generate PDF
+    await generateWillPdf({
+      outputPath: absoluteFilePath,
+      user,
+      assets,
+      executors,
+      actions,
+      customContent
+    });
+
+    // Send file as attachment
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="digital-will.pdf"');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
+    const fileStream = fs.createReadStream(absoluteFilePath);
+    
+    fileStream.on('error', (error) => {
+      console.error('File stream error:', error);
+      if (!res.headersSent) {
+        res.status(500).json({
+          success: false,
+          message: 'Error reading file'
+        });
+      } else {
+        res.end();
+      }
+    });
+
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error('Executor Download Will Error:', error);
+    next(error);
+  }
+}
+
 module.exports = {
   generateWill,
   downloadWill,
   updateWillContent,
-  getWillContent
+  getWillContent,
+  executorDownloadWill
 };

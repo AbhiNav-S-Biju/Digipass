@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { generateWill, downloadWill, updateWillContent, getWillContent } = require('../controllers/willController');
+const { generateWill, downloadWill, updateWillContent, getWillContent, executorDownloadWill } = require('../controllers/willController');
 const { authenticateToken: authMiddleware } = require('../middleware/auth');
+const { authenticateExecutor } = require('../middleware/executorAuth');
 const pool = require('../db');
+
+// Executor endpoint (must be before authMiddleware)
+router.get('/executor/download-will', authenticateExecutor, executorDownloadWill);
 
 router.use(authMiddleware);
 
