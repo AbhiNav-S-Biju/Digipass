@@ -901,6 +901,39 @@
             font-weight: 600;
         }
 
+        /* Workflow Navigation Buttons */
+        .workflow-nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--cream-light);
+            padding: 10px 14px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .workflow-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .workflow-nav-btn:active {
+            transform: translateY(0);
+        }
+
+        .workflow-nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Right Panel: Preview */
         .workflow-preview-panel {
             background: var(--cream-light);
@@ -1729,6 +1762,17 @@
                         <div id="progressBar" class="progress-fill"></div>
                     </div>
                     <p id="progressText" class="progress-text">Step 1 of 5</p>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <button class="workflow-nav-btn" id="prevStepBtn" onclick="previousStep()" title="Previous step" style="flex: 1;">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <button class="workflow-nav-btn" id="nextStepBtn" onclick="nextStep()" title="Next step" style="flex: 1;">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="workflow-nav-btn" id="doneBtn" onclick="markAsDone()" title="Mark as done" style="flex: 1; background: #10b981; border-color: #10b981;">
+                            <i class="fas fa-check"></i> Done
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -2091,7 +2135,7 @@
                                     <div class="credential-value" style="flex: 1; font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; word-break: break-all;" id="credUsername">
                                         ${account || 'Not provided'}
                                     </div>
-                                    <button class="copy-credential-btn" onclick="copyCredential('credUsername', 'Username copied!')">
+                                    <button class="copy-credential-btn" type="button" onclick="copyUsernameValue('credUsername')" title="Copy username">
                                         <i class="fas fa-copy"></i>
                                     </button>
                                 </div>
@@ -2119,14 +2163,29 @@
                             <div class="credential-item">
                                 <div class="credential-label">PASSWORD</div>
                                 <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div class="credential-value" style="flex: 1; font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; word-break: break-all;" id="${uniqueId}">
+                                    <div class="credential-value" style="flex: 1; font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; word-break: break-all;" id="${uniqueId}" data-actual="${password || ''}">
                                         ${password ? password.replace(/./g, '•') : 'Not provided'}
                                     </div>
-                                    <button class="copy-credential-btn" title="Copy password" onclick="copyCredentialValue('${uniqueId}', '${password || ''}', 'Password copied!')">
+                                    <button class="copy-credential-btn" type="button" onclick="copyPasswordValue('${uniqueId}')" title="Copy password">
                                         <i class="fas fa-copy"></i>
                                     </button>
-                                    <button class="toggle-password-btn" title="Show/Hide password" onclick="togglePasswordVisibility('${uniqueId}', '${password || ''}')">
+                                    <button class="toggle-password-btn" type="button" onclick="togglePasswordDisplay('${uniqueId}')" title="Show/Hide password">
                                         <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } else if (cred.toLowerCase().includes('email') || cred.toLowerCase().includes('username') || cred.toLowerCase().includes('account')) {
+                        const uniqueId = `credUsername_${Date.now()}_${index}`;
+                        html += `
+                            <div class="credential-item">
+                                <div class="credential-label">${cred.toUpperCase()}</div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="credential-value" style="flex: 1; font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; word-break: break-all;" id="${uniqueId}">
+                                        ${account || 'Not provided'}
+                                    </div>
+                                    <button class="copy-credential-btn" type="button" onclick="copyUsernameValue('${uniqueId}')" title="Copy username">
+                                        <i class="fas fa-copy"></i>
                                     </button>
                                 </div>
                             </div>
@@ -2172,7 +2231,7 @@
                     <div style="margin-top: 20px; padding: 14px 16px; background: #dbeafe; border-radius: 10px; border-left: 4px solid #0369a1;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <strong style="color: #0369a1;">📧 Your Message:</strong>
-                            <button class="copy-credential-btn" title="Copy message" onclick="copyCredential('${messageId}', 'Message copied!')">
+                            <button class="copy-credential-btn" type="button" onclick="copyMessageValue('${messageId}')" title="Copy message">
                                 <i class="fas fa-copy"></i> Copy
                             </button>
                         </div>
@@ -2203,20 +2262,49 @@
             });
         }
 
-        function copyCredentialValue(elementId, actualValue, message) {
-            navigator.clipboard.writeText(actualValue).then(() => {
-                showCopyFeedback(message);
+        function copyUsernameValue(elementId) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const text = element.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyFeedback('Username copied!');
             }).catch(err => {
                 console.error('Copy failed:', err);
             });
         }
 
-        function togglePasswordVisibility(elementId, actualValue) {
+        function copyPasswordValue(elementId) {
             const element = document.getElementById(elementId);
             if (!element) return;
             
+            const actualPassword = element.getAttribute('data-actual') || '';
+            navigator.clipboard.writeText(actualPassword).then(() => {
+                showCopyFeedback('Password copied!');
+            }).catch(err => {
+                console.error('Copy failed:', err);
+            });
+        }
+
+        function copyMessageValue(elementId) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const text = element.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyFeedback('Message copied!');
+            }).catch(err => {
+                console.error('Copy failed:', err);
+            });
+        }
+
+        function togglePasswordDisplay(elementId) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const actualPassword = element.getAttribute('data-actual') || '';
             const isHidden = element.textContent.includes('•');
-            element.textContent = isHidden ? actualValue : actualValue.replace(/./g, '•');
+            element.textContent = isHidden ? actualPassword : actualPassword.replace(/./g, '•');
         }
 
         function showCopyFeedback(message) {
@@ -2255,6 +2343,31 @@
             const workflowPanel = document.getElementById('workflowPanel');
             workflowPanel.classList.remove('workflow-panel-visible');
             workflowPanel.classList.add('workflow-panel-hidden');
+        }
+
+        function nextStep() {
+            const activeStep = document.querySelector('.step-item-active');
+            if (!activeStep) return;
+            
+            const nextStepEl = activeStep.nextElementSibling;
+            if (nextStepEl && nextStepEl.classList.contains('step-item')) {
+                nextStepEl.click();
+            }
+        }
+
+        function previousStep() {
+            const activeStep = document.querySelector('.step-item-active');
+            if (!activeStep) return;
+            
+            const prevStepEl = activeStep.previousElementSibling;
+            if (prevStepEl && prevStepEl.classList.contains('step-item')) {
+                prevStepEl.click();
+            }
+        }
+
+        function markAsDone() {
+            closeWorkflow();
+            showCopyFeedback('Workflow completed! ✓');
         }
 
         // Copy text to clipboard (for final messages)
