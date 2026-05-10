@@ -79,6 +79,8 @@ async function authenticateExecutor(req, res, next) {
 
     console.log('[Executor Auth] Authentication successful for executor:', executor.executor_id);
     req.executor = executor;
+    req.executorId = executor.executor_id;
+    req.executorEmail = executor.executor_email;
     req.ownerUserId = executor.user_id;
     next();
   } catch (error) {
