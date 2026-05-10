@@ -2030,7 +2030,7 @@
             `).join('');
             
             // Generate preview for first step
-            renderStepPreview(steps[0], platform, action, password, message);
+            renderStepPreview(steps[0], platform, account, action, password, message);
             
             // Add click handlers to steps
             document.querySelectorAll('.step-item').forEach((stepEl, index) => {
@@ -2043,7 +2043,7 @@
                     
                     // Update preview
                     const stepIndex = parseInt(stepEl.dataset.step);
-                    renderStepPreview(steps[stepIndex], platform, action, password, message);
+                    renderStepPreview(steps[stepIndex], platform, account, action, password, message);
                     
                     // Update progress
                     updateProgress(stepIndex, steps.length);
@@ -2058,7 +2058,7 @@
             workflowPanel.classList.add('workflow-panel-visible');
         }
 
-        function renderStepPreview(step, platform, action, password, message) {
+        function renderStepPreview(step, platform, account, action, password, message) {
             const previewContent = document.getElementById('previewContent');
             
             let html = `
