@@ -647,14 +647,23 @@ async function executorLogin(req, res) {
     // Generate JWT token for executor (includes type: 'executor' for middleware authentication)
     const token = generateExecutorToken(executor);
 
-    return res.status(200).json({
+    const responseData = {
       success: true,
       message: 'Executor login successful',
       data: {
         token,
         executor: buildExecutorResponse(executor)
       }
+    };
+
+    console.log('[Executor Controller] Sending login response:', {
+      has_token: !!token,
+      token_type: typeof token,
+      token_value: token,
+      has_executor: !!responseData.data.executor
     });
+
+    return res.status(200).json(responseData);
   } catch (error) {
     console.error('Executor Login Error:', error);
     return res.status(500).json({

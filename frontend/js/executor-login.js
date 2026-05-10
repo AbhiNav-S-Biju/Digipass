@@ -45,11 +45,24 @@ document.getElementById('executorLoginForm').addEventListener('submit', async (e
       has_token: !!data.data?.token,
       token_type: typeof data.data?.token,
       token_value: data.data?.token,
-      has_executor: !!data.data?.executor
+      has_executor: !!data.data?.executor,
+      full_response: JSON.stringify(data)
     });
 
     if (!response.ok) {
+      console.error('[Executor Login] Response not OK:', data);
       showMessage(data.message || 'Executor login failed', 'error');
+      button.disabled = false;
+      return;
+    }
+
+    if (!data.data || !data.data.token) {
+      console.error('[Executor Login] Token missing from response:', {
+        data_exists: !!data.data,
+        token: data.data?.token,
+        executor: data.data?.executor
+      });
+      showMessage('Login failed: No token received from server', 'error');
       button.disabled = false;
       return;
     }
@@ -63,9 +76,12 @@ document.getElementById('executorLoginForm').addEventListener('submit', async (e
     });
 
     showMessage('Executor access granted. Redirecting...', 'success');
+    
+    // Give user time to see logs before redirect
     setTimeout(() => {
+      console.log('[Executor Login] Redirecting to dashboard');
       window.location.href = 'executor-dashboard.html';
-    }, 1200);
+    }, 3000);
   } catch (error) {
     console.error('Executor login error:', error);
     showMessage('Network error. Please try again.', 'error');
