@@ -382,6 +382,38 @@
             stroke-width: 1.5;
         }
 
+        /* Download Will Button */
+        #downloadWillBtn {
+            background-color: var(--forest-deep) !important;
+            border-color: var(--forest-deep) !important;
+            color: var(--cream-light) !important;
+            font-weight: 600;
+            border-radius: 7px;
+            padding: 0.5rem 1.25rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        #downloadWillBtn:hover {
+            background-color: var(--forest-mid) !important;
+            border-color: var(--forest-mid) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(27, 58, 45, 0.3);
+        }
+
+        #downloadWillBtn:active {
+            transform: translateY(0);
+        }
+
+        #downloadWillBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         /* Empty state */
         .alert-info {
             background-color: var(--cream-light);
