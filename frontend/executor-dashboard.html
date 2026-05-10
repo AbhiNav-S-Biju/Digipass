@@ -1058,6 +1058,38 @@
             border-left: 4px solid var(--forest-deep);
         }
 
+        /* Step Content */
+        .step-content {
+            width: 100%;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--sand-deep);
+        }
+
+        .step-content h4 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0 0 12px 0;
+        }
+
+        .step-content p {
+            font-size: 14px;
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin: 8px 0;
+        }
+
+        .step-content p:first-of-type {
+            margin-top: 0;
+        }
+
+        .step-content p:last-of-type {
+            margin-bottom: 0;
+        }
+
         /* Credentials Section */
         .credentials-section {
             margin-bottom: 20px;
@@ -1853,6 +1885,12 @@
                         }
                     });
                     
+                    // Close workflow panel button
+                    const closeWorkflowBtn = document.querySelector('.workflow-close-btn');
+                    if (closeWorkflowBtn) {
+                        closeWorkflowBtn.addEventListener('click', closeWorkflow);
+                    }
+                    
                     // Update asset count in profile stats
                     document.getElementById('assetCount').textContent = assets.length;
                     
@@ -1878,6 +1916,116 @@
                     emptyState.classList.remove('d-none');
                 }
             }
+        }
+
+        // Workflow Panel Functions
+        function openWorkflowDirect(assetId, platform, account, action, message, password) {
+            const workflowPanel = document.getElementById('workflowPanel');
+            const appName = document.getElementById('appName');
+            const stepsList = document.getElementById('stepsList');
+            const previewContent = document.getElementById('previewContent');
+            
+            // Set app name
+            appName.textContent = platform;
+            
+            // Define steps for the workflow
+            const steps = [
+                {
+                    title: 'Account Info',
+                    icon: 'fa-user',
+                    content: `<div class="step-content">
+                        <h4>${platform}</h4>
+                        <p><strong>Account:</strong> ${account}</p>
+                        <p><strong>Asset ID:</strong> ${assetId}</p>
+                    </div>`
+                },
+                {
+                    title: 'Action Required',
+                    icon: 'fa-tasks',
+                    content: `<div class="step-content">
+                        <h4>Required Action</h4>
+                        <p><strong>Action:</strong> ${action}</p>
+                    </div>`
+                },
+                {
+                    title: 'Login Credentials',
+                    icon: 'fa-key',
+                    content: `<div class="step-content">
+                        <h4>Access Credentials</h4>
+                        ${password ? `<p><strong>Password:</strong> <span style="font-family: monospace; background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">${password.replace(/./g, '•')}</span></p>` : '<p>No password provided</p>'}
+                    </div>`
+                },
+                {
+                    title: 'Instructions',
+                    icon: 'fa-file-alt',
+                    content: `<div class="step-content">
+                        <h4>Special Instructions</h4>
+                        ${message ? `<p>${message}</p>` : '<p>No special instructions provided.</p>'}
+                    </div>`
+                },
+                {
+                    title: 'Completion',
+                    icon: 'fa-check-circle',
+                    content: `<div class="step-content">
+                        <h4>Complete</h4>
+                        <p>You have reviewed all necessary information for this digital asset.</p>
+                        <p>Keep this information secure and use it only as instructed.</p>
+                    </div>`
+                }
+            ];
+            
+            // Generate steps list
+            stepsList.innerHTML = steps.map((step, index) => `
+                <div class="step-item ${index === 0 ? 'step-item-active' : ''}" data-step="${index}">
+                    <div class="step-item-number">${index + 1}</div>
+                    <div class="step-item-content">
+                        <h5>${step.title}</h5>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Set initial preview content
+            previewContent.innerHTML = steps[0].content;
+            
+            // Add click handlers to steps
+            document.querySelectorAll('.step-item').forEach(stepEl => {
+                stepEl.addEventListener('click', () => {
+                    // Update active step
+                    document.querySelectorAll('.step-item').forEach(el => {
+                        el.classList.remove('step-item-active');
+                    });
+                    stepEl.classList.add('step-item-active');
+                    
+                    // Update preview
+                    const stepIndex = parseInt(stepEl.dataset.step);
+                    previewContent.innerHTML = steps[stepIndex].content;
+                    
+                    // Update progress
+                    updateProgress(stepIndex, steps.length);
+                });
+            });
+            
+            // Update initial progress
+            updateProgress(0, steps.length);
+            
+            // Show workflow panel
+            workflowPanel.classList.remove('workflow-panel-hidden');
+            workflowPanel.classList.add('workflow-panel-visible');
+        }
+
+        function updateProgress(currentStep, totalSteps) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const percentage = ((currentStep + 1) / totalSteps) * 100;
+            
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = `Step ${currentStep + 1} of ${totalSteps}`;
+        }
+
+        function closeWorkflow() {
+            const workflowPanel = document.getElementById('workflowPanel');
+            workflowPanel.classList.remove('workflow-panel-visible');
+            workflowPanel.classList.add('workflow-panel-hidden');
         }
 
         // Copy text to clipboard (for final messages)
