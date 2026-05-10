@@ -1645,7 +1645,10 @@
 
         // Check if executor is logged in
         const token = sessionStorage.getItem('executorToken');
+        console.log('[Dashboard] Token from sessionStorage:', token ? 'Present (' + token.substring(0, 20) + '...)' : 'MISSING');
+        
         if (!token) {
+            console.log('[Dashboard] No token found, redirecting to login');
             location.href = 'executor-login.html';
         }
 
@@ -1687,13 +1690,16 @@
         // Load assets
         async function loadAssets() {
             try {
+                console.log('[Dashboard] Loading assets with token:', token ? 'Present' : 'MISSING');
                 const response = await fetch(`${API_URL}/api/executor/assets`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
 
+                console.log('[Dashboard] Assets response status:', response.status);
                 const data = await response.json();
+                console.log('[Dashboard] Assets response data:', data);
 
                 // Handle authentication errors
                 if (response.status === 401) {
