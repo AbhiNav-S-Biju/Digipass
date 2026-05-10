@@ -1191,6 +1191,37 @@
             border-color: var(--forest-deep);
         }
 
+        /* Copy and Toggle Buttons for Workflow */
+        .copy-credential-btn,
+        .toggle-password-btn {
+            padding: 6px 10px;
+            border: 1px solid var(--sand-deep);
+            background: var(--cream-light);
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--forest-deep);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .copy-credential-btn:hover,
+        .toggle-password-btn:hover {
+            background: var(--sand);
+            border-color: var(--forest-deep);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(27, 58, 45, 0.15);
+        }
+
+        .copy-credential-btn:active,
+        .toggle-password-btn:active {
+            transform: translateY(0);
+        }
+
         /* Farewell Message Box */
         .farewell-message-box {
             margin-bottom: 20px;
@@ -2046,6 +2077,30 @@
                         </div>
             `;
             
+            // Add account/username section at the top for first step
+            if (step.stepNumber === 1) {
+                html += `
+                    <div class="credentials-section" style="margin-bottom: 20px;">
+                        <div class="credentials-header">
+                            <i class="fas fa-user"></i> Account Information
+                        </div>
+                        <div class="credentials-body">
+                            <div class="credential-item">
+                                <div class="credential-label">USERNAME / ACCOUNT</div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="credential-value" style="flex: 1; font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; word-break: break-all;" id="credUsername">
+                                        ${account || 'Not provided'}
+                                    </div>
+                                    <button class="copy-credential-btn" onclick="copyCredential('credUsername', 'Username copied!')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
             // Add credentials section if needed
             if (step.credentials && step.credentials.length > 0) {
                 html += `
@@ -2056,13 +2111,23 @@
                         <div class="credentials-body">
                 `;
                 
-                step.credentials.forEach(cred => {
+                step.credentials.forEach((cred, index) => {
                     if (cred.toLowerCase().includes('password')) {
+                        const uniqueId = `credPassword_${Date.now()}_${index}`;
+                        const toggleId = `togglePassword_${Date.now()}_${index}`;
                         html += `
                             <div class="credential-item">
                                 <div class="credential-label">PASSWORD</div>
-                                <div class="credential-value" style="font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; word-break: break-all;">
-                                    ${password ? password : 'Not provided'}
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="credential-value" style="flex: 1; font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; word-break: break-all;" id="${uniqueId}">
+                                        ${password ? password.replace(/./g, '•') : 'Not provided'}
+                                    </div>
+                                    <button class="copy-credential-btn" title="Copy password" onclick="copyCredentialValue('${uniqueId}', '${password || ''}', 'Password copied!')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button class="toggle-password-btn" title="Show/Hide password" onclick="togglePasswordVisibility('${uniqueId}', '${password || ''}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
                                 </div>
                             </div>
                         `;
@@ -2102,11 +2167,17 @@
             
             // Add farewell message section if applicable
             if (step.showFarewellMessage && message) {
+                const messageId = `farewell_${Date.now()}`;
                 html += `
                     <div style="margin-top: 20px; padding: 14px 16px; background: #dbeafe; border-radius: 10px; border-left: 4px solid #0369a1;">
-                        <strong style="color: #0369a1;">📧 Your Message:</strong>
-                        <div style="margin-top: 8px; padding: 10px; background: white; border-radius: 6px; font-style: italic; color: #1f2937;">
-                            "${message}"
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <strong style="color: #0369a1;">📧 Your Message:</strong>
+                            <button class="copy-credential-btn" title="Copy message" onclick="copyCredential('${messageId}', 'Message copied!')">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div style="margin-top: 8px; padding: 10px; background: white; border-radius: 6px; font-style: italic; color: #1f2937; word-break: break-word; white-space: pre-wrap;" id="${messageId}">
+                            ${message}
                         </div>
                     </div>
                 `;
@@ -2118,6 +2189,57 @@
             `;
             
             previewContent.innerHTML = html;
+        }
+
+        function copyCredential(elementId, message) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const text = element.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyFeedback(message);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+            });
+        }
+
+        function copyCredentialValue(elementId, actualValue, message) {
+            navigator.clipboard.writeText(actualValue).then(() => {
+                showCopyFeedback(message);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+            });
+        }
+
+        function togglePasswordVisibility(elementId, actualValue) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const isHidden = element.textContent.includes('•');
+            element.textContent = isHidden ? actualValue : actualValue.replace(/./g, '•');
+        }
+
+        function showCopyFeedback(message) {
+            // Create a temporary notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #10b981;
+                color: white;
+                padding: 12px 16px;
+                border-radius: 6px;
+                font-size: 13px;
+                z-index: 3000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 2000);
         }
 
         function updateProgress(currentStep, totalSteps) {
