@@ -38,6 +38,16 @@ document.getElementById('executorLoginForm').addEventListener('submit', async (e
 
     const data = await response.json();
 
+    console.log('[Executor Login] Login response:', {
+      status: response.status,
+      success: data.success,
+      has_data: !!data.data,
+      has_token: !!data.data?.token,
+      token_type: typeof data.data?.token,
+      token_value: data.data?.token,
+      has_executor: !!data.data?.executor
+    });
+
     if (!response.ok) {
       showMessage(data.message || 'Executor login failed', 'error');
       button.disabled = false;
@@ -46,6 +56,11 @@ document.getElementById('executorLoginForm').addEventListener('submit', async (e
 
     sessionStorage.setItem('executorToken', data.data.token);
     sessionStorage.setItem('executor', JSON.stringify(data.data.executor));
+    
+    console.log('[Executor Login] Stored in sessionStorage:',  {
+      token: sessionStorage.getItem('executorToken'),
+      executor: sessionStorage.getItem('executor')
+    });
 
     showMessage('Executor access granted. Redirecting...', 'success');
     setTimeout(() => {

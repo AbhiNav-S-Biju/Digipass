@@ -14,7 +14,7 @@ const generateToken = (userId) => {
 };
 
 const generateExecutorToken = (executor) => {
-  return jwt.sign(
+  const token = jwt.sign(
     {
       type: 'executor',
       executorId: executor.executor_id,
@@ -24,6 +24,16 @@ const generateExecutorToken = (executor) => {
     JWT_SECRET,
     { expiresIn: '7d' }
   );
+  
+  console.log('[JWT] Generated executor token:', {
+    has_token: !!token,
+    token_length: token?.length,
+    token_preview: token?.substring(0, 20),
+    executorId: executor.executor_id,
+    userId: executor.user_id
+  });
+  
+  return token;
 };
 
 // Verify JWT token
