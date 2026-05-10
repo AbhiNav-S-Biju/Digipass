@@ -945,6 +945,13 @@
             margin: 0;
         }
 
+        .step-description {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
         .step-badge {
             background: var(--sand);
             color: var(--text-dark);
@@ -1704,6 +1711,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/workflow-steps-detailed.js"></script>
     <script>
         const API_URL = 'https://digipass-3l63.onrender.com';
 
@@ -1928,67 +1936,73 @@
             // Set app name
             appName.textContent = platform;
             
-            // Define steps for the workflow
-            const steps = [
-                {
-                    title: 'Account Info',
-                    icon: 'fa-user',
-                    content: `<div class="step-content">
-                        <h4>${platform}</h4>
-                        <p><strong>Account:</strong> ${account}</p>
-                        <p><strong>Asset ID:</strong> ${assetId}</p>
-                    </div>`
-                },
-                {
-                    title: 'Action Required',
-                    icon: 'fa-tasks',
-                    content: `<div class="step-content">
-                        <h4>Required Action</h4>
-                        <p><strong>Action:</strong> ${action}</p>
-                    </div>`
-                },
-                {
-                    title: 'Login Credentials',
-                    icon: 'fa-key',
-                    content: `<div class="step-content">
-                        <h4>Access Credentials</h4>
-                        ${password ? `<p><strong>Password:</strong> <span style="font-family: monospace; background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">${password.replace(/./g, '•')}</span></p>` : '<p>No password provided</p>'}
-                    </div>`
-                },
-                {
-                    title: 'Instructions',
-                    icon: 'fa-file-alt',
-                    content: `<div class="step-content">
-                        <h4>Special Instructions</h4>
-                        ${message ? `<p>${message}</p>` : '<p>No special instructions provided.</p>'}
-                    </div>`
-                },
-                {
-                    title: 'Completion',
-                    icon: 'fa-check-circle',
-                    content: `<div class="step-content">
-                        <h4>Complete</h4>
-                        <p>You have reviewed all necessary information for this digital asset.</p>
-                        <p>Keep this information secure and use it only as instructed.</p>
-                    </div>`
+            // Get workflow data for this platform and action
+            let workflowData = null;
+            let steps = [];
+            
+            if (typeof WORKFLOWS !== 'undefined' && WORKFLOWS[platform] && WORKFLOWS[platform].actions[action]) {
+                workflowData = WORKFLOWS[platform].actions[action];
+                steps = workflowData.steps || [];
+            } else {
+                // Fallback if WORKFLOWS not available
+                steps = [
+                    {
+                        stepNumber: 1,
+                        title: 'Account Information',
+                        description: 'Review account details',
+                        action: `Platform: ${platform} | Account: ${account}`,
+                        credentials: null,
+                        tips: ['Review the account information below']
+                    },
+                    {
+                        stepNumber: 2,
+                        title: 'Action Type',
+                        description: `Action: ${action}`,
+                        action: `Required action on this account: ${action}`,
+                        credentials: null,
+                        tips: ['Proceed with the specified action']
+                    }
+                ];
+                
+                if (password) {
+                    steps.push({
+                        stepNumber: 3,
+                        title: 'Credentials',
+                        description: 'Account credentials',
+                        action: 'Password is provided in this workflow',
+                        credentials: ['password'],
+                        tips: ['Keep credentials secure']
+                    });
                 }
-            ];
+                
+                if (message) {
+                    steps.push({
+                        stepNumber: steps.length + 1,
+                        title: 'Special Instructions',
+                        description: 'Additional information',
+                        action: message,
+                        credentials: null,
+                        tips: ['Follow the instructions provided']
+                    });
+                }
+            }
             
             // Generate steps list
             stepsList.innerHTML = steps.map((step, index) => `
                 <div class="step-item ${index === 0 ? 'step-item-active' : ''}" data-step="${index}">
-                    <div class="step-item-number">${index + 1}</div>
+                    <div class="step-item-number">${step.stepNumber || index + 1}</div>
                     <div class="step-item-content">
                         <h5>${step.title}</h5>
+                        <p>${step.description || ''}</p>
                     </div>
                 </div>
             `).join('');
             
-            // Set initial preview content
-            previewContent.innerHTML = steps[0].content;
+            // Generate preview for first step
+            renderStepPreview(steps[0], platform, action, password, message);
             
             // Add click handlers to steps
-            document.querySelectorAll('.step-item').forEach(stepEl => {
+            document.querySelectorAll('.step-item').forEach((stepEl, index) => {
                 stepEl.addEventListener('click', () => {
                     // Update active step
                     document.querySelectorAll('.step-item').forEach(el => {
@@ -1998,7 +2012,7 @@
                     
                     // Update preview
                     const stepIndex = parseInt(stepEl.dataset.step);
-                    previewContent.innerHTML = steps[stepIndex].content;
+                    renderStepPreview(steps[stepIndex], platform, action, password, message);
                     
                     // Update progress
                     updateProgress(stepIndex, steps.length);
@@ -2011,6 +2025,99 @@
             // Show workflow panel
             workflowPanel.classList.remove('workflow-panel-hidden');
             workflowPanel.classList.add('workflow-panel-visible');
+        }
+
+        function renderStepPreview(step, platform, action, password, message) {
+            const previewContent = document.getElementById('previewContent');
+            
+            let html = `
+                <div class="step-preview-container">
+                    <div class="step-preview-header">
+                        <h3>${step.title}</h3>
+                        <span class="step-badge">Step ${step.stepNumber || 1}</span>
+                    </div>
+                    
+                    <div class="step-details">
+                        <p class="step-description">${step.description || ''}</p>
+                        
+                        <div class="step-action">
+                            <strong>Action:</strong><br>
+                            ${step.action}
+                        </div>
+            `;
+            
+            // Add credentials section if needed
+            if (step.credentials && step.credentials.length > 0) {
+                html += `
+                    <div class="credentials-section">
+                        <div class="credentials-header">
+                            <i class="fas fa-lock"></i> Credentials Required
+                        </div>
+                        <div class="credentials-body">
+                `;
+                
+                step.credentials.forEach(cred => {
+                    if (cred.toLowerCase().includes('password')) {
+                        html += `
+                            <div class="credential-item">
+                                <div class="credential-label">PASSWORD</div>
+                                <div class="credential-value" style="font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; word-break: break-all;">
+                                    ${password ? password : 'Not provided'}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        html += `
+                            <div class="credential-item">
+                                <div class="credential-label">${cred.toUpperCase()}</div>
+                                <div class="credential-value">Required - Provide your own</div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Add tips section
+            if (step.tips && step.tips.length > 0) {
+                html += `
+                    <div style="margin-top: 20px; padding: 14px 16px; background: #fffbeb; border-radius: 10px; border-left: 4px solid #f59e0b;">
+                        <strong style="color: #92400e;">💡 Tips:</strong>
+                        <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                `;
+                
+                step.tips.forEach(tip => {
+                    html += `<li style="color: #92400e; margin-bottom: 6px; font-size: 13px;">${tip}</li>`;
+                });
+                
+                html += `
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            // Add farewell message section if applicable
+            if (step.showFarewellMessage && message) {
+                html += `
+                    <div style="margin-top: 20px; padding: 14px 16px; background: #dbeafe; border-radius: 10px; border-left: 4px solid #0369a1;">
+                        <strong style="color: #0369a1;">📧 Your Message:</strong>
+                        <div style="margin-top: 8px; padding: 10px; background: white; border-radius: 6px; font-style: italic; color: #1f2937;">
+                            "${message}"
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            previewContent.innerHTML = html;
         }
 
         function updateProgress(currentStep, totalSteps) {
