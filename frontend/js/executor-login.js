@@ -67,8 +67,8 @@ document.getElementById('executorLoginForm').addEventListener('submit', async (e
       return;
     }
 
-    sessionStorage.setItem('executorToken', data.data.token);
-    sessionStorage.setItem('executor', JSON.stringify(data.data.executor));
+    localStorage.setItem('executorToken', data.data.token);
+    localStorage.setItem('executor', JSON.stringify(data.data.executor));
     
     console.log('[Executor Login] Stored in sessionStorage:',  {
       token: sessionStorage.getItem('executorToken'),

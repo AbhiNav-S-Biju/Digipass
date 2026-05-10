@@ -252,7 +252,7 @@
 
         if (token) {
             // If token is in URL, set it and prepare form
-            sessionStorage.setItem('executorToken', token);
+            localStorage.setItem('executorToken', token);
             location.href = 'executor-register.html?token=' + token;
         }
 

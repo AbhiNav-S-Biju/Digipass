@@ -529,7 +529,7 @@ function togglePasswordVisibility(fieldId) {
 function openPlatformWithFloatingPopup(platformUrl, platformName) {
     // Pass data via sessionStorage for the instructions window
     sessionStorage.setItem('digipass_asset_id', workflowState.assetId);
-    sessionStorage.setItem('digipass_token', sessionStorage.getItem('executorToken'));
+    sessionStorage.setItem('digipass_token', localStorage.getItem('executorToken'));
     sessionStorage.setItem('digipass_platform_url', platformUrl);
     sessionStorage.setItem('digipass_platform_name', platformName);
     

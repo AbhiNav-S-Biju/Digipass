@@ -100,7 +100,7 @@ async function handlePasswordSetup(event) {
       
       // Store executor token and profile for auto-login
       if (result.data && result.data.token) {
-        sessionStorage.setItem('executorToken', result.data.token);
+        localStorage.setItem('executorToken', result.data.token);
         
         // Store executor profile (without token field)
         const profile = { ...result.data };
