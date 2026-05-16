@@ -118,12 +118,38 @@ router.get('/executor/will/download/:userId', authenticateExecutor, async (req, 
     };
 
     console.log(`[PDF Download] Spawning Python process for PDF generation`);
+    console.log(`[PDF Download] Script path: ${path.join(__dirname, '../generate-will.py')}`);
 
     // Call Python script to generate PDF
-    const pythonProcess = spawn('python', [path.join(__dirname, '../generate-will.py')]);
+    // Try python3 first (standard on Linux), fallback to python
+    let pythonProcess;
+    let pythonCmd = 'python3';
+    
+    try {
+      const scriptPath = path.join(__dirname, '../generate-will.py');
+      pythonProcess = spawn(pythonCmd, [scriptPath]);
+    } catch (spawnError) {
+      console.error('[PDF Download] Failed to spawn python3, trying python');
+      pythonCmd = 'python';
+      pythonProcess = spawn(pythonCmd, [path.join(__dirname, '../generate-will.py')]);
+    }
 
     let pdfBuffer = Buffer.alloc(0);
     let errorOutput = '';
+    let isResponseSent = false;
+
+    // Handle spawn errors
+    pythonProcess.on('error', (err) => {
+      console.error('[PDF Generation] Spawn error:', err);
+      if (!isResponseSent) {
+        isResponseSent = true;
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to spawn PDF generator process',
+          error: err.message
+        });
+      }
+    });
 
     pythonProcess.stdout.on('data', (data) => {
       pdfBuffer = Buffer.concat([pdfBuffer, data]);
@@ -135,18 +161,24 @@ router.get('/executor/will/download/:userId', authenticateExecutor, async (req, 
     });
 
     pythonProcess.on('close', (code) => {
+      if (isResponseSent) {
+        return; // Response already sent
+      }
+
       if (code !== 0) {
         console.error('[PDF Generation] Process exited with code:', code);
         console.error('[PDF Generation] Error output:', errorOutput);
+        isResponseSent = true;
         return res.status(500).json({
           success: false,
-          message: 'Failed to generate PDF',
-          error: errorOutput
+          message: 'PDF generation failed',
+          error: errorOutput || `Process exited with code ${code}`
         });
       }
 
       if (pdfBuffer.length === 0) {
         console.error('[PDF Generation] No PDF data received');
+        isResponseSent = true;
         return res.status(500).json({
           success: false,
           message: 'PDF generation produced no output'
@@ -161,13 +193,42 @@ router.get('/executor/will/download/:userId', authenticateExecutor, async (req, 
       res.setHeader('Content-Disposition', `attachment; filename="Digital_Will_${userId}_${dateStr}.pdf"`);
       res.setHeader('Content-Length', pdfBuffer.length);
       
+      isResponseSent = true;
       // Send the PDF
       res.send(pdfBuffer);
     });
 
+    // Add timeout to prevent hanging
+    const timeout = setTimeout(() => {
+      if (!isResponseSent) {
+        isResponseSent = true;
+        console.error('[PDF Generation] Timeout: Process took too long');
+        pythonProcess.kill();
+        res.status(500).json({
+          success: false,
+          message: 'PDF generation timed out'
+        });
+      }
+    }, 30000); // 30 second timeout
+
+    pythonProcess.on('close', () => {
+      clearTimeout(timeout);
+    });
+
     // Send data to Python process via stdin
-    pythonProcess.stdin.write(JSON.stringify(pdfData));
-    pythonProcess.stdin.end();
+    try {
+      pythonProcess.stdin.write(JSON.stringify(pdfData));
+      pythonProcess.stdin.end();
+    } catch (err) {
+      console.error('[PDF Generation] Error writing to stdin:', err);
+      if (!isResponseSent) {
+        isResponseSent = true;
+        res.status(500).json({
+          success: false,
+          message: 'Failed to send data to PDF generator'
+        });
+      }
+    }
 
   } catch (error) {
     console.error('[PDF Download] Error:', error);

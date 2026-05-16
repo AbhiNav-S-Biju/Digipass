@@ -797,15 +797,30 @@ def generate_pdf(user_data, assets, executors, emergency_contacts=None):
 # ════════════════════════════════════════════════════════════════════════════════
 
 if __name__ == '__main__':
-    # Read JSON from stdin
-    data = json.loads(sys.stdin.read())
-    
-    user_data = data['user']
-    assets = data['assets']
-    executors = data['executors']
-    emergency_contacts = data.get('emergency_contacts', [])
-    
-    pdf_buffer = generate_pdf(user_data, assets, executors, emergency_contacts)
-    
-    # Write PDF to stdout in binary mode
-    sys.stdout.buffer.write(pdf_buffer.getvalue())
+    try:
+        # Read JSON from stdin
+        data = json.loads(sys.stdin.read())
+        
+        user_data = data['user']
+        assets = data['assets']
+        executors = data['executors']
+        emergency_contacts = data.get('emergency_contacts', [])
+        
+        pdf_buffer = generate_pdf(user_data, assets, executors, emergency_contacts)
+        
+        # Write PDF to stdout in binary mode
+        sys.stdout.buffer.write(pdf_buffer.getvalue())
+    except json.JSONDecodeError as e:
+        sys.stderr.write(f'JSON parsing error: {str(e)}\n')
+        sys.exit(1)
+    except KeyError as e:
+        sys.stderr.write(f'Missing required field: {str(e)}\n')
+        sys.exit(1)
+    except ImportError as e:
+        sys.stderr.write(f'Import error (missing dependency): {str(e)}\nInstall reportlab: pip install reportlab\n')
+        sys.exit(1)
+    except Exception as e:
+        sys.stderr.write(f'Unexpected error: {str(e)}\n')
+        import traceback
+        sys.stderr.write(traceback.format_exc() + '\n')
+        sys.exit(1)

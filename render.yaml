@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: digipass
+    env: node
+    plan: free
+    buildCommand: bash build.sh && npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        fromEnv: JWT_SECRET
+      - key: DATABASE_URL
+        fromEnv: DATABASE_URL
