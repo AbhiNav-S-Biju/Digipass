@@ -2529,8 +2529,14 @@
                 if (!response.ok) {
                     try {
                         const error = await response.json();
-                        alert('Error: ' + (error.message || `Failed to download will (${response.status})`));
+                        console.error('[Download] Server error response:', error);
+                        let errorMsg = error.message || `Failed to download will (${response.status})`;
+                        if (error.error) {
+                            errorMsg += ` - ${error.error}`;
+                        }
+                        alert('Error: ' + errorMsg);
                     } catch (e) {
+                        console.error('[Download] Failed to parse error response:', e);
                         alert('Error: Failed to download will (HTTP ' + response.status + ')');
                     }
                     btn.innerHTML = originalText;

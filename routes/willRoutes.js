@@ -44,7 +44,18 @@ router.get('/executor/will/download/:userId', authenticateExecutor, async (req, 
     }
 
     // Fetch user data with assets
-    const user = await getUserWithAssets(userId);
+    let user;
+    try {
+      user = await getUserWithAssets(userId);
+    } catch (dbError) {
+      console.error(`[PDF Download] Database error fetching user ${userId}:`, dbError.message);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to fetch user data',
+        error: process.env.NODE_ENV === 'development' ? dbError.message : undefined
+      });
+    }
+    
     if (!user) {
       console.log(`[PDF Download] User ${userId} not found`);
       return res.status(404).json({
@@ -54,11 +65,23 @@ router.get('/executor/will/download/:userId', authenticateExecutor, async (req, 
     }
 
     // Fetch executors
-    const executors = await getExecutorsByUserId(userId);
+    let executors;
+    try {
+      executors = await getExecutorsByUserId(userId);
+    } catch (dbError) {
+      console.error(`[PDF Download] Database error fetching executors:`, dbError.message);
+      executors = []; // Fallback to empty array
+    }
     console.log(`[PDF Download] Found ${executors.length} executors for user ${userId}`);
 
     // Fetch emergency contacts
-    const emergencyContacts = await getEmergencyContactsByUserId(userId);
+    let emergencyContacts;
+    try {
+      emergencyContacts = await getEmergencyContactsByUserId(userId);
+    } catch (dbError) {
+      console.error(`[PDF Download] Database error fetching emergency contacts:`, dbError.message);
+      emergencyContacts = []; // Fallback to empty array
+    }
     console.log(`[PDF Download] Found ${emergencyContacts.length} emergency contacts`);
 
     // Prepare data for PDF generation
@@ -117,6 +140,11 @@ router.get('/executor/will/download/:userId', authenticateExecutor, async (req, 
       }))
     };
 
+    console.log(`[PDF Download] PDF Data prepared:`);
+    console.log(`[PDF Download]   - User: ${pdfData.user.full_name} (ID: ${pdfData.user.id})`);
+    console.log(`[PDF Download]   - Assets: ${pdfData.assets.length}`);
+    console.log(`[PDF Download]   - Executors: ${pdfData.executors.length}`);
+    console.log(`[PDF Download]   - Emergency Contacts: ${pdfData.emergency_contacts.length}`);
     console.log(`[PDF Download] Spawning Python process for PDF generation`);
     console.log(`[PDF Download] Script path: ${path.join(__dirname, '../generate-will.py')}`);
 
@@ -231,10 +259,14 @@ router.get('/executor/will/download/:userId', authenticateExecutor, async (req, 
     }
 
   } catch (error) {
-    console.error('[PDF Download] Error:', error);
+    console.error('[PDF Download] Unexpected error:', error);
+    console.error('[PDF Download] Error stack:', error.stack);
+    const isDev = process.env.NODE_ENV !== 'production';
     return res.status(500).json({
       success: false,
-      message: 'Failed to process will download'
+      message: 'Failed to process will download',
+      error: isDev ? error.message : undefined,
+      details: isDev ? error.toString() : undefined
     });
   }
 });

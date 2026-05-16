@@ -64,9 +64,11 @@ async function getExecutorsByUserId(userId) {
 
 /**
  * Get emergency contacts for a user
+ * Returns empty array if table doesn't exist
  */
 async function getEmergencyContactsByUserId(userId) {
   try {
+    // Emergency contacts table may not exist, so we handle this gracefully
     const result = await pool.query(
       `SELECT 
         contact_id,
@@ -82,6 +84,11 @@ async function getEmergencyContactsByUserId(userId) {
 
     return result.rows;
   } catch (error) {
+    // If table doesn't exist, just return empty array
+    if (error.message.includes('does not exist') || error.code === '42P01') {
+      console.warn('emergency_contacts table not found, returning empty array');
+      return [];
+    }
     console.error('Error fetching emergency contacts:', error);
     throw error;
   }
