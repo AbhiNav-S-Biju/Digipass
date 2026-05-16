@@ -104,7 +104,7 @@ TOP_MARGIN = 15 * mm
 
 FOOTER_HEIGHT = 11 * mm
 SAFE_BUFFER = 15 * mm
-BOTTOM_LIMIT = 11 * mm
+BOTTOM_LIMIT = 11 * mm + 12 * mm
 
 SECTION_GAP = 8 * mm
 RULE_GAP = 5 * mm
@@ -567,11 +567,11 @@ def draw_page1(c, data, page_data):
     y = PAGE_HEIGHT - 64 * mm
     
     # Preamble
-    y = check_page_break(c, y, 15 * mm, page_data)
+    y = check_page_break(c, y, 35 * mm, page_data)
     y = draw_preamble(c, y, user_data)
     
     # Article I - Testator Identification
-    y = check_page_break(c, y, 8 * mm, page_data)
+    y = check_page_break(c, y, 35 * mm, page_data)
     y = draw_article_heading(c, y, "ARTICLE  I", "TESTATOR IDENTIFICATION")
     y -= SECTION_GAP
     
@@ -616,7 +616,7 @@ def draw_page1(c, data, page_data):
     y -= SECTION_GAP
     
     # Article II - Schedule of Digital Assets
-    y = check_page_break(c, y, 8 * mm, page_data)
+    y = check_page_break(c, y, 35 * mm, page_data)
     y = draw_article_heading(c, y, "ARTICLE  II", "SCHEDULE OF DIGITAL ASSETS")
     y -= SECTION_GAP
     
@@ -634,7 +634,7 @@ def draw_page1(c, data, page_data):
     
     # Asset cards
     for idx, asset in enumerate(assets, 1):
-        y = check_page_break(c, y, 10 * mm, page_data)
+        y = check_page_break(c, y, 18 * mm, page_data)
         y = draw_asset_card(c, ML, y, CW, roman_numeral(idx), asset)
     
     y -= RULE_GAP
@@ -643,7 +643,7 @@ def draw_page1(c, data, page_data):
     
     # Article III - Appointment of Executors
     # Need space for heading + intro paragraph + at least 1 executor
-    y = check_page_break(c, y, 10 * mm, page_data)
+    y = check_page_break(c, y, 55 * mm, page_data)
     y = draw_article_heading(c, y, "ARTICLE  III", "APPOINTMENT OF EXECUTORS")
     y -= SECTION_GAP
     
@@ -662,7 +662,7 @@ def draw_page1(c, data, page_data):
     romans = ['I','II','III','IV','V','VI','VII','VIII','IX','X']
     for i, executor in enumerate(data.get('executors', [])):
         roman = romans[i] if i < len(romans) else str(i+1)
-        y = check_page_break(c, y, 10 * mm, page_data)
+        y = check_page_break(c, y, 19 * mm, page_data)
         y = draw_executor_card(c, ML, y, CW, roman, executor)
 
     y -= 5 * mm
@@ -670,7 +670,7 @@ def draw_page1(c, data, page_data):
     y -= SECTION_GAP
 
     # ── ARTICLE IV: FINAL MESSAGES ──
-    y = check_page_break(c, y, 8 * mm, page_data)
+    y = check_page_break(c, y, 50 * mm, page_data)
     y = draw_article_heading(c, y, "ARTICLE  IV",
         "EXECUTOR INSTRUCTIONS & FINAL MESSAGES")
     y -= SECTION_GAP
@@ -688,6 +688,7 @@ def draw_page1(c, data, page_data):
         msg = (asset.get('final_message') or
                'No final message left.').strip()
         card_h = 20 * mm
+        y = check_page_break(c, y, 22 * mm, page_data)
 
         # Shadow
         c.setFillColor(colors.HexColor('#d4c4a0'))
@@ -753,7 +754,7 @@ def draw_page1(c, data, page_data):
     y -= SECTION_GAP
 
     # ── ARTICLE V: DISCLAIMER ──
-    y = check_page_break(c, y, 8 * mm, page_data)
+    y = check_page_break(c, y, 45 * mm, page_data)
     y = draw_article_heading(c, y, "ARTICLE  V",
         "GOVERNING TERMS AND LEGAL DISCLAIMER")
     y -= SECTION_GAP
@@ -774,7 +775,7 @@ def draw_page1(c, data, page_data):
 
     # Disclaimer card with SAGE left strip
     card_h = 30 * mm
-    y = check_page_break(c, y, 15 * mm, page_data)
+    y = check_page_break(c, y, 32 * mm, page_data)
     c.setFillColor(colors.HexColor('#fdf6ec'))
     c.setStrokeColor(colors.HexColor('#d4c4a0'))
     c.setLineWidth(0.4)
