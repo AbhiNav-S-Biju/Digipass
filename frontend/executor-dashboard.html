@@ -2526,9 +2526,9 @@
                 }
 
                 // Store token temporarily for PdfPreview component
-                localStorage.setItem('token', token);
+                localStorage.setItem('executorToken', token);
                 
-                await PdfPreview.openPreview(userId, 'Digital Will Preview');
+                await PdfPreview.openPreview(userId, 'Digital Will Preview', true);
                 
                 btn.innerHTML = originalText;
                 btn.disabled = false;

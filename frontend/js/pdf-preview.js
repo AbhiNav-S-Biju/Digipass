@@ -8,8 +8,9 @@ const PdfPreview = {
    * Open PDF preview in a modal
    * @param {number} userId - User ID to preview PDF for
    * @param {string} title - Title for the modal
+   * @param {boolean} isExecutor - Whether this is an executor preview
    */
-  async openPreview(userId, title = 'Digital Will Preview') {
+  async openPreview(userId, title = 'Digital Will Preview', isExecutor = false) {
     try {
       // Check for both user and executor tokens
       let token = localStorage.getItem('token') || 
@@ -25,34 +26,44 @@ const PdfPreview = {
       // Show loading modal
       this.showLoadingModal(title);
 
-      // Fetch PDF from backend - try user endpoint first, then executor endpoint
-      let response = await fetch(`https://digipass-3l63.onrender.com/api/will/preview/${userId}`, {
+      // Determine correct endpoint based on token type
+      let endpoint;
+      if (isExecutor || localStorage.getItem('executorToken') || sessionStorage.getItem('executorToken')) {
+        endpoint = `https://digipass-3l63.onrender.com/api/executor/will/preview/${userId}`;
+      } else {
+        endpoint = `https://digipass-3l63.onrender.com/api/will/preview/${userId}`;
+      }
+
+      console.log(`[PDF Preview] Using endpoint: ${endpoint}`);
+
+      // Fetch PDF from backend
+      const response = await fetch(endpoint, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      // If not found, try executor endpoint
-      if (response.status === 404 || response.status === 403) {
-        response = await fetch(`https://digipass-3l63.onrender.com/api/executor/will/download/${userId}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-      }
+      console.log(`[PDF Preview] Response status: ${response.status}`);
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || `Failed to load PDF (${response.status})`);
+        let errorMsg = `Failed to load PDF (${response.status})`;
+        try {
+          const error = await response.json();
+          errorMsg = error.message || errorMsg;
+        } catch (e) {
+          // Response wasn't JSON, use default message
+        }
+        throw new Error(errorMsg);
       }
 
       // Convert response to blob
       const blob = await response.blob();
+      console.log(`[PDF Preview] Blob created: ${blob.size} bytes`);
 
       // Create blob URL (safe way to load PDF)
       const blobUrl = window.URL.createObjectURL(blob);
+      console.log(`[PDF Preview] Blob URL created: ${blobUrl}`);
 
       // Update iframe with blob URL
       const iframe = document.getElementById('pdfPreviewIframe');
@@ -188,7 +199,7 @@ const PdfPreview = {
                 id="pdfPreviewIframe" 
                 style="width: 100%; height: 100%; border: none;" 
                 title="PDF Preview"
-                sandbox="allow-same-origin allow-scripts"
+                sandbox="allow-same-origin"
               ></iframe>
             </div>
             <div class="modal-footer" style="background-color: #f7e7ce; border-top: 1px solid #ddd;">
