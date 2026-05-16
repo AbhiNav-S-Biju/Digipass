@@ -611,7 +611,7 @@ def draw_page2(c, user_data, executors):
     # Execution Statement
     exec_text = (
         f"IN WITNESS WHEREOF, I, {user_data['full_name'].upper()}, the Testator named in this Digital Will "
-        f"and Estate Declaration, have hereunto set my hand and seal to this instrument, on this {datetime.now().strftime('%-d')} day of "
+        f"and Estate Declaration, have hereunto set my hand and seal to this instrument, on this {int(datetime.now().day)} day of "
         f"{datetime.now().strftime('%B')}, in the year {number_to_words(datetime.now().year).replace(' ', '  ')}, "
         f"declaring and publishing this as my Digital Will and Estate Declaration of digital assets, in the presence of the witnesses "
         f"whose signatures appear below, each of whom signed in my presence and in the presence of each other."
