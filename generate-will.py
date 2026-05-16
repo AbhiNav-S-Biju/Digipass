@@ -11,11 +11,14 @@ from datetime import datetime
 from io import BytesIO
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.lib.units import mm, pt
+from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT, TA_JUSTIFY
+
+# pt is the default unit in ReportLab (1 point = 1 unit)
+pt = 1
 
 # ════════════════════════════════════════════════════════════════════════════════
 # COLOR SYSTEM
