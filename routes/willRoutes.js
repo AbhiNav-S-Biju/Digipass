@@ -317,4 +317,208 @@ router.get('/will', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/will/preview/:userId
+ * Generate and serve PDF for inline preview (not download)
+ * Protected by authentication - user can only preview their own will
+ */
+router.get('/preview/:userId', authMiddleware, async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId, 10);
+    const authUserId = req.userId;
+
+    // Security check: user can only preview their own will
+    if (userId !== authUserId) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have permission to preview this will'
+      });
+    }
+
+    if (!userId || isNaN(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID'
+      });
+    }
+
+    console.log(`[PDF Preview] Generating preview for user ${userId}`);
+
+    // Fetch user data with assets
+    let user;
+    try {
+      user = await getUserWithAssets(userId);
+    } catch (dbError) {
+      console.error('[PDF Preview] Database error:', dbError);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to fetch user data'
+      });
+    }
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Get executors
+    const executors = await getExecutorsByUserId(userId);
+    const emergencyContacts = await getEmergencyContactsByUserId(userId);
+
+    // Prepare PDF data
+    const pdfData = {
+      user: {
+        id: user.id,
+        full_name: user.full_name,
+        email: user.email,
+        created_at: user.created_at ? user.created_at.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }) : new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      },
+      assets: user.assets.map((asset) => ({
+        name: asset.name || 'Unnamed Asset',
+        category: asset.category || 'digital',
+        description: asset.description || '',
+        preferred_action: asset.preferred_action || 'manage',
+        final_message: asset.final_message || '',
+        created_at: asset.created_at ? asset.created_at.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }) : new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      })),
+      executors: executors.map(executor => ({
+        name: executor.full_name,
+        email: executor.email,
+        relationship: executor.relationship || '',
+        status: executor.verification_status || 'Pending',
+        access_granted: executor.access_granted || false,
+        created_at: executor.created_at ? executor.created_at.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }) : new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      })),
+      emergency_contacts: emergencyContacts.map(contact => ({
+        name: contact.name,
+        role: contact.role,
+        email: contact.email,
+        phone: contact.phone_number
+      }))
+    };
+
+    console.log(`[PDF Preview] Spawning Python process for PDF generation`);
+
+    // Call Python script to generate PDF
+    let pythonProcess;
+    let pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
+
+    const scriptPath = path.join(__dirname, '../generate-will.py');
+    pythonProcess = spawn(pythonCmd, [scriptPath]);
+
+    let pdfBuffer = Buffer.alloc(0);
+    let errorOutput = '';
+    let isResponseSent = false;
+
+    // Handle spawn errors
+    pythonProcess.on('error', (err) => {
+      console.error('[PDF Generation] Spawn error:', err);
+      if (!isResponseSent) {
+        isResponseSent = true;
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to spawn PDF generator process',
+          error: err.message
+        });
+      }
+    });
+
+    // Send JSON data to Python process
+    pythonProcess.stdin.write(JSON.stringify(pdfData));
+    pythonProcess.stdin.end();
+
+    // Collect PDF output
+    pythonProcess.stdout.on('data', (data) => {
+      pdfBuffer = Buffer.concat([pdfBuffer, data]);
+    });
+
+    // Collect error output
+    pythonProcess.stderr.on('data', (data) => {
+      errorOutput += data.toString();
+    });
+
+    // Handle process completion
+    pythonProcess.on('close', (code) => {
+      if (isResponseSent) return;
+
+      if (code !== 0) {
+        console.error('[PDF Generation] Python process error:', errorOutput);
+        return res.status(500).json({
+          success: false,
+          message: 'PDF generation failed',
+          error: errorOutput.split('\n')[0]
+        });
+      }
+
+      if (pdfBuffer.length === 0) {
+        console.error('[PDF Generation] No PDF generated');
+        return res.status(500).json({
+          success: false,
+          message: 'PDF generation produced no output'
+        });
+      }
+
+      console.log(`[PDF Preview] PDF generated successfully (${pdfBuffer.length} bytes)`);
+
+      // Serve PDF with headers that allow inline viewing
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'inline; filename="digital-will.pdf"');
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+
+      res.send(pdfBuffer);
+    });
+
+    // Set timeout for PDF generation
+    setTimeout(() => {
+      if (!isResponseSent) {
+        isResponseSent = true;
+        pythonProcess.kill();
+        res.status(504).json({
+          success: false,
+          message: 'PDF generation timeout'
+        });
+      }
+    }, 30000); // 30 second timeout
+
+  } catch (error) {
+    console.error('[PDF Preview] Error:', error);
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to generate PDF preview',
+        error: error.message
+      });
+    }
+  }
+});
+
 module.exports = router;
