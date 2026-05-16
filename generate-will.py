@@ -1104,6 +1104,9 @@ def draw_signature_page(c, data, page_data):
             f"digipass.app  ·  Instrument No. {instr}  ·  {date_str}")
     c.drawCentredString(W / 2, y, cert)
     # Footer is handled by PageCountCanvas automatically
+    
+    # Finalize the signature page
+    c.showPage()
 
 def draw_notary_seal(c, cx, cy):
     """Draw notary seal with text inside circle"""
