@@ -290,29 +290,6 @@ async function loadWillData() {
   const generateBtn = document.getElementById('generateWillBtn');
   generateBtn.addEventListener('click', handleGenerateWill);
   
-  // Bind will preview button
-  const previewBtn = document.getElementById('previewWillBtn');
-  if (previewBtn) {
-    previewBtn.addEventListener('click', async () => {
-      const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
-      if (!userId) {
-        alert('User ID not found');
-        return;
-      }
-      try {
-        previewBtn.disabled = true;
-        previewBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-        await PdfPreview.openPreview(userId, 'Digital Will Preview');
-      } catch (error) {
-        console.error('Preview error:', error);
-        alert('Failed to open preview: ' + error.message);
-      } finally {
-        previewBtn.disabled = false;
-        previewBtn.innerHTML = '<i class="fas fa-eye"></i> Preview Will';
-      }
-    });
-  }
-  
   const refreshBtn = document.getElementById('refreshWillBtn');
   refreshBtn.addEventListener('click', loadWillData);
 
