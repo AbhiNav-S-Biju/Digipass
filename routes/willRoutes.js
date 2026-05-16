@@ -140,27 +140,18 @@ router.get('/executor/will/download/:userId', authenticateExecutor, async (req, 
       }))
     };
 
-    console.log(`[PDF Download] PDF Data prepared:`);
-    console.log(`[PDF Download]   - User: ${pdfData.user.full_name} (ID: ${pdfData.user.id})`);
-    console.log(`[PDF Download]   - Assets: ${pdfData.assets.length}`);
-    console.log(`[PDF Download]   - Executors: ${pdfData.executors.length}`);
-    console.log(`[PDF Download]   - Emergency Contacts: ${pdfData.emergency_contacts.length}`);
     console.log(`[PDF Download] Spawning Python process for PDF generation`);
     console.log(`[PDF Download] Script path: ${path.join(__dirname, '../generate-will.py')}`);
 
     // Call Python script to generate PDF
-    // Try python3 first (standard on Linux), fallback to python
+    // Try different ways to invoke Python for maximum compatibility
     let pythonProcess;
-    let pythonCmd = 'python3';
+    let pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
     
-    try {
-      const scriptPath = path.join(__dirname, '../generate-will.py');
-      pythonProcess = spawn(pythonCmd, [scriptPath]);
-    } catch (spawnError) {
-      console.error('[PDF Download] Failed to spawn python3, trying python');
-      pythonCmd = 'python';
-      pythonProcess = spawn(pythonCmd, [path.join(__dirname, '../generate-will.py')]);
-    }
+    console.log(`[PDF Download] Using python command: ${pythonCmd}`);
+    
+    const scriptPath = path.join(__dirname, '../generate-will.py');
+    pythonProcess = spawn(pythonCmd, [scriptPath]);
 
     let pdfBuffer = Buffer.alloc(0);
     let errorOutput = '';
@@ -180,12 +171,14 @@ router.get('/executor/will/download/:userId', authenticateExecutor, async (req, 
     });
 
     pythonProcess.stdout.on('data', (data) => {
+      console.log(`[PDF Generation] Received ${data.length} bytes of data`);
       pdfBuffer = Buffer.concat([pdfBuffer, data]);
     });
 
     pythonProcess.stderr.on('data', (data) => {
-      errorOutput += data.toString();
-      console.error('[PDF Generation] Error:', errorOutput);
+      const errorMsg = data.toString();
+      console.error('[PDF Generation] stderr:', errorMsg);
+      errorOutput += errorMsg;
     });
 
     pythonProcess.on('close', (code) => {
@@ -193,9 +186,11 @@ router.get('/executor/will/download/:userId', authenticateExecutor, async (req, 
         return; // Response already sent
       }
 
+      console.log(`[PDF Generation] Process closed with code: ${code}, buffer size: ${pdfBuffer.length}`);
+
       if (code !== 0) {
         console.error('[PDF Generation] Process exited with code:', code);
-        console.error('[PDF Generation] Error output:', errorOutput);
+        console.error('[PDF Generation] Full error output:', errorOutput);
         isResponseSent = true;
         return res.status(500).json({
           success: false,
@@ -209,7 +204,8 @@ router.get('/executor/will/download/:userId', authenticateExecutor, async (req, 
         isResponseSent = true;
         return res.status(500).json({
           success: false,
-          message: 'PDF generation produced no output'
+          message: 'PDF generation produced no output',
+          error: errorOutput
         });
       }
 
@@ -245,7 +241,9 @@ router.get('/executor/will/download/:userId', authenticateExecutor, async (req, 
 
     // Send data to Python process via stdin
     try {
-      pythonProcess.stdin.write(JSON.stringify(pdfData));
+      const jsonData = JSON.stringify(pdfData);
+      console.log(`[PDF Download] Sending ${jsonData.length} bytes of JSON data to Python`);
+      pythonProcess.stdin.write(jsonData);
       pythonProcess.stdin.end();
     } catch (err) {
       console.error('[PDF Generation] Error writing to stdin:', err);
