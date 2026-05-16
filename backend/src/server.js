@@ -23,8 +23,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes (to be added)
+// Routes
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/will', require('./routes/willRoutes'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
