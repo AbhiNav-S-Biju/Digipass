@@ -102,8 +102,8 @@ CW = MR - ML
 TOP_MARGIN = 15 * mm
 
 FOOTER_HEIGHT = 11 * mm
-FOOTER_SAFE = 18 * mm
-BOTTOM_LIMIT = FOOTER_HEIGHT + FOOTER_SAFE
+SAFE_BUFFER = 15 * mm
+BOTTOM_LIMIT = FOOTER_HEIGHT + SAFE_BUFFER
 
 SECTION_GAP = 8 * mm
 RULE_GAP = 5 * mm
@@ -241,31 +241,48 @@ def draw_page_border_rules(c):
     c.rect(PAGE_WIDTH - 3.5 * mm, 0, 3.5 * mm, PAGE_HEIGHT, fill=1, stroke=0)
 
 def draw_continuation_header(c, page_data):
-    # Forest band (compact 18mm)
-    c.setFillColor(colors.HexColor('#1b3a2d'))
-    c.rect(0, PAGE_HEIGHT - 18 * mm, PAGE_WIDTH, 18 * mm, fill=1, stroke=0)
+    """Draw continuation header with explicit coordinates — NO shared functions"""
+    W = PAGE_WIDTH
+    H = PAGE_HEIGHT
 
-    # SAGE accent line
+    # 1. FOREST band — compact 18mm
+    c.setFillColor(colors.HexColor('#1b3a2d'))
+    c.rect(0, H - 18 * mm, W, 18 * mm, fill=1, stroke=0)
+
+    # 2. SAGE accent line at bottom of band
     c.setStrokeColor(colors.HexColor('#8cbf9c'))
     c.setLineWidth(0.7)
-    c.line(0, PAGE_HEIGHT - 18 * mm, PAGE_WIDTH, PAGE_HEIGHT - 18 * mm)
+    c.line(0, H - 18 * mm, W, H - 18 * mm)
 
-    # Vault icon + wordmark (small)
-    draw_vault_icon(c, ML, PAGE_HEIGHT - 4 * mm, size=16, on_dark=True)
+    # 3. Left border rule (must redraw on new page)
+    c.setFillColor(colors.HexColor('#1b3a2d'))
+    c.rect(0, 0, 3.5 * mm, H, fill=1, stroke=0)
+
+    # 4. Right border rule
+    c.rect(W - 3.5 * mm, 0, 3.5 * mm, H, fill=1, stroke=0)
+
+    # 5. Vault icon — small, inside band
+    draw_vault_icon(c, 6 * mm, H - 3 * mm, size=16, on_dark=True)
+
+    # 6. "Digipass" wordmark — inline, right of icon
     c.setFillColor(colors.HexColor('#fdf6ec'))
-    c.setFont('Helvetica-Bold', 12)
-    c.drawString(ML + 20 * mm, PAGE_HEIGHT - 9 * mm, 'Digipass')
-    c.setFillColor(colors.HexColor('#8cbf9c'))
-    c.setFont('Helvetica', 7)
-    c.drawString(ML + 20 * mm, PAGE_HEIGHT - 13 * mm, 'DIGITAL  ESTATE')
+    c.setFont('Helvetica-Bold', 11)
+    c.drawString(25 * mm, H - 8 * mm, 'Digipass')
 
-    # Right: continued label
-    name = page_data.get('user_name', '').upper()
+    # 7. "DIGITAL ESTATE" tagline — SAME LINE as wordmark
+    c.setFillColor(colors.HexColor('#8cbf9c'))
+    c.setFont('Helvetica', 6.5)
+    c.drawString(25 * mm, H - 13 * mm, 'DIGITAL  ESTATE')
+
+    # 8. Right side: document title + page info
+    name = page_data.get('testator_name', '').upper()
     instr = page_data.get('instrument_no', '')
     c.setFillColor(colors.HexColor('#8cbf9c'))
     c.setFont('Helvetica', 7)
-    c.drawRightString(MR, PAGE_HEIGHT - 9 * mm, f"DIGITAL WILL — {name} (continued)")
-    c.drawRightString(MR, PAGE_HEIGHT - 13 * mm, instr)
+    MR_local = W - 6 * mm
+    c.drawRightString(MR_local, H - 8 * mm,
+        f'DIGITAL WILL — {name} (continued)')
+    c.drawRightString(MR_local, H - 13 * mm, instr)
 
 def check_page_break(c, y, block_height, page_data):
     """Only break if the ENTIRE block won't fit. Don't break for small gaps."""
@@ -666,38 +683,69 @@ def draw_page1(c, data, page_data):
 
     # Final message cards — one per asset
     for asset in data.get('assets', []):
-        msg = asset.get('final_message', '') or 'No final message left.'
-        card_h = 18 * mm
-        y = check_page_break(c, y, card_h + 2 * mm, page_data)
+        msg = (asset.get('final_message') or
+               'No final message left.').strip()
+        card_h = 20 * mm
+        y = check_page_break(c, y, card_h + 3 * mm, page_data)
 
-        # Card background
+        # Shadow
+        c.setFillColor(colors.HexColor('#d4c4a0'))
+        c.roundRect(ML + 0.6 * mm, y - card_h - 0.6 * mm,
+                    CW, card_h, 2 * mm, fill=1, stroke=0)
+
+        # Card
         c.setFillColor(colors.HexColor('#fdf6ec'))
         c.setStrokeColor(colors.HexColor('#d4c4a0'))
         c.setLineWidth(0.4)
-        c.roundRect(ML, y - card_h, CW, card_h, 2 * mm, fill=1, stroke=1)
+        c.roundRect(ML, y - card_h, CW, card_h,
+                    2 * mm, fill=1, stroke=1)
 
         # SAGE left strip
         c.setFillColor(colors.HexColor('#8cbf9c'))
-        c.roundRect(ML, y - card_h, 4 * mm, card_h, 2 * mm, fill=1, stroke=0)
-        c.rect(ML + 2 * mm, y - card_h, 2 * mm, card_h, fill=1, stroke=0)
+        c.roundRect(ML, y - card_h, 5 * mm, card_h,
+                    2 * mm, fill=1, stroke=0)
+        c.rect(ML + 3 * mm, y - card_h, 2 * mm, card_h,
+               fill=1, stroke=0)
 
         # Asset name
         c.setFillColor(colors.HexColor('#1a2e22'))
-        c.setFont('Helvetica-Bold', 9)
-        c.drawString(ML + 7 * mm, y - 5 * mm, truncate(asset.get('name', '').upper(), 30))
+        c.setFont('Helvetica-Bold', 9.5)
+        c.drawString(ML + 8 * mm, y - 6 * mm,
+                     asset.get('name', '').upper())
 
-        # "Final Message:" label
-        c.setFillColor(colors.HexColor('#8a9e90'))
+        # Category badge
+        cat = asset.get('category', '').lower()
+        CAT_COLORS = {
+            'social':  ('#ddeaf5', '#1a4a6e'),
+            'finance': ('#d4ead8', '#1b3a2d'),
+            'storage': ('#f0e6d4', '#7a4f1a'),
+            'email':   ('#ede8f5', '#4a3080'),
+        }
+        badge_bg, badge_fg = CAT_COLORS.get(cat, ('#e8d9c0', '#5a7260'))
+        badge_text = cat.upper() if cat else 'OTHER'
+        badge_w = 18 * mm
+        # Estimate name width to place badge after it
+        name_w = len(asset.get('name','')) * 2 * mm
+        bx = ML + 8 * mm + name_w + 3 * mm
+        c.setFillColor(colors.HexColor(badge_bg))
+        c.roundRect(bx, y - 7.5 * mm, badge_w, 4.2 * mm,
+                    1.2 * mm, fill=1, stroke=0)
+        c.setFillColor(colors.HexColor(badge_fg))
         c.setFont('Helvetica', 6.5)
-        c.drawString(ML + 7 * mm, y - 9.5 * mm, "Final Message:")
+        c.drawString(bx + 2.5 * mm, y - 5.8 * mm, badge_text)
 
-        # Message text (truncated)
-        msg_display = msg[:80] + '…' if len(msg) > 80 else msg
+        # "Final Message" label
+        c.setFillColor(colors.HexColor('#8a9e90'))
+        c.setFont('Helvetica', 7)
+        c.drawString(ML + 8 * mm, y - 11 * mm, 'FINAL MESSAGE')
+
+        # Message text
+        display_msg = msg[:90] + '…' if len(msg) > 90 else msg
         c.setFillColor(colors.HexColor('#5a7260'))
-        c.setFont('Helvetica-Oblique', 8)
-        c.drawString(ML + 7 * mm, y - 13.5 * mm, f'"{msg_display}"')
+        c.setFont('Helvetica-Oblique', 8.5)
+        c.drawString(ML + 8 * mm, y - 15.5 * mm, f'"{display_msg}"')
 
-        y -= card_h + CARD_GAP
+        y -= card_h + 3 * mm
 
     y -= 5 * mm
     draw_rule_dark(c, y)
@@ -744,11 +792,14 @@ def draw_page1(c, data, page_data):
     p.wrapOn(c, CW - 12 * mm, card_h - 6 * mm)
     p.drawOn(c, ML + 8 * mm, y - card_h + 3 * mm)
     
-    # End content pages - trigger page break for signature page
+    # ── END OF CONTENT PAGES ──
     c.showPage()
     page_data['page_num'] += 1
 
-    draw_footer(c, page_data)
+    # ── SIGNATURE PAGE ──
+    draw_page_background(c)
+    draw_left_right_borders(c)
+    draw_signature_page(c, data, page_data)
 
 def draw_asset_card(c, x, y, width, roman, asset):
     card_height = ASSET_CARD_H
@@ -894,6 +945,166 @@ def draw_executor_card(c, x, y, width, roman, executor):
 # PAGE 2 CONTENT
 # ════════════════════════════════════════════════════════════════════════════════
 
+def draw_signature_page(c, data, page_data):
+    """Draw the complete signature and execution page"""
+    W = PAGE_WIDTH
+    H = PAGE_HEIGHT
+    ML_val = 20 * mm
+    MR_val = W - 20 * mm
+    CW_val = MR_val - ML_val
+
+    name = data['user'].get('full_name', '').upper()
+    date_str = data.get('generated_date',
+               datetime.now().strftime('%B %d, %Y'))
+    day = str(datetime.now().day)
+    month = datetime.now().strftime('%B')
+    year_text = 'Two Thousand Twenty Six'
+    instr = page_data.get('instrument_no', '')
+
+    y = H
+
+    # ── 1. HEADER BAND (38mm) ──
+    c.setFillColor(colors.HexColor('#1b3a2d'))
+    c.rect(0, H - 38 * mm, W, 38 * mm, fill=1, stroke=0)
+
+    # Decorative circle (smaller than page 1)
+    c.setFillColor(colors.HexColor('#2d5a42'))
+    c.circle(W, H, 34 * mm, fill=1, stroke=0)
+    c.setFillColor(colors.HexColor('#1b3a2d'))
+    c.circle(W, H, 18 * mm, fill=1, stroke=0)
+
+    # SAGE accent line
+    c.setStrokeColor(colors.HexColor('#8cbf9c'))
+    c.setLineWidth(0.7)
+    c.line(0, H - 38 * mm, W, H - 38 * mm)
+
+    # Vault icon + wordmark
+    draw_vault_icon(c, ML_val, H - 8 * mm, size=26, on_dark=True)
+    c.setFillColor(colors.HexColor('#fdf6ec'))
+    c.setFont('Helvetica-Bold', 15)
+    c.drawString(ML_val + 32 * mm, H - 14 * mm, 'Digipass')
+    c.setFillColor(colors.HexColor('#8cbf9c'))
+    c.setFont('Helvetica', 7)
+    c.drawString(ML_val + 33 * mm, H - 19 * mm,
+                 'DIGITAL  ESTATE')
+
+    # Title
+    c.setFillColor(colors.HexColor('#ffffff'))
+    c.setFont('Helvetica-Bold', 16)
+    c.drawString(ML_val, H - 27 * mm,
+                 'SIGNATURE AND EXECUTION PAGE')
+
+    # Right meta
+    c.setFillColor(colors.HexColor('#8cbf9c'))
+    c.setFont('Helvetica', 7)
+    c.drawRightString(MR_val, H - 27 * mm, f'Instrument No. {instr}')
+    c.drawRightString(MR_val, H - 32 * mm,
+        f'Digital Will and Estate Declaration of {name}')
+
+    y = H - 38 * mm - 8 * mm
+
+    # ── 2. EXECUTION STATEMENT ──
+    exec_text = (
+        f"IN WITNESS WHEREOF, I, <b>{name}</b>, the Testator named in "
+        f"this Digital Will and Estate Declaration, have hereunto set my "
+        f"hand and seal to this instrument, on this {day} day of {month}, "
+        f"in the year <b>{year_text}</b>, declaring and publishing this as "
+        f"my Digital Will and Estate Declaration of digital assets."
+    )
+    exec_style = ParagraphStyle('exec',
+        fontName='Helvetica', fontSize=9,
+        textColor=colors.HexColor('#2c3a2e'),
+        leading=15, alignment=TA_JUSTIFY)
+    ep = Paragraph(exec_text, exec_style)
+    ep_w, ep_h = ep.wrapOn(c, CW_val, 50 * mm)
+    ep.drawOn(c, ML_val, y - ep_h)
+    y -= ep_h + 8 * mm
+
+    # ── 3. RULE DARK ──
+    c.setStrokeColor(colors.HexColor('#c4b090'))
+    c.setLineWidth(0.5)
+    c.line(ML_val, y, MR_val, y)
+    y -= 8 * mm
+
+    # ── 4. TESTATOR SECTION ──
+    c.setFillColor(colors.HexColor('#1b3a2d'))
+    c.setFont('Helvetica-Bold', 9)
+    c.drawString(ML_val, y, 'TESTATOR')
+    y -= 7 * mm
+
+    for line in [
+        f"I, {name}, sign my name to this instrument this {date_str},",
+        "and being first duly sworn, declare to the undersigned authority",
+        "that I sign and execute this instrument as my Digital Will willingly.",
+    ]:
+        c.setFillColor(colors.HexColor('#5a7260'))
+        c.setFont('Helvetica', 8.5)
+        c.drawString(ML_val, y, line)
+        y -= 5 * mm
+    y -= 4 * mm
+
+    # ── 5. TWO SIG BOXES ──
+    draw_signature_box(c, ML_val, y, 80 * mm,
+                 'SIGNATURE OF TESTATOR',
+                 data['user'].get('full_name', ''))
+    draw_signature_box(c, ML_val + 90 * mm, y, 80 * mm,
+                 'DATE', date_str)
+    y -= 22 * mm + 10 * mm
+
+    # ── 6. RULE DARK ──
+    c.setStrokeColor(colors.HexColor('#c4b090'))
+    c.setLineWidth(0.5)
+    c.line(ML_val, y, MR_val, y)
+    y -= 8 * mm
+
+    # ── 7. NOTARIAL ACKNOWLEDGEMENT ──
+    c.setFillColor(colors.HexColor('#1b3a2d'))
+    c.setFont('Helvetica-Bold', 9)
+    c.drawString(ML_val, y,
+        'NOTARIAL ACKNOWLEDGEMENT  /  OFFICIAL SEAL')
+    y -= 8 * mm
+
+    notary_text = (
+        "State / Jurisdiction of ____________________    "
+        "Country / District of ____________________<br/><br/>"
+        f"Subscribed, sworn to and acknowledged before me by "
+        f"<b>{name}</b>, the Testator, this ______ day of "
+        "____________________, 20____."
+    )
+    notary_style = ParagraphStyle('notary',
+        fontName='Helvetica', fontSize=8.5,
+        textColor=colors.HexColor('#5a7260'),
+        leading=14)
+    np = Paragraph(notary_text, notary_style)
+    np_w, np_h = np.wrapOn(c, CW_val - 52 * mm, 40 * mm)
+    np.drawOn(c, ML_val, y - np_h)
+
+    # ── 8. NOTARY SEAL (right of paragraph) ──
+    seal_cx = MR_val - 22 * mm
+    seal_cy = y - 18 * mm
+    draw_notary_seal(c, seal_cx, seal_cy)
+
+    y -= max(np_h, 36 * mm) + 10 * mm
+
+    # ── 9. NOTARY SIG BOX ──
+    draw_signature_box(c, ML_val, y, 100 * mm,
+        'NOTARY PUBLIC — SIGNATURE & COMMISSION NO.', '')
+    y -= 22 * mm + 10 * mm
+
+    # ── 10. RULE DARK ──
+    c.setStrokeColor(colors.HexColor('#c4b090'))
+    c.setLineWidth(0.5)
+    c.line(ML_val, y, MR_val, y)
+    y -= 8 * mm
+
+    # ── 11. CERTIFICATION LINE ──
+    c.setFillColor(colors.HexColor('#8a9e90'))
+    c.setFont('Helvetica', 7.5)
+    cert = (f"This document was digitally generated by DIGIPASS  ·  "
+            f"digipass.app  ·  Instrument No. {instr}  ·  {date_str}")
+    c.drawCentredString(W / 2, y, cert)
+    # Footer is handled by PageCountCanvas automatically
+
 def draw_notary_seal(c, cx, cy):
     """Draw notary seal with text inside circle"""
     outer_r = 18 * mm
@@ -922,87 +1133,6 @@ def draw_notary_seal(c, cx, cy):
     c.drawCentredString(cx, cy - 7 * mm,  'DIGITAL ESTATE')
     c.drawCentredString(cx, cy - 10 * mm, 'OFFICIAL SEAL')
 
-def draw_page2(c, data, page_data):
-    """Generate Page 2 - Signature and Execution Page"""
-    user_data = data['user']
-    draw_header_page2(c, user_data)
-    
-    y = PAGE_HEIGHT - 38 * mm - SECTION_GAP
-    
-    # Execution Statement
-    day_str = str(datetime.now().day)
-    year_str = number_to_words(datetime.now().year).replace(' ', '  ')
-    exec_text = (
-        f"IN WITNESS WHEREOF, I, {user_data['full_name'].upper()}, the Testator named in this Digital Will "
-        f"and Estate Declaration, have hereunto set my hand and seal to this instrument, on this {day_str} day of "
-        f"{datetime.now().strftime('%B')}, in the year {year_str}, "
-        f"declaring and publishing this as my Digital Will and Estate Declaration of digital assets."
-    )
-    
-    style = ParagraphStyle(name='Exec', fontName='Helvetica', fontSize=9, textColor=COLORS['TEXT_BODY'], leading=15, alignment=TA_JUSTIFY)
-    para_h = draw_multiline_text(c, exec_text, ML, y, CW, style)
-    y -= para_h + SECTION_GAP
-    
-    y = draw_rule_dark(c, y)
-    y -= SECTION_GAP
-    
-    # Testator Signature Section
-    y = draw_label(c, "TESTATOR", y)
-    y -= SECTION_GAP
-    
-    testator_text = (
-        f"I, {user_data['full_name'].upper()}, sign my name to this instrument this {datetime.now().strftime('%B %d, %Y')}, "
-        f"and being first duly sworn, declare to the undersigned authority that I sign and execute this instrument as my Digital Will "
-        f"and that I sign it willingly."
-    )
-    style_testator = ParagraphStyle(name='Testator', fontName='Helvetica', fontSize=8.5, textColor=COLORS['TEXT_MID'], leading=12.5, alignment=TA_JUSTIFY)
-    para_h = draw_multiline_text(c, testator_text, ML, y, CW, style_testator)
-    y -= para_h + 4 * mm
-    
-    # Signature boxes
-    draw_signature_box(c, ML, y, 80 * mm, "SIGNATURE OF TESTATOR", user_data['full_name'])
-    draw_signature_box(c, ML + 90 * mm, y, 80 * mm, "DATE", datetime.now().strftime('%B %d, %Y'))
-    y -= SIG_BOX_H + SECTION_GAP
-    
-    y = draw_rule_dark(c, y)
-    y -= SECTION_GAP
-    
-    # Notarial Acknowledgement
-    y = draw_label(c, "NOTARIAL ACKNOWLEDGEMENT / OFFICIAL SEAL", y)
-    y -= SECTION_GAP
-    
-    notary_text = (
-        f"State / Jurisdiction of ____________________    Country / District of ____________________<br/><br/>"
-        f"Subscribed, sworn to and acknowledged before me by {user_data['full_name'].upper()}, the Testator, "
-        f"this ______ day of ______________, 20____."
-    )
-    style_notary = ParagraphStyle(name='Notary', fontName='Helvetica', fontSize=8.5, textColor=COLORS['TEXT_MID'], leading=14)
-    
-    notary_text_width = CW - 52 * mm
-    para_h = draw_multiline_text(c, notary_text, ML, y, notary_text_width, style_notary)
-    
-    # Draw seal at right edge, vertically centered with text
-    seal_cx = MR - 20 * mm
-    seal_cy = y - 20 * mm  # 20mm below current y (approximate center)
-    draw_notary_seal(c, seal_cx, seal_cy)
-    y -= max(para_h, 44 * mm)
-
-    # Notary signature box
-    draw_signature_box(c, ML, y, 100 * mm, "NOTARY PUBLIC — SIGNATURE & COMMISSION NO.", "")
-    y -= SIG_BOX_H + SECTION_GAP
-    
-    y = draw_rule_dark(c, y)
-    y -= SECTION_GAP
-    
-    # Final certification
-    now = datetime.now()
-    instrument_no = f"DW-{now.strftime('%Y%m%d')}-U{data['user']['id']}"
-    cert_text = f"This document was digitally generated by DIGIPASS · digipass.app · Instrument No. {instrument_no} · {now.strftime('%B %d, %Y')}"
-    
-    c.setFont("Helvetica", 7.5)
-    c.setFillColor(COLORS['TEXT_LIGHT'])
-    c.drawCentredString(PAGE_WIDTH / 2, y, cert_text)
-
 # ════════════════════════════════════════════════════════════════════════════════
 # MAIN GENERATION FUNCTION
 # ════════════════════════════════════════════════════════════════════════════════
@@ -1030,16 +1160,10 @@ def generate_pdf(data):
         'instrument_no': c._instrument_no
     }
 
-    # Page 1
+    # Page 1 (and signature page at the end)
     draw_page_background(c)
     draw_page_border_rules(c)
     draw_page1(c, data, page_data)
-
-    # Page 2 (signature page)
-    page_data['page_num'] = 2
-    draw_page_background(c)
-    draw_page_border_rules(c)
-    draw_page2(c, data, page_data)
     
     c.save()
     output.seek(0)
