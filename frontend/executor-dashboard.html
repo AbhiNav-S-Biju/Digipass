@@ -1890,7 +1890,8 @@
                         ...executor,
                         ...executorData,
                         ownerName: owner.full_name || executor.ownerName || 'Estate Owner',
-                        ownerEmail: owner.email || executor.ownerEmail || ''
+                        ownerEmail: owner.email || executor.ownerEmail || '',
+                        userId: owner.id || executor.userId
                     }));
                 }
 
@@ -2500,17 +2501,29 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
 
             try {
-                const token = localStorage.getItem('executorToken');
-                const response = await fetch('https://digipass-3l63.onrender.com/api/executor/download-will', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                const executorData = JSON.parse(localStorage.getItem('executor') || '{}');
+                const userId = executorData.userId;
+                
+                if (!userId) {
+                    alert('Error: Unable to determine user ID. Please refresh and try again.');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+                
+                const response = await fetch(`https://digipass-3l63.onrender.com/api/will/download/${userId}`, {
+                    method: 'GET'
                 });
 
                 if (!response.ok) {
-                    const error = await response.json();
-                    alert('Error: ' + (error.message || 'Failed to download will'));
+                    try {
+                        const error = await response.json();
+                        alert('Error: ' + (error.message || `Failed to download will (${response.status})`));
+                    } catch (e) {
+                        alert('Error: Failed to download will (HTTP ' + response.status + ')');
+                    }
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
                     return;
                 }
 
@@ -2519,7 +2532,8 @@
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `digital-will-${new Date().toISOString().split('T')[0]}.pdf`;
+                const dateStr = new Date().toISOString().split('T')[0];
+                a.download = `Digital_Will_${userId}_${dateStr}.pdf`;
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
