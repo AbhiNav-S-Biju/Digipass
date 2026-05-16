@@ -3,6 +3,7 @@ const router = express.Router();
 const { spawn } = require('child_process');
 const path = require('path');
 const pool = require('../../config/database');
+const { authenticateExecutor } = require('../middleware/executorAuth');
 const { 
   getUserWithAssets, 
   getExecutorsByUserId, 
@@ -12,10 +13,20 @@ const {
 /**
  * GET /api/will/download/:userId
  * Generates and downloads a Digital Will PDF for the specified user
+ * Protected by executor authentication
  */
-router.get('/download/:userId', async (req, res) => {
+router.get('/download/:userId', authenticateExecutor, async (req, res) => {
   try {
     const userId = parseInt(req.params.userId, 10);
+    const ownerUserId = req.ownerUserId; // From executor auth middleware
+    
+    // Security check: executor can only download will for their assigned owner
+    if (userId !== ownerUserId) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have permission to access this will'
+      });
+    }
     
     if (!userId || isNaN(userId)) {
       return res.status(400).json({

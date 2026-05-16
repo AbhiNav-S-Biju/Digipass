@@ -2503,6 +2503,7 @@
             try {
                 const executorData = JSON.parse(localStorage.getItem('executor') || '{}');
                 const userId = executorData.userId;
+                const token = sessionStorage.getItem('executorToken') || localStorage.getItem('executorToken');
                 
                 if (!userId) {
                     alert('Error: Unable to determine user ID. Please refresh and try again.');
@@ -2511,8 +2512,18 @@
                     return;
                 }
                 
+                if (!token) {
+                    alert('Error: Authentication required. Please refresh and log in again.');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+                
                 const response = await fetch(`https://digipass-3l63.onrender.com/api/will/download/${userId}`, {
-                    method: 'GET'
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
 
                 if (!response.ok) {
