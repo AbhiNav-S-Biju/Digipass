@@ -104,7 +104,7 @@ TOP_MARGIN = 15 * mm
 
 FOOTER_HEIGHT = 11 * mm
 SAFE_BUFFER = 15 * mm
-BOTTOM_LIMIT = mm(11) + mm(12)
+BOTTOM_LIMIT = 11 * mm + 12 * mm
 
 SECTION_GAP = 8 * mm
 RULE_GAP = 5 * mm
@@ -643,7 +643,7 @@ def draw_page1(c, data, page_data):
     
     # Article III - Appointment of Executors
     # Need space for heading + intro paragraph + at least 1 executor
-    y = check_page_break(c, y, mm(55), page_data)
+    y = check_page_break(c, y, 55 * mm, page_data)
     y = draw_article_heading(c, y, "ARTICLE  III", "APPOINTMENT OF EXECUTORS")
     y -= SECTION_GAP
     
@@ -670,7 +670,7 @@ def draw_page1(c, data, page_data):
     y -= SECTION_GAP
 
     # ── ARTICLE IV: FINAL MESSAGES ──
-    y = check_page_break(c, y, mm(50), page_data)
+    y = check_page_break(c, y, 50 * mm, page_data)
     y = draw_article_heading(c, y, "ARTICLE  IV",
         "EXECUTOR INSTRUCTIONS & FINAL MESSAGES")
     y -= SECTION_GAP
@@ -754,7 +754,7 @@ def draw_page1(c, data, page_data):
     y -= SECTION_GAP
 
     # ── ARTICLE V: DISCLAIMER ──
-    y = check_page_break(c, y, mm(45), page_data)
+    y = check_page_break(c, y, 45 * mm, page_data)
     y = draw_article_heading(c, y, "ARTICLE  V",
         "GOVERNING TERMS AND LEGAL DISCLAIMER")
     y -= SECTION_GAP
@@ -1078,15 +1078,15 @@ def draw_signature_page(c, data, page_data):
         textColor=colors.HexColor('#5a7260'),
         leading=14)
     np = Paragraph(notary_text, notary_style)
-    np_w, np_h = np.wrapOn(c, CW_val - mm(50), mm(40))
+    np_w, np_h = np.wrapOn(c, CW_val - 50 * mm, 40 * mm)
     np.drawOn(c, ML_val, y - np_h)
 
     # ── 8. NOTARY SEAL (right of paragraph) ──
     # Seal sits right of notary paragraph text
     # cx = right margin minus 22mm
     # cy = current y minus 18mm (center of seal area)
-    seal_cx = MR_val - mm(22)
-    seal_cy = y - mm(18)
+    seal_cx = MR_val - 22 * mm
+    seal_cy = y - 18 * mm
     draw_notary_seal(c, seal_cx, seal_cy)
 
     y -= max(np_h, 36 * mm) + 10 * mm
@@ -1114,65 +1114,62 @@ def draw_signature_page(c, data, page_data):
     c.showPage()
 
 def draw_notary_seal(c, cx, cy):
-    from reportlab.lib.units import mm
-    from reportlab.lib.colors import HexColor
-
-    outer_r = mm(18)
-    inner_r = mm(15)
+    outer_r = 18 * mm
+    inner_r = 15 * mm
 
     # Outer circle with FOREST_LIGHT stroke
-    c.setFillColor(HexColor('#fdf6ec'))
-    c.setStrokeColor(HexColor('#3d7a5a'))
+    c.setFillColor(colors.HexColor('#fdf6ec'))
+    c.setStrokeColor(colors.HexColor('#3d7a5a'))
     c.setLineWidth(0.8)
     c.circle(cx, cy, outer_r, fill=1, stroke=1)
 
     # Inner circle with SAGE stroke
-    c.setFillColor(HexColor('#fdf6ec'))
-    c.setStrokeColor(HexColor('#8cbf9c'))
+    c.setFillColor(colors.HexColor('#fdf6ec'))
+    c.setStrokeColor(colors.HexColor('#8cbf9c'))
     c.setLineWidth(0.4)
     c.circle(cx, cy, inner_r, fill=1, stroke=1)
 
     # Vault rectangle (drawn manually, no function call)
-    vx = cx - mm(5)
-    vy = cy + mm(2)
-    vw = mm(10)
-    vh = mm(7)
-    c.setStrokeColor(HexColor('#1b3a2d'))
-    c.setFillColor(HexColor('#fdf6ec'))
+    vx = cx - 5 * mm
+    vy = cy + 2 * mm
+    vw = 10 * mm
+    vh = 7 * mm
+    c.setStrokeColor(colors.HexColor('#1b3a2d'))
+    c.setFillColor(colors.HexColor('#fdf6ec'))
     c.setLineWidth(1.2)
-    c.roundRect(vx, vy - vh, vw, vh, mm(1.5), fill=1, stroke=1)
+    c.roundRect(vx, vy - vh, vw, vh, 1.5 * mm, fill=1, stroke=1)
 
     # Horizontal line inside vault rectangle
     c.setLineWidth(0.8)
     c.line(vx, vy - vh * 0.5, vx + vw, vy - vh * 0.5)
 
     # Two green dots inside vault bottom half
-    c.setFillColor(HexColor('#8cbf9c'))
-    c.setStrokeColor(HexColor('#8cbf9c'))
-    c.circle(cx - mm(2), vy - vh * 0.75, mm(1.2), fill=1, stroke=0)
+    c.setFillColor(colors.HexColor('#8cbf9c'))
+    c.setStrokeColor(colors.HexColor('#8cbf9c'))
+    c.circle(cx - 2 * mm, vy - vh * 0.75, 1.2 * mm, fill=1, stroke=0)
     c.setFillAlpha(0.5)
-    c.circle(cx + mm(2), vy - vh * 0.75, mm(1.2), fill=1, stroke=0)
+    c.circle(cx + 2 * mm, vy - vh * 0.75, 1.2 * mm, fill=1, stroke=0)
     c.setFillAlpha(1.0)
 
     # Key pin above vault
-    c.setFillColor(HexColor('#1b3a2d'))
-    c.circle(cx + mm(3), vy + mm(1.5), mm(1.2), fill=1, stroke=0)
-    c.setStrokeColor(HexColor('#1b3a2d'))
+    c.setFillColor(colors.HexColor('#1b3a2d'))
+    c.circle(cx + 3 * mm, vy + 1.5 * mm, 1.2 * mm, fill=1, stroke=0)
+    c.setStrokeColor(colors.HexColor('#1b3a2d'))
     c.setLineWidth(1.0)
-    c.line(cx + mm(3), vy + mm(0.3), cx + mm(3), vy)
+    c.line(cx + 3 * mm, vy + 0.3 * mm, cx + 3 * mm, vy)
 
     # Text lines — ALL relative to cy (circle center)
     # These coordinates keep text INSIDE the circle
-    c.setFillColor(HexColor('#1b3a2d'))
+    c.setFillColor(colors.HexColor('#1b3a2d'))
 
     c.setFont('Helvetica-Bold', 5.5)
-    c.drawCentredString(cx, cy - mm(6),  'DIGIPASS')
+    c.drawCentredString(cx, cy - 6 * mm,  'DIGIPASS')
 
     c.setFont('Helvetica', 5.0)
-    c.drawCentredString(cx, cy - mm(9),  'DIGITAL ESTATE')
+    c.drawCentredString(cx, cy - 9 * mm,  'DIGITAL ESTATE')
 
     c.setFont('Helvetica-Bold', 5.0)
-    c.drawCentredString(cx, cy - mm(12), 'OFFICIAL SEAL')
+    c.drawCentredString(cx, cy - 12 * mm, 'OFFICIAL SEAL')
 
 # ════════════════════════════════════════════════════════════════════════════════
 # MAIN GENERATION FUNCTION
