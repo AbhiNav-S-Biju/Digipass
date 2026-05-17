@@ -34,12 +34,12 @@ class PageCountCanvas(canvas.Canvas):
         self._startPage()
 
     def save(self):
-        total = len(self._saved_page_states) + 1
+        self._saved_page_states.append(dict(self.__dict__))
+        total = len(self._saved_page_states)
         for i, state in enumerate(self._saved_page_states):
             self.__dict__.update(state)
             self._draw_page_footer_with_count(i + 1, total)
             canvas.Canvas.showPage(self)
-        self._draw_page_footer_with_count(total, total)
         canvas.Canvas.save(self)
 
     def _draw_page_footer_with_count(self, page_num, total_pages):
@@ -104,19 +104,19 @@ TOP_MARGIN = 15 * mm
 
 FOOTER_HEIGHT = 11 * mm
 SAFE_BUFFER = 15 * mm
-BOTTOM_LIMIT = 14 * mm  # Aggressive: footer height + minimal 3mm buffer
+BOTTOM_LIMIT = 11 * mm + 10 * mm
 
-SECTION_GAP = 4 * mm  # Reduced from 8mm to pack content tighter
-RULE_GAP = 2 * mm    # Reduced from 5mm to pack content tighter
-CARD_GAP = 1.5 * mm  # Reduced for cards
+SECTION_GAP = 7 * mm
+RULE_GAP = 4 * mm
+CARD_GAP = 3 * mm
 PARA_LINE_HEIGHT = 4 * mm  # Reduced from 5mm for tighter text
 
-ASSET_CARD_H = 16 * mm
-EXECUTOR_CARD_H = 17 * mm
-PREAMBLE_H = 32 * mm
+ASSET_CARD_H = 18 * mm
+EXECUTOR_CARD_H = 19 * mm
+PREAMBLE_H = 38 * mm
 DISCLAIMER_H = 28 * mm
 SIG_BOX_H = 22 * mm
-ARTICLE_HEAD_H = 8 * mm
+ARTICLE_HEAD_H = 12 * mm
 CONTINUATION_HEADER_HEIGHT = 16 * mm  # Reduced from 18mm
 
 ACTION_DISPLAY = {
@@ -428,7 +428,7 @@ def draw_preamble(c, y, user_data):
         fontName='Helvetica',
         fontSize=8.5,
         textColor=COLORS['TEXT_MID'],
-        leading=PARA_LINE_HEIGHT,
+        leading=14,
         alignment=TA_JUSTIFY,
     )
     p = Paragraph(preamble_text, style)
@@ -438,28 +438,32 @@ def draw_preamble(c, y, user_data):
     return y - box_height - SECTION_GAP
 
 def draw_article_heading(c, y, article_label, title_text):
-    """Draw article heading with label, dot, and title"""
-    # Article label
-    c.setFont("Helvetica-Bold", 7)
-    c.setFillColor(COLORS['FOREST'])
+    """Draw article heading — larger, more prominent"""
+
+    # Article label (e.g. "ARTICLE  I")
+    c.setFont("Helvetica-Bold", 7.5)
+    c.setFillColor(colors.HexColor('#3d7a5a'))
     c.drawString(ML, y, article_label)
-    
-    # SAGE dot
-    c.setFillColor(COLORS['SAGE'])
-    label_width = c.stringWidth(article_label, "Helvetica-Bold", 7)
-    c.circle(ML + label_width + 3 * mm, y + 1 * mm, 1.1 * mm, fill=1, stroke=0)
-    
-    # Title
-    c.setFont("Helvetica-Bold", 10.5)
-    c.setFillColor(COLORS['FOREST'])
-    c.drawString(ML + label_width + 8 * mm, y, title_text)
-    
-    # Rule below
-    c.setStrokeColor(COLORS['SAND_DEEP'])
-    c.setLineWidth(0.5)
-    c.line(ML, y - 2.5 * mm, MR, y - 2.5 * mm)
-    
-    return y - ARTICLE_HEAD_H
+
+    # SAGE dot accent
+    label_width = c.stringWidth(article_label, "Helvetica-Bold", 7.5)
+    c.setFillColor(colors.HexColor('#8cbf9c'))
+    c.circle(ML + label_width + 3 * mm, y + 1.5 * mm, 1.4 * mm, fill=1, stroke=0)
+
+    # Title — MUCH larger than before
+    c.setFont("Helvetica-Bold", 14)
+    c.setFillColor(colors.HexColor('#1b3a2d'))
+    c.drawString(ML + label_width + 8 * mm, y - 1 * mm, title_text)
+
+    # Double rule below: thick + thin
+    c.setStrokeColor(colors.HexColor('#1b3a2d'))
+    c.setLineWidth(1.2)
+    c.line(ML, y - 5 * mm, MR, y - 5 * mm)
+    c.setStrokeColor(colors.HexColor('#8cbf9c'))
+    c.setLineWidth(0.4)
+    c.line(ML, y - 6.2 * mm, MR, y - 6.2 * mm)
+
+    return y - 12 * mm
 
 def draw_signature_box(c, x, y, width, label, prefill=""):
     """Draw signature box component"""
@@ -520,16 +524,30 @@ def draw_left_right_borders(c):
     c.rect(PAGE_WIDTH - 3.5 * mm, 0, 3.5 * mm, PAGE_HEIGHT, fill=1, stroke=0)
 
 def draw_section_rule(c, y):
-    """Two-tone rule with accent dot"""
-    c.setStrokeColor(COLORS['SAND_DEEP'])
-    c.setLineWidth(0.5)
-    c.line(ML, y, MR, y)
-    # Accent dot in center
-    c.setFillColor(COLORS['SAGE'])
-    c.circle(ML + (MR - ML) / 2, y, 0.8 * mm, fill=1, stroke=0)
-    return y - 2 * mm
+    """Three-element decorative rule"""
+    mid_x = ML + (MR - ML) / 2
 
-def draw_italic_paragraph(c, x, y, width, text, font_size=8, leading=12, color='#5a7260'):
+    # Left segment
+    c.setStrokeColor(colors.HexColor('#d4c4a0'))
+    c.setLineWidth(0.5)
+    c.line(ML, y, mid_x - 6 * mm, y)
+
+    # Center dot cluster
+    c.setFillColor(colors.HexColor('#8cbf9c'))
+    c.circle(mid_x - 3 * mm, y, 1 * mm, fill=1, stroke=0)
+    c.setFillAlpha(0.5)
+    c.circle(mid_x, y, 1.4 * mm, fill=1, stroke=0)
+    c.setFillAlpha(1)
+    c.circle(mid_x + 3 * mm, y, 1 * mm, fill=1, stroke=0)
+
+    # Right segment
+    c.setStrokeColor(colors.HexColor('#d4c4a0'))
+    c.setLineWidth(0.5)
+    c.line(mid_x + 6 * mm, y, MR, y)
+
+    return y - 3 * mm
+
+def draw_italic_paragraph(c, x, y, width, text, font_size=8.5, leading=14, color='#5a7260'):
     """Draw paragraph with italic formatting"""
     style = ParagraphStyle(
         name='ItalicPara',
@@ -539,18 +557,92 @@ def draw_italic_paragraph(c, x, y, width, text, font_size=8, leading=12, color='
         leading=leading,
         alignment=TA_JUSTIFY,
     )
-    return draw_multiline_text(c, text, x, y, width, style)
+    text_h = draw_multiline_text(c, text, x, y, width, style)
+    return y - text_h
 
 def draw_article_heading_safe(c, y, label, title, page_data, min_content_below=None):
     """Don't draw heading unless there's room for heading + min content."""
     if min_content_below is None:
         min_content_below = 25 * mm
-    heading_h = 8 * mm
+    heading_h = ARTICLE_HEAD_H
     total_needed = heading_h + min_content_below
     
     y = check_page_break(c, y, total_needed, page_data)
     y = draw_article_heading(c, y, label, title)
     return y
+
+def draw_testator_message(c, y, will_data, page_data):
+    """
+    Draw testator's personal message from digital_will.custom_content.
+    Only renders if custom_content is non-empty.
+    """
+    message = (will_data or {}).get('custom_content', '').strip()
+    if not message:
+        return y
+
+    # Section heading
+    y = check_page_break(c, y, 50 * mm, page_data)
+    y = draw_article_heading(c, y,
+        "ARTICLE  I-B",
+        "TESTATOR'S PERSONAL DECLARATION")
+    y -= 4 * mm
+
+    # Card with FOREST left strip
+    chars_per_line = 85
+    lines = max(3, len(message) // chars_per_line + 2)
+    card_h = max(28 * mm, lines * 5 * mm + 12 * mm)
+
+    y = check_page_break(c, y, card_h + 4 * mm, page_data)
+
+    # Shadow
+    c.setFillColor(colors.HexColor('#d4c4a0'))
+    c.roundRect(ML + 0.6 * mm, y - card_h - 0.6 * mm,
+                CW, card_h, 2 * mm, fill=1, stroke=0)
+
+    # Card background
+    c.setFillColor(colors.HexColor('#fdf6ec'))
+    c.setStrokeColor(colors.HexColor('#d4c4a0'))
+    c.setLineWidth(0.5)
+    c.roundRect(ML, y - card_h, CW, card_h,
+                2 * mm, fill=1, stroke=1)
+
+    # FOREST left strip
+    c.setFillColor(colors.HexColor('#1b3a2d'))
+    c.roundRect(ML, y - card_h, 7 * mm, card_h,
+                2 * mm, fill=1, stroke=0)
+    c.rect(ML + 5 * mm, y - card_h, 2 * mm, card_h,
+           fill=1, stroke=0)
+
+    # Quote mark decorative
+    c.setFillColor(colors.HexColor('#8cbf9c'))
+    c.setFont('Helvetica-Bold', 32)
+    c.drawString(ML + 10 * mm, y - 9 * mm, '\u201c')
+
+    # Message text
+    msg_style = ParagraphStyle(
+        'TestatorMsg',
+        fontName='Helvetica-Oblique',
+        fontSize=9.5,
+        textColor=colors.HexColor('#2c3a2e'),
+        leading=15,
+        alignment=TA_JUSTIFY,
+    )
+    p = Paragraph(message, msg_style)
+    p_w, p_h = p.wrapOn(c, CW - 18 * mm, card_h - 14 * mm)
+    p.drawOn(c, ML + 10 * mm, y - card_h + 6 * mm)
+
+    # Closing quote mark
+    c.setFillColor(colors.HexColor('#8cbf9c'))
+    c.setFont('Helvetica-Bold', 32)
+    c.drawRightString(MR - 4 * mm, y - card_h + 2 * mm, '\u201d')
+
+    # Attribution line
+    c.setFillColor(colors.HexColor('#8a9e90'))
+    c.setFont('Helvetica', 7)
+    c.drawRightString(MR - 4 * mm, y - card_h - 3 * mm,
+                      "— Personal declaration by the Testator")
+
+    return y - card_h - 10 * mm
 
 # ════════════════════════════════════════════════════════════════════════════════
 # PAGE 1 CONTENT
@@ -564,20 +656,20 @@ def draw_page1(c, data, page_data):
     
     draw_header_page1(c, user_data)
     
-    y = PAGE_HEIGHT - 48 * mm  # Adjusted for reduced header (was 64mm)
+    y = PAGE_HEIGHT - 52 * mm
     
     # Preamble
-    y = check_page_break(c, y, 18 * mm, page_data)
+    y = check_page_break(c, y, 36 * mm, page_data)
     y = draw_preamble(c, y, user_data)
     
     # Article I - Testator Identification
-    y = check_page_break(c, y, 12 * mm, page_data)
+    y = check_page_break(c, y, 40 * mm, page_data)
     y = draw_article_heading(c, y, "ARTICLE  I", "TESTATOR IDENTIFICATION")
-    y -= SECTION_GAP
+    y -= SECTION_GAP + 3 * mm
     
     # Two-column field grid
     col_width = (CW - 5 * mm) / 2
-    field_height = 13 * mm
+    field_height = 16 * mm
     
     created_at_str = user_data.get('created_at', datetime.now().strftime('%Y-%m-%d'))
     try:
@@ -597,28 +689,35 @@ def draw_page1(c, data, page_data):
         for col_idx, (label, value) in enumerate(row):
             x = ML + col_idx * (col_width + 5 * mm)
             
+            # Label
             c.setFont("Helvetica", 6.5)
             c.setFillColor(COLORS['TEXT_LIGHT'])
             c.drawString(x, y - 3 * mm, label)
             
-            c.setFont("Helvetica-Bold", 10)
+            # Value — larger font
+            c.setFont("Helvetica-Bold", 11)
             c.setFillColor(COLORS['TEXT_DARK'])
-            c.drawString(x, y - 8.5 * mm, truncate(value, 40))
+            c.drawString(x, y - 9.5 * mm, truncate(value, 38))
             
+            # Underline
             c.setStrokeColor(COLORS['SAND_DEEP'])
-            c.setLineWidth(0.5)
-            c.line(x, y - 10.5 * mm, x + col_width - 5 * mm, y - 10.5 * mm)
+            c.setLineWidth(0.6)
+            c.line(x, y - 11.5 * mm, x + col_width - 4 * mm, y - 11.5 * mm)
         
         y -= field_height
     
     y -= RULE_GAP
-    draw_rule_dark(c, y)
+    draw_section_rule(c, y)
     y -= SECTION_GAP
+
+    # Testator personal message (from digital_will.custom_content)
+    will_data = data.get('will') or {'custom_content': data.get('custom_content', '')}
+    y = draw_testator_message(c, y, will_data, page_data)
     
     # Article II - Schedule of Digital Assets
-    y = check_page_break(c, y, 12 * mm, page_data)
+    y = check_page_break(c, y, 55 * mm, page_data)
     y = draw_article_heading(c, y, "ARTICLE  II", "SCHEDULE OF DIGITAL ASSETS")
-    y -= SECTION_GAP
+    y -= SECTION_GAP + 3 * mm
     
     intro_text = (
         "I give, bequeath, and assign the following digital assets, being the whole of my electronic "
@@ -626,24 +725,29 @@ def draw_page1(c, data, page_data):
         "with the permissions and instructions granted under Article III. Each asset shall be managed "
         "according to the preferred action specified herein:"
     )
-    style = ParagraphStyle(name='Intro', fontName='Helvetica-Oblique', fontSize=8, textColor=COLORS['TEXT_MID'], leading=12)
+    style = ParagraphStyle(name='Intro',
+        fontName='Helvetica-Oblique',
+        fontSize=8.5,
+        textColor=COLORS['TEXT_MID'],
+        leading=14)
     
     text_h = draw_multiline_text(c, intro_text, ML, y, CW, style)
     y -= text_h + SECTION_GAP
     
     # Asset cards
     for idx, asset in enumerate(assets, 1):
+        y = check_page_break(c, y, 20 * mm, page_data)
         y = draw_asset_card(c, ML, y, CW, roman_numeral(idx), asset)
     
     y -= RULE_GAP
-    draw_rule_dark(c, y)
+    draw_section_rule(c, y)
     y -= SECTION_GAP
     
     # Article III - Appointment of Executors
     # Need space for heading + intro paragraph + at least 1 executor
-    y = check_page_break(c, y, 14 * mm, page_data)
+    y = check_page_break(c, y, 60 * mm, page_data)
     y = draw_article_heading(c, y, "ARTICLE  III", "APPOINTMENT OF EXECUTORS")
-    y -= SECTION_GAP
+    y -= SECTION_GAP + 3 * mm
     
     intro_text_exec = (
         "I hereby nominate, constitute, and appoint the following named individuals as Personal Executors "
@@ -659,31 +763,33 @@ def draw_page1(c, data, page_data):
     romans = ['I','II','III','IV','V','VI','VII','VIII','IX','X']
     for i, executor in enumerate(data.get('executors', [])):
         roman = romans[i] if i < len(romans) else str(i+1)
+        y = check_page_break(c, y, 22 * mm, page_data)
         y = draw_executor_card(c, ML, y, CW, roman, executor)
 
     y -= 5 * mm
-    draw_rule_dark(c, y)
+    draw_section_rule(c, y)
     y -= SECTION_GAP
 
     # ── ARTICLE IV: FINAL MESSAGES ──
-    y = check_page_break(c, y, 12 * mm, page_data)
+    y = check_page_break(c, y, 55 * mm, page_data)
     y = draw_article_heading(c, y, "ARTICLE  IV",
         "EXECUTOR INSTRUCTIONS & FINAL MESSAGES")
-    y -= SECTION_GAP
+    y -= SECTION_GAP + 3 * mm
 
     # Intro paragraph
     intro = ("The following instructions and final messages have been "
              "left by the Testator for each designated asset. These "
              "instructions are to be carried out faithfully and in "
              "accordance with the Testator's expressed wishes:")
-    y = draw_italic_paragraph(c, ML, y, CW, intro, font_size=8, leading=12, color='#5a7260')
+    y = draw_italic_paragraph(c, ML, y, CW, intro, font_size=8.5, leading=14, color='#5a7260')
     y -= 6 * mm
 
     # Final message cards — one per asset
     for asset in data.get('assets', []):
         msg = (asset.get('final_message') or
                'No final message left.').strip()
-        card_h = 20 * mm
+        card_h = 22 * mm
+        y = check_page_break(c, y, 25 * mm, page_data)
 
         # Shadow
         c.setFillColor(colors.HexColor('#d4c4a0'))
@@ -737,22 +843,29 @@ def draw_page1(c, data, page_data):
         c.drawString(ML + 8 * mm, y - 11 * mm, 'FINAL MESSAGE')
 
         # Message text
-        display_msg = msg[:90] + '…' if len(msg) > 90 else msg
-        c.setFillColor(colors.HexColor('#5a7260'))
-        c.setFont('Helvetica-Oblique', 8.5)
-        c.drawString(ML + 8 * mm, y - 15.5 * mm, f'"{display_msg}"')
+        msg_style = ParagraphStyle(
+            'MsgText',
+            fontName='Helvetica-Oblique',
+            fontSize=8.5,
+            textColor=colors.HexColor('#5a7260'),
+            leading=13,
+        )
+        display_msg = msg if len(msg) <= 120 else msg[:120] + '…'
+        mp = Paragraph(f'"{display_msg}"', msg_style)
+        mp_w, mp_h = mp.wrapOn(c, CW - 16 * mm, 12 * mm)
+        mp.drawOn(c, ML + 8 * mm, y - card_h + 3 * mm)
 
         y -= card_h + 3 * mm
 
     y -= 5 * mm
-    draw_rule_dark(c, y)
+    draw_section_rule(c, y)
     y -= SECTION_GAP
 
     # ── ARTICLE V: DISCLAIMER ──
-    y = check_page_break(c, y, 12 * mm, page_data)
+    y = check_page_break(c, y, 50 * mm, page_data)
     y = draw_article_heading(c, y, "ARTICLE  V",
         "GOVERNING TERMS AND LEGAL DISCLAIMER")
-    y -= SECTION_GAP
+    y -= SECTION_GAP + 3 * mm
 
     disclaimer_text = (
         "This instrument has been generated by DIGIPASS, a digital estate "
@@ -769,7 +882,8 @@ def draw_page1(c, data, page_data):
     )
 
     # Disclaimer card with SAGE left strip
-    card_h = 30 * mm
+    card_h = 34 * mm
+    y = check_page_break(c, y, card_h + 4 * mm, page_data)
     c.setFillColor(colors.HexColor('#fdf6ec'))
     c.setStrokeColor(colors.HexColor('#d4c4a0'))
     c.setLineWidth(0.4)
@@ -785,8 +899,8 @@ def draw_page1(c, data, page_data):
         leading=12, alignment=TA_JUSTIFY,
         leftIndent=0, rightIndent=0)
     p = Paragraph(disclaimer_text, style_disc)
-    p.wrapOn(c, CW - 12 * mm, card_h - 6 * mm)
-    p.drawOn(c, ML + 8 * mm, y - card_h + 3 * mm)
+    p.wrapOn(c, CW - 14 * mm, card_h - 8 * mm)
+    p.drawOn(c, ML + 8 * mm, y - card_h + 4 * mm)
     
     # ── END OF CONTENT PAGES ──
     c.showPage()
@@ -808,6 +922,11 @@ def draw_asset_card(c, x, y, width, roman, asset):
     c.setStrokeColor(COLORS['SAND_DEEP'])
     c.setLineWidth(0.4)
     c.roundRect(x, y - card_height, width, card_height, 2, fill=1, stroke=1)
+
+    # Light description band at bottom of card
+    c.setFillColor(colors.HexColor('#f5ead8'))
+    c.rect(x + 6 * mm, y - ASSET_CARD_H,
+           width - 6 * mm, 7 * mm, fill=1, stroke=0)
     
     strip_w = 6 * mm
     c.setFillColor(COLORS['FOREST'])
@@ -829,18 +948,19 @@ def draw_asset_card(c, x, y, width, roman, asset):
         'email': (colors.HexColor('#ede8f5'), colors.HexColor('#4a3080')),
         'default': (COLORS['SAND'], COLORS['TEXT_MID'])
     }
-    bg_color, text_color = badge_colors.get(asset.get('category', 'default'), badge_colors['default'])
+    category = asset.get('category', 'default')
+    bg_color, text_color = badge_colors.get(category.lower(), badge_colors['default'])
     
     c.setFillColor(bg_color)
     c.roundRect(x + 100 * mm, y - 7.5 * mm, 25 * mm, 4.2 * mm, 1.2, fill=1, stroke=0)
     
     c.setFont("Helvetica", 6.5)
     c.setFillColor(text_color)
-    c.drawCentredString(x + 112.5 * mm, y - 5.5 * mm, asset.get('category', 'ASSET').upper())
+    c.drawCentredString(x + 112.5 * mm, y - 5.5 * mm, category.upper())
     
     c.setFont("Helvetica", 8)
     c.setFillColor(COLORS['TEXT_MID'])
-    c.drawString(x + 9 * mm, y - 11 * mm, truncate(asset.get('description', ''), 55))
+    c.drawString(x + 9 * mm, y - 12 * mm, truncate(asset.get('description', ''), 55))
     
     c.setFont("Helvetica", 7)
     c.setFillColor(COLORS['TEXT_LIGHT'])
@@ -1103,9 +1223,6 @@ def draw_signature_page(c, data, page_data):
             f"digipass.app  ·  Instrument No. {instr}  ·  {date_str}")
     c.drawCentredString(W / 2, y, cert)
     # Footer is handled by PageCountCanvas automatically
-    
-    # Finalize the signature page
-    c.showPage()
 
 def draw_notary_seal(c, cx, cy):
     outer_r = 18 * mm
@@ -1171,6 +1288,9 @@ def draw_notary_seal(c, cx, cy):
 
 def generate_pdf(data):
     """Main function to generate the complete multi-page PDF"""
+    # Node.js should pass digital_will.custom_content as:
+    # data["will"]["custom_content"].
+    # Legacy data["custom_content"] is still tolerated by draw_page1().
     output = BytesIO()
     
     c = PageCountCanvas(output, pagesize=A4)
@@ -1220,7 +1340,11 @@ def create_mock_data():
         { "name": "Jane M. Doe", "email": "jane.doe@example.com", "relationship": "Spouse", "status": "verified", "access_granted": True, "created_at": "2026-05-09T10:05:00Z" },
         { "name": "Samuel Smith Jr.", "email": "sam.smith@example.com", "relationship": "Attorney", "status": "pending", "access_granted": False, "created_at": "2026-05-09T10:10:00Z" }
       ],
-      "emergency_contacts": []
+      "emergency_contacts": [],
+      "will": {
+        "custom_content": "I leave this declaration as a personal guide for those entrusted with preserving my digital life.",
+        "created_at": "2026-05-17T00:00:00Z"
+      }
     }
 
 # ════════════════════════════════════════════════════════════════════════════════
@@ -1240,6 +1364,13 @@ if __name__ == '__main__':
 
         # Read JSON from stdin
         data = json.loads(sys.stdin.read())
+        
+        # Debug: Log what assets we received
+        asset_count = len(data.get('assets', []))
+        sys.stderr.write(f'DEBUG: Processing {asset_count} assets\n')
+        for i, asset in enumerate(data.get('assets', [])):
+            msg = asset.get('final_message', '')
+            sys.stderr.write(f'  Asset {i+1}: {asset.get("name", "?")} -> Message: "{msg[:50] if msg else "(empty)"}{".." if len(msg) > 50 else ""}"\n')
         
         pdf_buffer = generate_pdf(data)
         

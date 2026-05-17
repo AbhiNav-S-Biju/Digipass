@@ -66,7 +66,7 @@ async function generateWill(req, res, next) {
         [userId]
       ),
       pool.query(
-        `SELECT custom_content FROM digital_will
+        `SELECT custom_content, created_at FROM digital_will
          WHERE user_id = $1
          ORDER BY created_at DESC
          LIMIT 1`,
@@ -113,7 +113,13 @@ async function generateWill(req, res, next) {
         access_granted: executor.access_granted || false,
         created_at: executor.created_at ? executor.created_at.toISOString() : new Date().toISOString()
       })),
-      custom_content: customContent || null
+      custom_content: customContent || null,
+      will: {
+        custom_content: customContent || '',
+        created_at: customContentResult.rows[0]?.created_at
+          ? customContentResult.rows[0].created_at.toISOString()
+          : new Date().toISOString()
+      }
     };
 
     // Ensure generated-wills directory exists
@@ -472,7 +478,7 @@ async function executorDownloadWill(req, res, next) {
         [userId]
       ),
       pool.query(
-        `SELECT custom_content FROM digital_will
+        `SELECT custom_content, created_at FROM digital_will
          WHERE user_id = $1
          ORDER BY created_at DESC
          LIMIT 1`,
@@ -519,7 +525,13 @@ async function executorDownloadWill(req, res, next) {
         access_granted: executor.access_granted || false,
         created_at: executor.created_at ? executor.created_at.toISOString() : new Date().toISOString()
       })),
-      custom_content: customContent || null
+      custom_content: customContent || null,
+      will: {
+        custom_content: customContent || '',
+        created_at: customContentResult.rows[0]?.created_at
+          ? customContentResult.rows[0].created_at.toISOString()
+          : new Date().toISOString()
+      }
     };
 
     const willDirectory = path.join(process.cwd(), 'generated-wills');
