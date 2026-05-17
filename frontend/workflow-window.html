@@ -577,6 +577,31 @@
             background: #1a7a55;
         }
 
+        .icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-md);
+            color: var(--ink-soft);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-deep);
+            color: var(--ink);
+        }
+
+        .icon-btn.copied {
+            background: #1a7a55;
+            color: #ffffff;
+            border-color: #1a7a55;
+        }
+
         .msg-body {
             color: var(--ink);
             font-size: 0.9rem;
@@ -970,17 +995,34 @@
             const hasCredentialStep = !step.credentials || step.credentials.length || assetInfo.account_identifier;
             if (!hasCredentialStep) return '';
 
+            const encUser = encodeURIComponent(assetInfo.account_identifier || '');
+            const encPass = encodeURIComponent(assetInfo.account_password || '');
+            const hiddenPass = '•'.repeat((assetInfo.account_password || '').length || 8);
+
             return `
                 <div class="cred-box">
                     <div class="cred-header"><i class="fas fa-key"></i> Login Credentials</div>
                     <div class="cred-grid">
                         <div class="cred-field">
                             <label>Username / Email</label>
-                            <div class="cred-val">${esc(assetInfo.account_identifier || '')}</div>
+                            <div style="display:flex; gap: 8px;">
+                                <div class="cred-val" style="flex:1;">${esc(assetInfo.account_identifier || '')}</div>
+                                <button class="icon-btn" onclick="copyIcon(this, '${encUser}')" type="button" title="Copy Username">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="cred-field">
                             <label>Password</label>
-                            <div class="cred-val">${esc(assetInfo.account_password || '')}</div>
+                            <div style="display:flex; gap: 8px;">
+                                <div class="cred-val" id="pwdVal" data-pwd="${encPass}" style="flex:1;">${hiddenPass}</div>
+                                <button class="icon-btn" onclick="togglePwd(this)" type="button" title="Show Password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="icon-btn" onclick="copyIcon(this, '${encPass}')" type="button" title="Copy Password">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1108,6 +1150,34 @@
             }).catch(() => {
                 button.textContent = 'Copy failed';
             });
+        }
+
+        function copyIcon(button, encodedText) {
+            const text = decodeURIComponent(encodedText);
+            navigator.clipboard.writeText(text).then(() => {
+                const icon = button.querySelector('i');
+                const oldClass = icon.className;
+                icon.className = 'fas fa-check';
+                button.classList.add('copied');
+                setTimeout(() => {
+                    icon.className = oldClass;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {});
+        }
+
+        function togglePwd(button) {
+            const pwdVal = document.getElementById('pwdVal');
+            const icon = button.querySelector('i');
+            const isHidden = icon.classList.contains('fa-eye');
+            
+            if (isHidden) {
+                icon.className = 'fas fa-eye-slash';
+                pwdVal.textContent = decodeURIComponent(pwdVal.getAttribute('data-pwd'));
+            } else {
+                icon.className = 'fas fa-eye';
+                pwdVal.textContent = '•'.repeat(decodeURIComponent(pwdVal.getAttribute('data-pwd')).length || 8);
+            }
         }
 
         function showError(message) {
