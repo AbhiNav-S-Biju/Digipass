@@ -1,0 +1,11 @@
+{
+  "user": {
+    "id": 15,
+    "full_name": "Test User",
+    "email": "test@example.com",
+    "created_at": "May 16, 2026"
+  },
+  "assets": [],
+  "executors": [],
+  "emergency_contacts": []
+}
