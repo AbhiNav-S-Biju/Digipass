@@ -2004,104 +2004,24 @@
 
         // Workflow Panel Functions
         function openWorkflowDirect(assetId, platform, account, action, message, password) {
-            const workflowPanel = document.getElementById('workflowPanel');
-            const appName = document.getElementById('appName');
-            const stepsList = document.getElementById('stepsList');
-            const previewContent = document.getElementById('previewContent');
-            
-            // Set app name
-            appName.textContent = platform;
-            
-            // Get workflow data for this platform and action
-            let workflowData = null;
-            let steps = [];
-            
-            if (typeof WORKFLOWS !== 'undefined' && WORKFLOWS[platform] && WORKFLOWS[platform].actions[action]) {
-                workflowData = WORKFLOWS[platform].actions[action];
-                steps = workflowData.steps || [];
+            sessionStorage.setItem('digipass_asset_id', assetId);
+            sessionStorage.setItem('digipass_platform_name', platform);
+            sessionStorage.setItem('digipass_account', account || '');
+            sessionStorage.setItem('digipass_action', action || '');
+            if (message) {
+                sessionStorage.setItem('digipass_message', message);
             } else {
-                // Fallback if WORKFLOWS not available
-                steps = [
-                    {
-                        stepNumber: 1,
-                        title: 'Account Information',
-                        description: 'Review account details',
-                        action: `Platform: ${platform} | Account: ${account}`,
-                        credentials: null,
-                        tips: ['Review the account information below']
-                    },
-                    {
-                        stepNumber: 2,
-                        title: 'Action Type',
-                        description: `Action: ${action}`,
-                        action: `Required action on this account: ${action}`,
-                        credentials: null,
-                        tips: ['Proceed with the specified action']
-                    }
-                ];
-                
-                if (password) {
-                    steps.push({
-                        stepNumber: 3,
-                        title: 'Credentials',
-                        description: 'Account credentials',
-                        action: 'Password is provided in this workflow',
-                        credentials: ['password'],
-                        tips: ['Keep credentials secure']
-                    });
-                }
-                
-                if (message) {
-                    steps.push({
-                        stepNumber: steps.length + 1,
-                        title: 'Special Instructions',
-                        description: 'Additional information',
-                        action: message,
-                        credentials: null,
-                        tips: ['Follow the instructions provided']
-                    });
-                }
+                sessionStorage.removeItem('digipass_message');
+            }
+            if (password) {
+                sessionStorage.setItem('digipass_password', password);
+            } else {
+                sessionStorage.removeItem('digipass_password');
             }
             
-            // Generate steps list
-            stepsList.innerHTML = steps.map((step, index) => `
-                <div class="step-item ${index === 0 ? 'step-item-active' : ''}" data-step="${index}">
-                    <div class="step-item-number">${step.stepNumber || index + 1}</div>
-                    <div class="step-item-content">
-                        <h5>${step.title}</h5>
-                        <p>${step.description || ''}</p>
-                    </div>
-                </div>
-            `).join('');
-            
-            // Generate preview for first step
-            renderStepPreview(steps[0], platform, account, action, password, message);
-            
-            // Add click handlers to steps
-            document.querySelectorAll('.step-item').forEach((stepEl, index) => {
-                stepEl.addEventListener('click', () => {
-                    // Update active step
-                    document.querySelectorAll('.step-item').forEach(el => {
-                        el.classList.remove('step-item-active');
-                    });
-                    stepEl.classList.add('step-item-active');
-                    
-                    // Update preview
-                    const stepIndex = parseInt(stepEl.dataset.step);
-                    renderStepPreview(steps[stepIndex], platform, account, action, password, message);
-                    
-                    // Update progress
-                    updateProgress(stepIndex, steps.length);
-                });
-            });
-            
-            // Update initial progress
-            updateProgress(0, steps.length);
-            
-            // Show workflow panel
-            workflowPanel.classList.remove('workflow-panel-hidden');
-            workflowPanel.classList.add('workflow-panel-visible');
+            window.open('workflow-window.html', '_blank');
         }
+
 
         function renderStepPreview(step, platform, account, action, password, message) {
             const previewContent = document.getElementById('previewContent');
