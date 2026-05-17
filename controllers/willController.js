@@ -42,7 +42,7 @@ async function generateWill(req, res, next) {
       });
     }
 
-    const [userResult, assetsResult, executorsResult] = await Promise.all([
+    const [userResult, assetsResult, executorsResult, customContentResult] = await Promise.all([
       pool.query(
         `SELECT user_id, full_name, email, created_at
          FROM users
@@ -64,6 +64,13 @@ async function generateWill(req, res, next) {
          WHERE user_id = $1
          ORDER BY created_at DESC`,
         [userId]
+      ),
+      pool.query(
+        `SELECT custom_content FROM digital_will
+         WHERE user_id = $1
+         ORDER BY created_at DESC
+         LIMIT 1`,
+        [userId]
       )
     ]);
 
@@ -77,6 +84,7 @@ async function generateWill(req, res, next) {
     const user = userResult.rows[0];
     const assets = assetsResult.rows;
     const executors = executorsResult.rows;
+    const customContent = customContentResult.rows.length > 0 ? customContentResult.rows[0].custom_content : null;
 
     // Prepare data for Python PDF generator (matching generate-will.py format)
     const pdfData = {
@@ -104,7 +112,8 @@ async function generateWill(req, res, next) {
         status: executor.status || 'pending',
         access_granted: executor.access_granted || false,
         created_at: executor.created_at ? executor.created_at.toISOString() : new Date().toISOString()
-      }))
+      })),
+      custom_content: customContent || null
     };
 
     // Ensure generated-wills directory exists
@@ -438,8 +447,8 @@ async function executorDownloadWill(req, res, next) {
 
     const userId = executor.user_id;
 
-    // Get user, assets, executors (same as generateWill)
-    const [userResult, assetsResult, executorsResult] = await Promise.all([
+    // Get user, assets, executors, and custom content
+    const [userResult, assetsResult, executorsResult, customContentResult] = await Promise.all([
       pool.query(
         `SELECT user_id, full_name, email, created_at
          FROM users
@@ -461,6 +470,13 @@ async function executorDownloadWill(req, res, next) {
          WHERE user_id = $1
          ORDER BY created_at DESC`,
         [userId]
+      ),
+      pool.query(
+        `SELECT custom_content FROM digital_will
+         WHERE user_id = $1
+         ORDER BY created_at DESC
+         LIMIT 1`,
+        [userId]
       )
     ]);
 
@@ -474,6 +490,7 @@ async function executorDownloadWill(req, res, next) {
     const user = userResult.rows[0];
     const assets = assetsResult.rows;
     const executors = executorsResult.rows;
+    const customContent = customContentResult.rows.length > 0 ? customContentResult.rows[0].custom_content : null;
 
     // Prepare data for Python PDF generator (matching generate-will.py format)
     const pdfData = {
@@ -501,7 +518,8 @@ async function executorDownloadWill(req, res, next) {
         status: executor.status || 'pending',
         access_granted: executor.access_granted || false,
         created_at: executor.created_at ? executor.created_at.toISOString() : new Date().toISOString()
-      }))
+      })),
+      custom_content: customContent || null
     };
 
     const willDirectory = path.join(process.cwd(), 'generated-wills');

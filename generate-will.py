@@ -1210,11 +1210,11 @@ def create_mock_data():
         "created_at": "2026-05-09T10:00:00Z"
       },
       "assets": [
-        { "name": "Facebook", "category": "social", "description": "Primary social media account.", "preferred_action": "memorialize", "created_at": "2026-05-10T11:00:00Z" },
-        { "name": "Gmail Account", "category": "email", "description": "Personal email address.", "preferred_action": "download", "created_at": "2026-05-10T11:05:00Z" },
-        { "name": "Coinbase Pro", "category": "finance", "description": "Cryptocurrency holdings.", "preferred_action": "transfer", "created_at": "2026-05-11T12:00:00Z" },
-        { "name": "iCloud Storage", "category": "storage", "description": "Family photos and documents.", "preferred_action": "pass_executor", "created_at": "2026-05-12T14:30:00Z" },
-        { "name": "Old MySpace", "category": "social", "description": "Ancient social media account.", "preferred_action": "delete", "created_at": "2026-05-12T15:00:00Z" }
+        { "name": "Facebook", "category": "social", "description": "Primary social media account.", "preferred_action": "memorialize", "final_message": "Please memorialize my account as a memorial page for family and friends.", "created_at": "2026-05-10T11:00:00Z" },
+        { "name": "Gmail Account", "category": "email", "description": "Personal email address.", "preferred_action": "download", "final_message": "Download all my emails and pass them to my executor for archival.", "created_at": "2026-05-10T11:05:00Z" },
+        { "name": "Coinbase Pro", "category": "finance", "description": "Cryptocurrency holdings.", "preferred_action": "transfer", "final_message": "Transfer all cryptocurrency holdings to the executor account specified in my will.", "created_at": "2026-05-11T12:00:00Z" },
+        { "name": "iCloud Storage", "category": "storage", "description": "Family photos and documents.", "preferred_action": "pass_executor", "final_message": "All family photos and documents should be transferred to Jane for safekeeping.", "created_at": "2026-05-12T14:30:00Z" },
+        { "name": "Old MySpace", "category": "social", "description": "Ancient social media account.", "preferred_action": "delete", "final_message": "Please delete this old account completely.", "created_at": "2026-05-12T15:00:00Z" }
       ],
       "executors": [
         { "name": "Jane M. Doe", "email": "jane.doe@example.com", "relationship": "Spouse", "status": "verified", "access_granted": True, "created_at": "2026-05-09T10:05:00Z" },
