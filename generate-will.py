@@ -576,23 +576,36 @@ def draw_testator_message(c, y, will_data, page_data):
     Draw testator's personal message from digital_will.custom_content.
     Only renders if custom_content is non-empty.
     """
-    message = (will_data or {}).get('custom_content', '').strip()
+    message = (will_data or {}).get('custom_content') or ""
+    message = message.strip()
     if not message:
         return y
 
     # Section heading
     y = check_page_break(c, y, 50 * mm, page_data)
     y = draw_article_heading(c, y,
-        "ARTICLE  I-B",
-        "TESTATOR'S PERSONAL DECLARATION")
+        "ARTICLE  V",
+        "CUSTOM DIGITAL WILL CONTENT")
     y -= 4 * mm
 
-    # Card with FOREST left strip
-    chars_per_line = 85
-    lines = max(3, len(message) // chars_per_line + 2)
-    card_h = max(28 * mm, lines * 5 * mm + 12 * mm)
+    # Measure text height exactly
+    msg_style = ParagraphStyle(
+        'TestatorMsg',
+        fontName='Helvetica-Oblique',
+        fontSize=9.5,
+        textColor=colors.HexColor('#2c3a2e'),
+        leading=15,
+        alignment=TA_JUSTIFY,
+    )
+    # Convert newlines to HTML <br/> for ReportLab Paragraph
+    formatted_msg = message.replace('\n', '<br/>')
+    p = Paragraph(formatted_msg, msg_style)
+    p_w, p_h = p.wrap(CW - 18 * mm, PAGE_HEIGHT)
 
-    y = check_page_break(c, y, card_h + 4 * mm, page_data)
+    # Card height based on actual text height + padding
+    card_h = max(28 * mm, p_h + 16 * mm)
+
+    y = check_page_break(c, y, card_h + 10 * mm, page_data)
 
     # Shadow
     c.setFillColor(colors.HexColor('#d4c4a0'))
@@ -618,18 +631,8 @@ def draw_testator_message(c, y, will_data, page_data):
     c.setFont('Helvetica-Bold', 32)
     c.drawString(ML + 10 * mm, y - 9 * mm, '\u201c')
 
-    # Message text
-    msg_style = ParagraphStyle(
-        'TestatorMsg',
-        fontName='Helvetica-Oblique',
-        fontSize=9.5,
-        textColor=colors.HexColor('#2c3a2e'),
-        leading=15,
-        alignment=TA_JUSTIFY,
-    )
-    p = Paragraph(message, msg_style)
-    p_w, p_h = p.wrapOn(c, CW - 18 * mm, card_h - 14 * mm)
-    p.drawOn(c, ML + 10 * mm, y - card_h + 6 * mm)
+    # Draw Message text (aligned to top with padding)
+    p.drawOn(c, ML + 10 * mm, y - p_h - 8 * mm)
 
     # Closing quote mark
     c.setFillColor(colors.HexColor('#8cbf9c'))
@@ -710,9 +713,7 @@ def draw_page1(c, data, page_data):
     draw_section_rule(c, y)
     y -= SECTION_GAP
 
-    # Testator personal message (from digital_will.custom_content)
-    will_data = data.get('will') or {'custom_content': data.get('custom_content', '')}
-    y = draw_testator_message(c, y, will_data, page_data)
+    # Testator personal message moved to end of document
     
     # Article II - Schedule of Digital Assets
     y = check_page_break(c, y, 55 * mm, page_data)
@@ -861,9 +862,17 @@ def draw_page1(c, data, page_data):
     draw_section_rule(c, y)
     y -= SECTION_GAP
 
-    # ── ARTICLE V: DISCLAIMER ──
+    # Testator personal message (from digital_will.custom_content)
+    will_data = data.get('will') or {'custom_content': data.get('custom_content', '')}
+    y = draw_testator_message(c, y, will_data, page_data)
+
+    y -= 5 * mm
+    draw_section_rule(c, y)
+    y -= SECTION_GAP
+
+    # ── ARTICLE VI: DISCLAIMER ──
     y = check_page_break(c, y, 50 * mm, page_data)
-    y = draw_article_heading(c, y, "ARTICLE  V",
+    y = draw_article_heading(c, y, "ARTICLE  VI",
         "GOVERNING TERMS AND LEGAL DISCLAIMER")
     y -= SECTION_GAP + 3 * mm
 
