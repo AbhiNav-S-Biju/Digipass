@@ -319,40 +319,36 @@ def draw_header_page1(c, user_data):
     c.setLineWidth(0.7)
     c.line(0, PAGE_HEIGHT - 56 * mm, PAGE_WIDTH, PAGE_HEIGHT - 56 * mm)
     
-    # Vault icon (adjusted for reduced header)
-    draw_vault_icon(c, ML, PAGE_HEIGHT - 7 * mm, size=28, on_dark=True)
+    # Vault icon (Top left)
+    draw_vault_icon(c, ML, PAGE_HEIGHT - 7 * mm, size=22, on_dark=True)
     
     # Wordmark and tagline
-    c.setFont("Helvetica-Bold", 16)
+    c.setFont("Helvetica-Bold", 14)
     c.setFillColor(COLORS['CREAM_LIGHT'])
-    c.drawString(ML + 36 * mm, PAGE_HEIGHT - 9 * mm, "Digipass")
+    c.drawString(ML + 30 * mm, PAGE_HEIGHT - 11 * mm, "Digipass")
     
-    c.setFont("Helvetica", 7)
+    c.setFont("Helvetica", 6.5)
     c.setFillColor(COLORS['SAGE'])
-    c.drawString(ML + 37 * mm, PAGE_HEIGHT - 15 * mm, "DIGITAL  ESTATE")
+    c.drawString(ML + 30 * mm, PAGE_HEIGHT - 16 * mm, "DIGITAL  ESTATE")
     
-    # Thin rule
-    c.setStrokeColor(COLORS['FOREST_LIGHT'])
-    c.setLineWidth(0.4)
-    c.line(ML + 36 * mm, PAGE_HEIGHT - 17 * mm, ML + 100 * mm, PAGE_HEIGHT - 17 * mm)
-    
-    # Main title (adjusted for reduced header)
-    c.setFont("Helvetica-Bold", 18)
-    c.setFillColor(COLORS['WHITE'])
-    c.drawString(ML, PAGE_HEIGHT - 22 * mm, "DIGITAL WILL & ESTATE DECLARATION")
-    
-    # Subtitle
-    c.setFont("Helvetica-Bold", 8)
-    c.setFillColor(COLORS['SAGE'])
-    c.drawString(ML, PAGE_HEIGHT - 29 * mm, "A STRUCTURED RECORD OF DIGITAL ASSETS AND EXECUTOR ASSIGNMENTS")
-    
-    # Document meta right-aligned
+    # Document meta right-aligned (Top right)
     now = datetime.now()
     instrument_no = f"DW-{now.strftime('%Y%m%d')}-U{user_data['id']}"
     
     c.setFont("Helvetica", 7)
-    c.drawString(MR - 100 * mm, PAGE_HEIGHT - 37 * mm, f"INSTRUMENT NO.  {instrument_no}")
-    c.drawString(MR - 100 * mm, PAGE_HEIGHT - 42 * mm, f"GENERATED: {now.strftime('%d %B %Y')}  ·  CONFIDENTIAL")
+    c.setFillColor(COLORS['SAGE'])
+    c.drawRightString(MR, PAGE_HEIGHT - 11 * mm, f"INSTRUMENT NO.  {instrument_no}")
+    c.drawRightString(MR, PAGE_HEIGHT - 16 * mm, f"GENERATED: {now.strftime('%d %B %Y')}  ·  CONFIDENTIAL")
+
+    # Main title (Below logo, Times-Bold)
+    c.setFont("Times-Bold", 24)
+    c.setFillColor(COLORS['WHITE'])
+    c.drawString(ML, PAGE_HEIGHT - 30 * mm, "DIGITAL WILL & ESTATE DECLARATION")
+    
+    # Subtitle
+    c.setFont("Helvetica-Bold", 8.5)
+    c.setFillColor(COLORS['SAGE'])
+    c.drawString(ML, PAGE_HEIGHT - 38 * mm, "A STRUCTURED RECORD OF DIGITAL ASSETS AND EXECUTOR ASSIGNMENTS")
 
 def draw_header_page2(c, user_data):
     """Draw header band for Page 2"""
@@ -451,10 +447,10 @@ def draw_article_heading(c, y, article_label, title_text):
     c.setFillColor(colors.HexColor('#8cbf9c'))
     c.circle(ML + label_width + 3 * mm, y + 1.5 * mm, 1.4 * mm, fill=1, stroke=0)
 
-    # Title — MUCH larger than before
-    c.setFont("Helvetica-Bold", 14)
+    # Title — MUCH larger than before (Times-Bold and Title Case)
+    c.setFont("Times-Bold", 16)
     c.setFillColor(colors.HexColor('#1b3a2d'))
-    c.drawString(ML + label_width + 8 * mm, y - 1 * mm, title_text)
+    c.drawString(ML + label_width + 8 * mm, y - 1 * mm, title_text.title())
 
     # Double rule below: thick + thin
     c.setStrokeColor(colors.HexColor('#1b3a2d'))
@@ -531,22 +527,18 @@ def draw_section_rule(c, y):
     mid_x = ML + (MR - ML) / 2
 
     # Left segment
-    c.setStrokeColor(colors.HexColor('#d4c4a0'))
-    c.setLineWidth(0.5)
-    c.line(ML, y, mid_x - 6 * mm, y)
+    c.setStrokeColor(colors.HexColor('#8cbf9c'))
+    c.setLineWidth(0.6)
+    c.line(ML, y, mid_x - 3 * mm, y)
 
-    # Center dot cluster
+    # Center single dot
     c.setFillColor(colors.HexColor('#8cbf9c'))
-    c.circle(mid_x - 3 * mm, y, 1 * mm, fill=1, stroke=0)
-    c.setFillAlpha(0.5)
-    c.circle(mid_x, y, 1.4 * mm, fill=1, stroke=0)
-    c.setFillAlpha(1)
-    c.circle(mid_x + 3 * mm, y, 1 * mm, fill=1, stroke=0)
+    c.circle(mid_x, y, 1.2 * mm, fill=1, stroke=0)
 
     # Right segment
-    c.setStrokeColor(colors.HexColor('#d4c4a0'))
-    c.setLineWidth(0.5)
-    c.line(mid_x + 6 * mm, y, MR, y)
+    c.setStrokeColor(colors.HexColor('#8cbf9c'))
+    c.setLineWidth(0.6)
+    c.line(mid_x + 3 * mm, y, MR, y)
 
     return y - 3 * mm
 
