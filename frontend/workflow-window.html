@@ -4,365 +4,1177 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DIGIPASS - Workflow Instructions</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * {
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
+        :root {
+            --bg: #f5e6ce;
+            --bg-deep: #eddcbc;
+            --bg-card: #ffffff;
+            --ink: #102c26;
+            --ink-mid: #2a4a42;
+            --ink-soft: #5a7a72;
+            --border: rgba(16, 44, 38, 0.11);
+            --border-md: rgba(16, 44, 38, 0.2);
+            --action-bg: #f6f2eb;
+            --tip-bg: #fffcf4;
+            --tip-bdr: #ddb96a;
+            --msg-bg: #edf4f1;
+            --radius: 10px;
+            --radius-sm: 6px;
+        }
+
+        html,
         body {
-            background-color: #f7e7ce;
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            height: 100vh;
+            height: 100%;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             overflow: hidden;
         }
-        
-        .workflow-container {
+
+        .shell {
             display: flex;
             height: 100vh;
-            gap: 0;
         }
-        
-        .instructions-panel {
-            width: 100%;
-            background-color: #f7e7ce;
-            color: #102c26;
-            padding: 20px;
-            overflow-y: auto;
-            border-right: none;
-        }
-        
-        .platform-panel {
-            display: none;
-            background: linear-gradient(135deg, #f7e7ce 0%, #f0dcc0 100%);
+
+        .sidebar {
+            width: 272px;
+            min-width: 272px;
+            background: var(--ink);
             display: flex;
             flex-direction: column;
-            padding: 0;
             overflow: hidden;
         }
-        
-        .platform-panel-header {
-            padding: 12px 20px;
-            background-color: white;
-            border-bottom: 1px solid #ddd;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
+
+        .sb-head {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            flex-shrink: 0;
         }
-        
-        .platform-panel-header h5 {
-            margin: 0;
-            font-size: 0.9rem;
-            color: #102c26;
-            font-weight: 600;
-        }
-        
-        #platformIframe {
-            flex: 1;
-            border: none;
-            width: 100%;
-            height: 100%;
-            background-color: white;
-        }
-        
-        .instructions-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #102c26;
-        }
-        
-        .instructions-header h4 {
-            margin: 0;
-            color: #102c26;
-            font-weight: 600;
-        }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #102c26;
-        }
-        
-        .close-btn:hover {
-            color: #0a1f1a;
-        }
-        
-        .credentials-box {
-            background-color: rgba(16, 44, 38, 0.08);
-            border: 2px solid #102c26;
-            border-radius: 6px;
-            padding: 14px;
-            margin-bottom: 20px;
-        }
-        
-        .credentials-box h5 {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #102c26;
-            margin-bottom: 10px;
-        }
-        
-        .credential-field {
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-        }
-        
-        .credential-field strong {
-            color: #102c26;
-            display: block;
-            margin-bottom: 3px;
-        }
-        
-        .credential-value {
-            background: white;
-            padding: 6px 8px;
-            border-radius: 3px;
-            border: 1px solid #102c26;
-            word-break: break-all;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-        }
-        
-        .steps-container {
-            margin-top: 20px;
-        }
-        
-        .steps-container h5 {
-            color: #102c26;
-            font-weight: 600;
-            margin-bottom: 12px;
-            font-size: 0.95rem;
-        }
-        
-        .step-item {
-            background: white;
-            border: 1px solid #e0d4c0;
-            border-radius: 4px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-        
-        .step-header {
+
+        .sb-platform-row {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 9px;
         }
-        
-        .step-number {
-            background: #102c26;
-            color: #f7e7ce;
-            width: 28px;
-            height: 28px;
+
+        .sb-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: rgba(245, 230, 206, 0.13);
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            font-weight: 600;
-            font-size: 0.9rem;
+            color: #f5e6ce;
+            font-size: 1rem;
             flex-shrink: 0;
         }
-        
-        .step-title {
+
+        .sb-name {
+            flex: 1;
+            min-width: 0;
+            color: #f5e6ce;
+            font-size: 0.95rem;
             font-weight: 600;
-            color: #102c26;
-            margin: 0;
+            letter-spacing: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        
-        .step-description {
-            font-size: 0.9rem;
-            color: #555;
-            margin: 6px 0;
-            line-height: 1.4;
-        }
-        
-        .step-action {
-            font-size: 0.85rem;
-            color: #102c26;
-            background: #f9f6f1;
-            padding: 6px;
-            border-radius: 3px;
-            margin: 0;
-        }
-        
-        .platform-panel h3 {
-            color: #102c26;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .open-platform-btn {
-            background-color: #102c26;
-            color: #f7e7ce;
-            border: none;
-            padding: 14px 28px;
-            font-size: 1.1rem;
-            border-radius: 6px;
+
+        .sb-close {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(245, 230, 206, 0.08);
+            border: 1px solid rgba(245, 230, 206, 0.14);
+            color: rgba(245, 230, 206, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            transition: background-color 0.3s;
+            font-size: 0.72rem;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .sb-close:hover {
+            background: rgba(245, 230, 206, 0.18);
+            color: #f5e6ce;
+        }
+
+        .sb-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 8px;
+            background: rgba(245, 230, 206, 0.09);
+            color: rgba(245, 230, 206, 0.58);
+            font-size: 0.68rem;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            padding: 3px 9px 3px 7px;
+            border-radius: 20px;
+        }
+
+        .sb-badge i {
+            font-size: 0.65rem;
+        }
+
+        .sb-steps {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 10px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+        }
+
+        .sb-steps::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .sb-steps::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 3px;
+        }
+
+        .sb-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            padding: 9px;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: background 0.12s;
+        }
+
+        .sb-step:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sb-step.active {
+            background: rgba(245, 230, 206, 0.11);
+        }
+
+        .sb-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(245, 230, 206, 0.5);
+            font-size: 0.68rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 1px;
+            transition: all 0.15s;
+        }
+
+        .sb-step.active .sb-num {
+            background: #f5e6ce;
+            border-color: #f5e6ce;
+            color: var(--ink);
+        }
+
+        .sb-step.done .sb-num {
+            background: rgba(245, 230, 206, 0.15);
+            border-color: rgba(245, 230, 206, 0.35);
+            color: #f5e6ce;
+        }
+
+        .sb-step-text {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .sb-step-title {
+            color: rgba(245, 230, 206, 0.76);
+            font-size: 0.8rem;
+            font-weight: 600;
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sb-step.active .sb-step-title {
+            color: #f5e6ce;
+        }
+
+        .sb-step-sub {
+            color: rgba(245, 230, 206, 0.34);
+            font-size: 0.68rem;
+            margin-top: 1px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sb-connector {
+            height: 10px;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.08);
+            margin-left: 20px;
+        }
+
+        .sb-footer {
+            padding: 10px 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            color: rgba(245, 230, 206, 0.28);
+            font-size: 0.66rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .main-topbar {
             display: flex;
             align-items: center;
             gap: 10px;
+            padding: 12px 26px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+            flex-shrink: 0;
         }
-        
-        .open-platform-btn:hover {
-            background-color: #0a1f1a;
-            color: #f7e7ce;
+
+        .step-pill {
+            flex-shrink: 0;
+            color: var(--ink-soft);
+            background: var(--bg-deep);
+            border: 1px solid var(--border-md);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.67rem;
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            white-space: nowrap;
         }
-        
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #102c26;
+
+        .topbar-title {
+            color: var(--ink-mid);
+            font-size: 0.82rem;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        
-        .error-msg {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 12px;
+
+        .main-scroll {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .main-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .main-scroll::-webkit-scrollbar-thumb {
+            background: var(--border);
             border-radius: 4px;
-            margin: 12px 0;
-            border: 1px solid #f5c6cb;
+        }
+
+        .main-body {
+            max-width: 800px;
+            padding: 26px 28px 24px;
+        }
+
+        .step-eyebrow {
+            color: var(--ink-soft);
+            font-size: 0.67rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .step-h1 {
+            color: var(--ink);
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 0;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 18px 0;
+        }
+
+        .cred-box {
+            background: var(--bg-card);
+            border: 1.5px solid var(--ink);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            margin-bottom: 20px;
+        }
+
+        .cred-header {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--ink-soft);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .cred-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .cred-field label {
+            display: block;
+            color: var(--ink-soft);
+            font-size: 0.67rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .cred-val {
+            background: var(--action-bg);
+            border: 1px solid var(--border-md);
+            border-radius: var(--radius-sm);
+            color: var(--ink);
+            font-family: "DM Mono", monospace;
+            font-size: 0.8rem;
+            padding: 7px 10px;
+            word-break: break-all;
+        }
+
+        .action-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 18px;
+            box-shadow: 0 1px 4px rgba(16, 44, 38, 0.06);
+        }
+
+        .action-card-head {
+            background: var(--ink);
+            color: #f5e6ce;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+        }
+
+        .action-card-head i {
+            opacity: 0.65;
+            font-size: 0.75rem;
+        }
+
+        .pipe-row {
+            display: flex;
+            align-items: stretch;
+            padding: 0 16px 0 14px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.1s;
+        }
+
+        .pipe-row:last-child {
+            border-bottom: none;
+        }
+
+        .pipe-row:hover {
+            background: #faf8f4;
+        }
+
+        .pipe-icon-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 32px;
+            flex-shrink: 0;
+            margin-right: 13px;
+            padding: 13px 0;
+        }
+
+        .pipe-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--action-bg);
+            border: 1px solid var(--border-md);
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.82rem;
+            flex-shrink: 0;
+        }
+
+        .pipe-line {
+            width: 1.5px;
+            flex: 1;
+            min-height: 10px;
+            background: var(--border);
+            margin: 4px auto 0;
+        }
+
+        .pipe-content {
+            flex: 1;
+            min-width: 0;
+            padding: 13px 0;
+        }
+
+        .pipe-label {
+            color: var(--ink-soft);
+            font-size: 0.63rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .pipe-text {
+            color: var(--ink);
+            font-size: 0.86rem;
+            font-weight: 500;
+            line-height: 1.45;
+        }
+
+        .tips-card {
+            background: var(--tip-bg);
+            border: 1px solid var(--tip-bdr);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            margin-bottom: 18px;
+        }
+
+        .tips-head {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #7a5c1e;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .tips-head i {
+            color: #c49a3c;
+            font-size: 0.78rem;
+        }
+
+        .tips-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .tip-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            color: #5a4510;
+            font-size: 0.83rem;
+            line-height: 1.45;
+        }
+
+        .tip-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(196, 154, 60, 0.16);
+            color: #b8891c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.5rem;
+            flex-shrink: 0;
+            margin-top: 3px;
+        }
+
+        .msg-card {
+            background: var(--msg-bg);
+            border: 1.5px solid var(--ink);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 18px;
+        }
+
+        .msg-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 9px 14px;
+            border-bottom: 1px solid rgba(16, 44, 38, 0.12);
+        }
+
+        .msg-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--ink);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .copy-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--ink);
+            color: #f5e6ce;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 5px 11px;
+            transition: opacity 0.15s, background 0.15s;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            opacity: 0.82;
+        }
+
+        .copy-btn.copied {
+            background: #1a7a55;
+        }
+
+        .msg-body {
+            color: var(--ink);
+            font-size: 0.9rem;
+            font-style: italic;
+            line-height: 1.65;
+            min-height: 64px;
+            padding: 16px;
+            white-space: pre-wrap;
+        }
+
+        .nav-footer {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            border-top: 1px solid var(--border);
+            background: var(--bg);
+            padding: 12px 26px;
+            flex-shrink: 0;
+        }
+
+        .progress-wrap {
+            flex: 1;
+        }
+
+        .progress-label {
+            color: var(--ink-soft);
+            font-size: 0.67rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .progress-track {
+            height: 3px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0;
+            background: var(--ink);
+            border-radius: 10px;
+            transition: width 0.35s ease;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1.5px solid var(--ink);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 8px 16px;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .btn-ghost:hover:not(:disabled) {
+            background: var(--bg-deep);
+        }
+
+        .btn-ghost:disabled {
+            cursor: default;
+            opacity: 0.28;
+        }
+
+        .btn-solid {
+            background: var(--ink);
+            color: #f5e6ce;
+        }
+
+        .btn-solid:hover {
+            opacity: 0.88;
+        }
+
+        .btn-done {
+            background: #1a7a55;
+            border-color: #1a7a55;
+            color: #ffffff;
+        }
+
+        .btn-done:hover {
+            background: #145e41;
+            border-color: #145e41;
+        }
+
+        .state-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            color: var(--ink-soft);
+            font-size: 0.88rem;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 2.5px solid var(--border);
+            border-top-color: var(--ink);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .state-error {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            border-radius: var(--radius);
+            color: #7f1d1d;
+            font-size: 0.85rem;
+            margin: 20px;
+            padding: 14px 16px;
+        }
+
+        .step-enter {
+            animation: stepIn 0.2s ease both;
+        }
+
+        @keyframes stepIn {
+            from {
+                opacity: 0;
+                transform: translateY(7px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @media (max-width: 720px) {
+            body {
+                overflow: auto;
+            }
+
+            .shell {
+                min-height: 100vh;
+                height: auto;
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                min-width: 0;
+                max-height: 260px;
+            }
+
+            .main {
+                min-height: 640px;
+            }
+
+            .main-body {
+                padding: 22px 18px 24px;
+            }
+
+            .cred-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-footer {
+                align-items: stretch;
+                flex-wrap: wrap;
+                padding: 12px 18px;
+            }
+
+            .progress-wrap {
+                flex-basis: 100%;
+            }
+
+            .nav-btn {
+                flex: 1;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="workflow-container">
-        <!-- LEFT: Instructions -->
-        <div class="instructions-panel">
-            <div class="instructions-header">
-                <h4><i class="fas fa-tasks"></i> <span id="platformName">Instructions</span></h4>
-                <button class="close-btn" onclick="window.close()" title="Close">
-                    <i class="fas fa-times"></i>
-                </button>
+    <div class="shell">
+        <aside class="sidebar">
+            <div class="sb-head">
+                <div class="sb-platform-row">
+                    <div class="sb-icon" id="sbIcon"><i class="fas fa-globe"></i></div>
+                    <span class="sb-name" id="sbName">Platform</span>
+                    <button class="sb-close" onclick="window.close()" title="Close" type="button">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="sb-badge" id="sbBadge"><i class="fas fa-list"></i> Workflow</div>
             </div>
-            
-            <div id="content">
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i> Loading instructions...
+
+            <div class="sb-steps" id="sbSteps">
+                <div style="padding:20px;text-align:center;color:rgba(245,230,206,0.3);font-size:.78rem;">Loading...</div>
+            </div>
+
+            <div class="sb-footer">DIGIPASS &middot; Workflow Guide</div>
+        </aside>
+
+        <main class="main">
+            <div class="main-topbar">
+                <span class="step-pill" id="stepPill">Step - of -</span>
+                <span class="topbar-title" id="topbarTitle"></span>
+            </div>
+
+            <div class="main-scroll" id="mainScroll">
+                <div class="main-body" id="mainBody">
+                    <div class="state-loading">
+                        <div class="spinner"></div>
+                        <span>Loading instructions...</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- RIGHT: Platform Window -->
-        <div class="platform-panel">
-            <div class="platform-panel-header">
-                <h5 id="platformHeaderName"><i class="fas fa-globe"></i> <span id="platformHeaderText">Platform</span></h5>
+
+            <div class="nav-footer" id="navFooter">
+                <div class="progress-wrap">
+                    <div class="progress-label" id="progressLabel">Step 1 of 1</div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                <button class="nav-btn btn-ghost" id="prevBtn" onclick="navigate(-1)" disabled type="button">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <button class="nav-btn btn-solid" id="nextBtn" onclick="navigate(1)" type="button">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
-            <iframe id="platformIframe" title="Platform login"></iframe>
-        </div>
+        </main>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         const API_URL = 'https://digipass-3l63.onrender.com/api';
-        let platformUrl = '';
-        let platformName = '';
-        
-        function escapeHtml(text) {
-            if (!text) return '';
+        let allSteps = [];
+        let current = 0;
+        let assetInfo = null;
+        let platformName = 'Platform';
+
+        const ICON_RULES = [
+            { keys: ['open web browser', 'web browser', 'open browser', 'open chrome', 'open firefox', 'open safari', 'address bar'], icon: 'fa-globe', label: 'Open Browser' },
+            { keys: ['instagram.com', 'facebook.com', 'linkedin.com', 'twitter.com', 'x.com', 'disneyplus.com', 'netflix.com', 'spotify.com', 'gmail.com', 'google.com', 'amazon.com', 'messenger.com'], icon: 'fa-arrow-up-right-from-square', label: 'Visit Site' },
+            { keys: ['log in', 'login', 'sign in', 'enter username', 'enter email', 'enter your email', 'enter password', 'click "login"', 'click "log in"', 'click "sign in"'], icon: 'fa-right-to-bracket', label: 'Sign In' },
+            { keys: ['two-factor', '2fa', 'authenticat', 'verification code', 'approve the login'], icon: 'fa-shield-halved', label: '2FA Verification' },
+            { keys: ['click profile picture', 'click profile icon', 'profile icon', 'click your profile', 'top right corner', 'profile photo'], icon: 'fa-circle-user', label: 'Open Profile' },
+            { keys: ['accounts center', 'personal details', 'account ownership', 'deactivation or deletion'], icon: 'fa-sliders', label: 'Accounts Center' },
+            { keys: ['click "more"', 'click more', 'bottom-left', 'left sidebar', 'left navigation', 'navigation sidebar'], icon: 'fa-bars', label: 'Open Menu' },
+            { keys: ['click "settings"', 'open settings', 'settings ->', 'settings', 'go to settings', 'click settings'], icon: 'fa-gear', label: 'Settings' },
+            { keys: ['security section', 'login & security', 'security ->', 'click "security"'], icon: 'fa-lock', label: 'Security' },
+            { keys: ['change password', 'new password', 'enter new', 'confirm new password', 'click "change password"', 'update password'], icon: 'fa-key', label: 'Change Password' },
+            { keys: ['re-enter your password', 'enter your password', 'confirm your password', 'enter current password'], icon: 'fa-lock-open', label: 'Confirm Password' },
+            { keys: ['delete account', 'click "delete account"', 'permanently delet', 'select "delete account"'], icon: 'fa-trash', label: 'Delete Account' },
+            { keys: ['deactivate account', 'select "deactivate"', 'choose "deactivate"'], icon: 'fa-circle-pause', label: 'Deactivate' },
+            { keys: ['select a reason', 'choose a reason', 'select reason'], icon: 'fa-list-check', label: 'Select Reason' },
+            { keys: ['click "continue"', 'click continue', 'click "next"', 'continue'], icon: 'fa-arrow-right', label: 'Continue' },
+            { keys: ['confirm on the final', 'final screen', 'click "confirm"', 'confirm deletion', 'confirm'], icon: 'fa-circle-check', label: 'Confirm' },
+            { keys: ['download your data', 'export your data', 'download a copy'], icon: 'fa-download', label: 'Download Data' },
+            { keys: ['messenger icon', 'chat bubble', 'message icon', 'open direct messages', 'access your messages', 'inbox will open', 'open your inbox', 'open inbox', 'open messenger', 'paper plane'], icon: 'fa-comment-dots', label: 'Open Messages' },
+            { keys: ['select recipient', 'choose who', 'find the person', 'search for the person', 'open the conversation', 'click their name', 'type the person'], icon: 'fa-user', label: 'Select Contact' },
+            { keys: ['type your', 'compose', 'write your message', 'click message input', 'message input field', 'farewell message'], icon: 'fa-pen-to-square', label: 'Compose Message' },
+            { keys: ['click send', 'send button', 'click "send"', 'message is sent', 'press send', 'airplane icon'], icon: 'fa-paper-plane', label: 'Send' },
+            { keys: ['subscription', 'billing', 'payment', 'check your card', 'payment method', 'click "subscriptions"'], icon: 'fa-credit-card', label: 'Billing' },
+            { keys: ['trusted contact', 'trusted contacts', 'add executor'], icon: 'fa-user-shield', label: 'Trusted Contacts' },
+            { keys: ['screenshot', 'take screenshots', 'take a screenshot'], icon: 'fa-camera', label: 'Screenshot' },
+            { keys: ['save this info', 'write down', 'save in a secure', 'note any', 'list all', 'document account'], icon: 'fa-floppy-disk', label: 'Save Info' },
+            { keys: ['cancel subscription', 'cancel your subscription', 'click "cancel"'], icon: 'fa-ban', label: 'Cancel' },
+            { keys: ['verify', 'confirm cancellation'], icon: 'fa-circle-check', label: 'Verify' },
+            { keys: ['scroll down', 'scroll to find'], icon: 'fa-arrows-up-down', label: 'Scroll' },
+            { keys: ['press enter', 'press tab'], icon: 'fa-keyboard', label: 'Keyboard' },
+            { keys: ['click "save"', 'click save', 'save changes'], icon: 'fa-floppy-disk', label: 'Save' },
+            { keys: ['wait for', 'fully load', 'page to load'], icon: 'fa-hourglass-half', label: 'Wait' },
+        ];
+
+        const PLATFORM_ICONS = {
+            instagram: 'fab fa-instagram',
+            facebook: 'fab fa-facebook-f',
+            twitter: 'fab fa-twitter',
+            x: 'fab fa-x-twitter',
+            linkedin: 'fab fa-linkedin-in',
+            gmail: 'fas fa-envelope',
+            google: 'fab fa-google',
+            netflix: 'fas fa-film',
+            spotify: 'fab fa-spotify',
+            amazon: 'fab fa-amazon',
+            apple: 'fab fa-apple',
+            disney: 'fas fa-wand-magic-sparkles',
+            youtube: 'fab fa-youtube',
+            snapchat: 'fab fa-snapchat',
+            tiktok: 'fab fa-tiktok',
+            reddit: 'fab fa-reddit-alien',
+            discord: 'fab fa-discord',
+            whatsapp: 'fab fa-whatsapp',
+            pinterest: 'fab fa-pinterest',
+        };
+
+        const ACTION_META = {
+            delete: { icon: 'fa-trash', label: 'Delete Account' },
+            pass: { icon: 'fa-share-nodes', label: 'Pass to Executor' },
+            pass_executor: { icon: 'fa-share-nodes', label: 'Pass to Executor' },
+            last_message: { icon: 'fa-paper-plane', label: 'Last Message' },
+            memorialise: { icon: 'fa-ribbon', label: 'Memorialise' },
+            memorialize: { icon: 'fa-ribbon', label: 'Memorialize' },
+            transfer: { icon: 'fa-right-left', label: 'Transfer' },
+            download: { icon: 'fa-download', label: 'Download' },
+            deactivate: { icon: 'fa-circle-pause', label: 'Deactivate' },
+        };
+
+        function esc(value) {
+            if (value == null) return '';
             const div = document.createElement('div');
-            div.textContent = text;
+            div.textContent = String(value);
             return div.innerHTML;
         }
-        
+
+        function iconFor(text) {
+            const low = String(text || '').toLowerCase();
+            for (const rule of ICON_RULES) {
+                if (rule.keys.some((key) => low.includes(key))) {
+                    return { icon: rule.icon, label: rule.label };
+                }
+            }
+            return { icon: 'fa-computer-mouse', label: 'Action' };
+        }
+
+        function parseAction(raw) {
+            if (!raw) return [];
+            return String(raw)
+                .split(/\s*(?:->|\u2192|\u00e2\u2020\u2019)\s*|\n+|\d+\)\s+|\d+\.\s+/)
+                .map((chunk) => chunk.trim())
+                .filter((chunk) => chunk.length > 3)
+                .map((text) => ({ text, ...iconFor(text) }));
+        }
+
+        function applyBranding(actionType) {
+            document.getElementById('sbName').textContent = platformName;
+            const platformKey = Object.keys(PLATFORM_ICONS).find((key) => platformName.toLowerCase().includes(key));
+            document.getElementById('sbIcon').innerHTML = `<i class="${platformKey ? PLATFORM_ICONS[platformKey] : 'fas fa-globe'}"></i>`;
+
+            const meta = ACTION_META[actionType] || { icon: 'fa-list', label: 'Workflow' };
+            document.getElementById('sbBadge').innerHTML = `<i class="fas ${meta.icon}"></i> ${esc(meta.label)}`;
+        }
+
+        function buildSidebar() {
+            const sidebar = document.getElementById('sbSteps');
+            sidebar.innerHTML = allSteps.map((step, i) => `
+                <div class="sb-step${i === current ? ' active' : ''}" id="sbStep${i}" onclick="goTo(${i})">
+                    <div class="sb-num" id="sbNum${i}">${i + 1}</div>
+                    <div class="sb-step-text">
+                        <div class="sb-step-title">${esc(step.title || `Step ${i + 1}`)}</div>
+                        <div class="sb-step-sub">${esc(step.description || '')}</div>
+                    </div>
+                </div>
+                ${i < allSteps.length - 1 ? '<div class="sb-connector"></div>' : ''}
+            `).join('');
+        }
+
+        function syncSidebar() {
+            allSteps.forEach((_, i) => {
+                const row = document.getElementById(`sbStep${i}`);
+                const num = document.getElementById(`sbNum${i}`);
+                if (!row || !num) return;
+
+                row.classList.toggle('active', i === current);
+                row.classList.toggle('done', i < current);
+                num.innerHTML = i < current
+                    ? '<i class="fas fa-check" style="font-size:.55rem"></i>'
+                    : String(i + 1);
+            });
+        }
+
+        function renderCredentials(idx, step) {
+            if (idx !== 0 || !assetInfo?.account_password) return '';
+
+            const hasCredentialStep = !step.credentials || step.credentials.length || assetInfo.account_identifier;
+            if (!hasCredentialStep) return '';
+
+            return `
+                <div class="cred-box">
+                    <div class="cred-header"><i class="fas fa-key"></i> Login Credentials</div>
+                    <div class="cred-grid">
+                        <div class="cred-field">
+                            <label>Username / Email</label>
+                            <div class="cred-val">${esc(assetInfo.account_identifier || '')}</div>
+                        </div>
+                        <div class="cred-field">
+                            <label>Password</label>
+                            <div class="cred-val">${esc(assetInfo.account_password || '')}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderActionCard(step) {
+            const chunks = parseAction(step.action);
+            const rows = chunks.map((chunk, i) => `
+                <div class="pipe-row">
+                    <div class="pipe-icon-col">
+                        <div class="pipe-icon"><i class="fas ${esc(chunk.icon)}"></i></div>
+                        ${i < chunks.length - 1 ? '<div class="pipe-line"></div>' : ''}
+                    </div>
+                    <div class="pipe-content">
+                        <div class="pipe-label">${esc(chunk.label)}</div>
+                        <div class="pipe-text">${esc(chunk.text)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="action-card">
+                    <div class="action-card-head"><i class="fas fa-arrow-pointer"></i> How to do it</div>
+                    ${rows || '<div style="padding:16px;font-size:.85rem;color:var(--ink-soft)">No actions specified.</div>'}
+                </div>
+            `;
+        }
+
+        function renderTips(step) {
+            if (!Array.isArray(step.tips) || !step.tips.length) return '';
+
+            return `
+                <div class="tips-card">
+                    <div class="tips-head"><i class="fas fa-lightbulb"></i> Tips &amp; Notes</div>
+                    <ul class="tips-list">
+                        ${step.tips.map((tip) => `
+                            <li class="tip-row">
+                                <div class="tip-dot"><i class="fas fa-circle"></i></div>
+                                <span>${esc(tip)}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function renderMessage(step) {
+            if (!step.message) return '';
+            const encoded = encodeURIComponent(step.message);
+
+            return `
+                <div class="msg-card">
+                    <div class="msg-head">
+                        <div class="msg-label"><i class="fas fa-message"></i> Your Message</div>
+                        <button class="copy-btn" onclick="copyMessage(this, '${encoded}')" type="button">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="msg-body">${esc(step.message)}</div>
+                </div>
+            `;
+        }
+
+        function renderStep(idx) {
+            const step = allSteps[idx];
+            const total = allSteps.length;
+            if (!step) return;
+
+            document.getElementById('stepPill').textContent = `Step ${idx + 1} of ${total}`;
+            document.getElementById('topbarTitle').textContent = step.title || '';
+            document.getElementById('progressLabel').textContent = `Step ${idx + 1} of ${total}`;
+            document.getElementById('progressFill').style.width = `${((idx + 1) / total) * 100}%`;
+
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            prevBtn.disabled = idx === 0;
+
+            if (idx === total - 1) {
+                nextBtn.className = 'nav-btn btn-done';
+                nextBtn.innerHTML = '<i class="fas fa-check"></i> Done';
+                nextBtn.onclick = () => window.close();
+            } else {
+                nextBtn.className = 'nav-btn btn-solid';
+                nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+                nextBtn.onclick = () => navigate(1);
+            }
+
+            document.getElementById('mainBody').innerHTML = `
+                <div class="step-enter">
+                    ${renderCredentials(idx, step)}
+                    <div class="step-eyebrow">Step ${idx + 1} - ${esc(step.description || '')}</div>
+                    <h1 class="step-h1">${esc(step.title || `Step ${idx + 1}`)}</h1>
+                    <div class="divider"></div>
+                    ${renderActionCard(step)}
+                    ${renderTips(step)}
+                    ${renderMessage(step)}
+                </div>
+            `;
+        }
+
+        function navigate(direction) {
+            const next = current + direction;
+            if (next >= 0 && next < allSteps.length) {
+                goTo(next);
+            }
+        }
+
+        function goTo(idx) {
+            current = idx;
+            syncSidebar();
+            renderStep(idx);
+            document.getElementById('mainScroll').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function copyMessage(button, encodedMessage) {
+            const message = decodeURIComponent(encodedMessage);
+            navigator.clipboard.writeText(message).then(() => {
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                    button.classList.remove('copied');
+                }, 2200);
+            }).catch(() => {
+                button.textContent = 'Copy failed';
+            });
+        }
+
+        function showError(message) {
+            document.getElementById('mainBody').innerHTML = `
+                <div class="state-error">
+                    <i class="fas fa-triangle-exclamation" style="flex-shrink:0;margin-top:2px"></i>
+                    <span>${esc(message)}</span>
+                </div>
+            `;
+            document.getElementById('stepPill').textContent = 'Error';
+            document.getElementById('topbarTitle').textContent = '';
+            document.getElementById('navFooter').style.display = 'none';
+        }
+
+        function bootstrap() {
+            current = 0;
+            buildSidebar();
+            syncSidebar();
+            document.getElementById('navFooter').style.display = 'flex';
+            renderStep(0);
+        }
+
         async function loadInstructions() {
             try {
                 const assetId = sessionStorage.getItem('digipass_asset_id');
                 const token = sessionStorage.getItem('digipass_token');
-                const url = sessionStorage.getItem('digipass_platform_url');
+                const actionType = sessionStorage.getItem('digipass_action') || 'last_message';
                 platformName = sessionStorage.getItem('digipass_platform_name') || 'Platform';
-                platformUrl = url;
-                
-                // Safely set title
-                const titleEl = document.getElementById('platformName');
-                if (titleEl) titleEl.textContent = platformName;
-                
+
+                applyBranding(actionType);
+
                 if (!assetId || !token) {
-                    const contentEl = document.getElementById('content');
-                    if (contentEl) contentEl.innerHTML = '<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Error: Missing asset or token.</div>';
+                    showError('Missing asset or token. Please open this workflow from the executor dashboard.');
                     return;
                 }
-                
+
                 const response = await fetch(`${API_URL}/executor/asset-instructions/${assetId}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${token}` },
                 });
-                
+
                 if (response.status === 304) {
                     throw new Error('Cached response - refresh and try again');
                 }
-                
+
                 if (!response.ok) {
                     throw new Error(`API Error ${response.status}`);
                 }
-                
+
                 const data = await response.json();
                 if (!data.success || !data.data || !data.data.instructions) {
                     throw new Error('Invalid response from server');
                 }
-                
-                const asset = data.data.asset;
+
                 const instructionsObj = data.data.instructions;
-                let instructions = instructionsObj.steps || instructionsObj;
-                
-                if (!Array.isArray(instructions)) {
+                allSteps = instructionsObj.steps || instructionsObj;
+
+                if (!Array.isArray(allSteps) || !allSteps.length) {
                     throw new Error('Instructions data is invalid');
                 }
-                
-                let html = '';
-                
-                if (asset && asset.account_password) {
-                    html += `
-                        <div class="credentials-box">
-                            <h5><i class="fas fa-key"></i> Login Credentials</h5>
-                            <div class="credential-field">
-                                <strong>Username / Email</strong>
-                                <div class="credential-value">${escapeHtml(asset.account_identifier)}</div>
-                            </div>
-                            <div class="credential-field">
-                                <strong>Password</strong>
-                                <div class="credential-value">${escapeHtml(asset.account_password)}</div>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                html += '<div class="steps-container"><h5><i class="fas fa-list"></i> Steps to Follow</h5>';
-                instructions.forEach((step, i) => {
-                    html += `
-                        <div class="step-item">
-                            <div class="step-header">
-                                <div class="step-number">${i + 1}</div>
-                                <h6 class="step-title">${escapeHtml(step.title)}</h6>
-                            </div>
-                            <p class="step-description">${escapeHtml(step.description)}</p>
-                            <p class="step-action"><strong>Action:</strong> ${escapeHtml(step.action)}</p>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                
-                const contentEl = document.getElementById('content');
-                if (contentEl) contentEl.innerHTML = html;
-                
-            } catch (e) {
-                console.error('Error:', e);
-                const contentEl = document.getElementById('content');
-                if (contentEl) contentEl.innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> ${escapeHtml(e.message)}</div>`;
+
+                assetInfo = data.data.asset || null;
+                bootstrap();
+            } catch (error) {
+                console.error('Workflow instruction error:', error);
+                showError(error.message || 'Unable to load workflow instructions.');
             }
         }
-        
-        // Run immediately since this script is at the end of body
+
         loadInstructions();
     </script>
 </body>
