@@ -411,7 +411,8 @@ def draw_preamble(c, y, user_data):
     
     # Left strip
     c.setFillColor(COLORS['FOREST'])
-    c.rect(ML, box_y, 5 * mm, box_height, fill=1, stroke=0)
+    c.roundRect(ML, box_y, 7 * mm, box_height, 2, fill=1, stroke=0)
+    c.rect(ML + 5 * mm, box_y, 2 * mm, box_height, fill=1, stroke=0)
     
     # Preamble text
     preamble_text = (
@@ -477,8 +478,10 @@ def draw_signature_box(c, x, y, width, label, prefill=""):
     
     # Top band
     c.setFillColor(COLORS['SAND'])
-    c.rect(x, y - 7 * mm, width, 7 * mm, fill=1, stroke=0)
-    c.roundRect(x, y - 7 * mm, width, 7 * mm, 1.5, fill=0, stroke=1) # border
+    c.roundRect(x, y - 7 * mm, width, 7 * mm, 1.5, fill=1, stroke=0)
+    c.rect(x, y - 7 * mm, width, 1.5, fill=1, stroke=0) # flatten bottom corners
+    c.setStrokeColor(COLORS['SAND_DEEP'])
+    c.line(x, y - 7 * mm, x + width, y - 7 * mm) # bottom border
     
     # Label in band
     c.setFont("Helvetica", 6.5)
@@ -596,6 +599,7 @@ def draw_testator_message(c, y, will_data, page_data):
         textColor=colors.HexColor('#2c3a2e'),
         leading=15,
         alignment=TA_JUSTIFY,
+        leftIndent=12,
     )
     # Convert newlines to HTML <br/> for ReportLab Paragraph
     formatted_msg = message.replace('\n', '<br/>')
@@ -642,7 +646,7 @@ def draw_testator_message(c, y, will_data, page_data):
     # Attribution line
     c.setFillColor(colors.HexColor('#8a9e90'))
     c.setFont('Helvetica', 7)
-    c.drawRightString(MR - 4 * mm, y - card_h - 3 * mm,
+    c.drawRightString(MR - 4 * mm, y - card_h + 4 * mm,
                       "— Personal declaration by the Testator")
 
     return y - card_h - 10 * mm
@@ -934,8 +938,8 @@ def draw_asset_card(c, x, y, width, roman, asset):
 
     # Light description band at bottom of card
     c.setFillColor(colors.HexColor('#f5ead8'))
-    c.rect(x + 6 * mm, y - ASSET_CARD_H,
-           width - 6 * mm, 7 * mm, fill=1, stroke=0)
+    c.roundRect(x + 6 * mm, y - ASSET_CARD_H, width - 6 * mm, 7 * mm, 2, fill=1, stroke=0)
+    c.rect(x + 6 * mm, y - ASSET_CARD_H + 2 * mm, width - 6 * mm, 5 * mm, fill=1, stroke=0)
     
     strip_w = 6 * mm
     c.setFillColor(COLORS['FOREST'])
