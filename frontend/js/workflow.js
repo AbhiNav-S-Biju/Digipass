@@ -539,7 +539,7 @@ function openPlatformWithFloatingPopup(platformUrl, platformName) {
     
     // Open instructions window on the LEFT (30% width) - add cache-busting parameter
     const cacheBuster = '?v=' + Date.now();
-    window.open('workflow-window.html' + cacheBuster, 'digipass_instructions', `width=${halfWidth},height=${screenHeight},left=0,top=0,resizable=yes,scrollbars=yes`);
+    window.open('/workflow-window.html' + cacheBuster, 'digipass_instructions', `width=${halfWidth},height=${screenHeight},left=0,top=0,resizable=yes,scrollbars=yes`);
     
     // Open platform window on the RIGHT (70% width, but as separate window)
     setTimeout(() => {
