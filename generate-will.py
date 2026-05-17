@@ -117,7 +117,7 @@ PREAMBLE_H = 32 * mm
 DISCLAIMER_H = 28 * mm
 SIG_BOX_H = 22 * mm
 ARTICLE_HEAD_H = 8 * mm
-CONTINUATION_HEADER_HEIGHT = 18 * mm
+CONTINUATION_HEADER_HEIGHT = 16 * mm  # Reduced from 18mm
 
 ACTION_DISPLAY = {
     'last_message':   'Deliver Final Message',
@@ -246,14 +246,14 @@ def draw_continuation_header(c, page_data):
     W = PAGE_WIDTH
     H = PAGE_HEIGHT
 
-    # 1. FOREST band — compact 18mm
+    # 1. FOREST band — compact 16mm (reduced from 18mm)
     c.setFillColor(colors.HexColor('#1b3a2d'))
-    c.rect(0, H - 18 * mm, W, 18 * mm, fill=1, stroke=0)
+    c.rect(0, H - 16 * mm, W, 16 * mm, fill=1, stroke=0)
 
     # 2. SAGE accent line at bottom of band
     c.setStrokeColor(colors.HexColor('#8cbf9c'))
     c.setLineWidth(0.7)
-    c.line(0, H - 18 * mm, W, H - 18 * mm)
+    c.line(0, H - 16 * mm, W, H - 16 * mm)
 
     # 3. Left border rule (must redraw on new page)
     c.setFillColor(colors.HexColor('#1b3a2d'))
@@ -262,28 +262,28 @@ def draw_continuation_header(c, page_data):
     # 4. Right border rule
     c.rect(W - 3.5 * mm, 0, 3.5 * mm, H, fill=1, stroke=0)
 
-    # 5. Vault icon — small, inside band
-    draw_vault_icon(c, 6 * mm, H - 3 * mm, size=16, on_dark=True)
+    # 5. Vault icon — small, inside band (adjusted positions for 16mm)
+    draw_vault_icon(c, 6 * mm, H - 2.5 * mm, size=14, on_dark=True)
 
     # 6. "Digipass" wordmark — inline, right of icon
     c.setFillColor(colors.HexColor('#fdf6ec'))
-    c.setFont('Helvetica-Bold', 11)
-    c.drawString(25 * mm, H - 8 * mm, 'Digipass')
+    c.setFont('Helvetica-Bold', 10)
+    c.drawString(23 * mm, H - 6.5 * mm, 'Digipass')
 
     # 7. "DIGITAL ESTATE" tagline — SAME LINE as wordmark
     c.setFillColor(colors.HexColor('#8cbf9c'))
-    c.setFont('Helvetica', 6.5)
-    c.drawString(25 * mm, H - 13 * mm, 'DIGITAL  ESTATE')
+    c.setFont('Helvetica', 6)
+    c.drawString(23 * mm, H - 10.5 * mm, 'DIGITAL  ESTATE')
 
     # 8. Right side: document title + page info
     name = page_data.get('testator_name', '').upper()
     instr = page_data.get('instrument_no', '')
     c.setFillColor(colors.HexColor('#8cbf9c'))
-    c.setFont('Helvetica', 7)
+    c.setFont('Helvetica', 6.5)
     MR_local = W - 6 * mm
-    c.drawRightString(MR_local, H - 8 * mm,
+    c.drawRightString(MR_local, H - 6.5 * mm,
         f'DIGITAL WILL — {name} (continued)')
-    c.drawRightString(MR_local, H - 13 * mm, instr)
+    c.drawRightString(MR_local, H - 10.5 * mm, instr)
 
 def check_page_break(c, y, block_height, page_data):
     """Only break if the ENTIRE block won't fit. Don't break for small gaps."""
@@ -295,16 +295,16 @@ def check_page_break(c, y, block_height, page_data):
         draw_page_background(c)
         draw_page_border_rules(c)
 
-        # Continuation header (compact, 18mm)
+        # Continuation header (compact, 16mm)
         draw_continuation_header(c, page_data)
-        y = PAGE_HEIGHT - 18 * mm - 6 * mm  # below continuation header
+        y = PAGE_HEIGHT - 16 * mm - 6 * mm  # below continuation header
     return y
 
 def draw_header_page1(c, user_data):
     """Draw header band for Page 1"""
-    # Full-width FOREST background
+    # Full-width FOREST background (reduced from 56mm to 48mm)
     c.setFillColor(COLORS['FOREST'])
-    c.rect(0, PAGE_HEIGHT - 56 * mm, PAGE_WIDTH, 56 * mm, fill=1, stroke=0)
+    c.rect(0, PAGE_HEIGHT - 48 * mm, PAGE_WIDTH, 48 * mm, fill=1, stroke=0)
     
     # Decorative circle top-right
     circle_radius = 46 * mm
@@ -319,13 +319,13 @@ def draw_header_page1(c, user_data):
     c.setLineWidth(0.7)
     c.line(0, PAGE_HEIGHT - 56 * mm, PAGE_WIDTH, PAGE_HEIGHT - 56 * mm)
     
-    # Vault icon
-    draw_vault_icon(c, ML, PAGE_HEIGHT - 8 * mm, size=28, on_dark=True)
+    # Vault icon (adjusted for reduced header)
+    draw_vault_icon(c, ML, PAGE_HEIGHT - 7 * mm, size=28, on_dark=True)
     
     # Wordmark and tagline
     c.setFont("Helvetica-Bold", 16)
     c.setFillColor(COLORS['CREAM_LIGHT'])
-    c.drawString(ML + 36 * mm, PAGE_HEIGHT - 11 * mm, "Digipass")
+    c.drawString(ML + 36 * mm, PAGE_HEIGHT - 9 * mm, "Digipass")
     
     c.setFont("Helvetica", 7)
     c.setFillColor(COLORS['SAGE'])
@@ -336,50 +336,50 @@ def draw_header_page1(c, user_data):
     c.setLineWidth(0.4)
     c.line(ML + 36 * mm, PAGE_HEIGHT - 17 * mm, ML + 100 * mm, PAGE_HEIGHT - 17 * mm)
     
-    # Main title
-    c.setFont("Helvetica-Bold", 20)
+    # Main title (adjusted for reduced header)
+    c.setFont("Helvetica-Bold", 18)
     c.setFillColor(COLORS['WHITE'])
-    c.drawString(ML, PAGE_HEIGHT - 28 * mm, "DIGITAL WILL & ESTATE DECLARATION")
+    c.drawString(ML, PAGE_HEIGHT - 22 * mm, "DIGITAL WILL & ESTATE DECLARATION")
     
     # Subtitle
-    c.setFont("Helvetica-Bold", 9.5)
+    c.setFont("Helvetica-Bold", 8)
     c.setFillColor(COLORS['SAGE'])
-    c.drawString(ML, PAGE_HEIGHT - 36 * mm, "A STRUCTURED RECORD OF DIGITAL ASSETS AND EXECUTOR ASSIGNMENTS")
+    c.drawString(ML, PAGE_HEIGHT - 29 * mm, "A STRUCTURED RECORD OF DIGITAL ASSETS AND EXECUTOR ASSIGNMENTS")
     
     # Document meta right-aligned
     now = datetime.now()
     instrument_no = f"DW-{now.strftime('%Y%m%d')}-U{user_data['id']}"
     
     c.setFont("Helvetica", 7)
-    c.drawString(MR - 100 * mm, PAGE_HEIGHT - 44 * mm, f"INSTRUMENT NO.  {instrument_no}")
-    c.drawString(MR - 100 * mm, PAGE_HEIGHT - 49.5 * mm, f"GENERATED: {now.strftime('%d %B %Y')}  ·  CONFIDENTIAL")
+    c.drawString(MR - 100 * mm, PAGE_HEIGHT - 37 * mm, f"INSTRUMENT NO.  {instrument_no}")
+    c.drawString(MR - 100 * mm, PAGE_HEIGHT - 42 * mm, f"GENERATED: {now.strftime('%d %B %Y')}  ·  CONFIDENTIAL")
 
 def draw_header_page2(c, user_data):
     """Draw header band for Page 2"""
-    # Full-width FOREST background (shorter)
+    # Full-width FOREST background (reduced from 38mm to 32mm)
     c.setFillColor(COLORS['FOREST'])
-    c.rect(0, PAGE_HEIGHT - 38 * mm, PAGE_WIDTH, 38 * mm, fill=1, stroke=0)
+    c.rect(0, PAGE_HEIGHT - 32 * mm, PAGE_WIDTH, 32 * mm, fill=1, stroke=0)
     
     # SAGE accent line
     c.setStrokeColor(COLORS['SAGE'])
     c.setLineWidth(0.7)
-    c.line(0, PAGE_HEIGHT - 38 * mm, PAGE_WIDTH, PAGE_HEIGHT - 38 * mm)
+    c.line(0, PAGE_HEIGHT - 32 * mm, PAGE_WIDTH, PAGE_HEIGHT - 32 * mm)
     
-    # Vault icon and wordmark
-    draw_vault_icon(c, ML, PAGE_HEIGHT - 8 * mm, size=28, on_dark=True)
+    # Vault icon and wordmark (adjusted for reduced header)
+    draw_vault_icon(c, ML, PAGE_HEIGHT - 7 * mm, size=28, on_dark=True)
     
     c.setFont("Helvetica-Bold", 16)
     c.setFillColor(COLORS['CREAM_LIGHT'])
-    c.drawString(ML + 36 * mm, PAGE_HEIGHT - 11 * mm, "Digipass")
+    c.drawString(ML + 36 * mm, PAGE_HEIGHT - 9 * mm, "Digipass")
     
     c.setFont("Helvetica", 7)
     c.setFillColor(COLORS['SAGE'])
-    c.drawString(ML + 37 * mm, PAGE_HEIGHT - 15 * mm, "DIGITAL  ESTATE")
+    c.drawString(ML + 37 * mm, PAGE_HEIGHT - 13 * mm, "DIGITAL  ESTATE")
     
     # Page 2 title
-    c.setFont("Helvetica-Bold", 16)
+    c.setFont("Helvetica-Bold", 14)
     c.setFillColor(COLORS['WHITE'])
-    c.drawString(ML, PAGE_HEIGHT - 26 * mm, "SIGNATURE AND EXECUTION PAGE")
+    c.drawString(ML, PAGE_HEIGHT - 18 * mm, "SIGNATURE AND EXECUTION PAGE")
     
     # Right-aligned meta
     now = datetime.now()
@@ -387,8 +387,8 @@ def draw_header_page2(c, user_data):
     
     c.setFont("Helvetica", 7)
     c.setFillColor(COLORS['SAGE'])
-    c.drawRightString(MR, PAGE_HEIGHT - 26 * mm, f"Instrument No. {instrument_no}")
-    c.drawRightString(MR, PAGE_HEIGHT - 31 * mm, f"Digital Will and Estate Declaration of {user_data['full_name'].upper()}")
+    c.drawRightString(MR, PAGE_HEIGHT - 18 * mm, f"Instrument No. {instrument_no}")
+    c.drawRightString(MR, PAGE_HEIGHT - 23 * mm, f"Digital Will and Estate Declaration of {user_data['full_name'].upper()}")
 
 def draw_footer(c, page_data):
     """Footer is now handled by PageCountCanvas.save() method"""
@@ -564,7 +564,7 @@ def draw_page1(c, data, page_data):
     
     draw_header_page1(c, user_data)
     
-    y = PAGE_HEIGHT - 64 * mm
+    y = PAGE_HEIGHT - 48 * mm  # Adjusted for reduced header (was 64mm)
     
     # Preamble
     y = check_page_break(c, y, 18 * mm, page_data)
@@ -959,45 +959,45 @@ def draw_signature_page(c, data, page_data):
 
     y = H
 
-    # ── 1. HEADER BAND (38mm) ──
+    # ── 1. HEADER BAND (32mm, reduced from 38mm) ──
     c.setFillColor(colors.HexColor('#1b3a2d'))
-    c.rect(0, H - 38 * mm, W, 38 * mm, fill=1, stroke=0)
+    c.rect(0, H - 32 * mm, W, 32 * mm, fill=1, stroke=0)
 
     # Decorative circle (smaller than page 1)
     c.setFillColor(colors.HexColor('#2d5a42'))
-    c.circle(W, H, 34 * mm, fill=1, stroke=0)
+    c.circle(W, H, 28 * mm, fill=1, stroke=0)
     c.setFillColor(colors.HexColor('#1b3a2d'))
-    c.circle(W, H, 18 * mm, fill=1, stroke=0)
+    c.circle(W, H, 16 * mm, fill=1, stroke=0)
 
     # SAGE accent line
     c.setStrokeColor(colors.HexColor('#8cbf9c'))
     c.setLineWidth(0.7)
-    c.line(0, H - 38 * mm, W, H - 38 * mm)
+    c.line(0, H - 32 * mm, W, H - 32 * mm)
 
     # Vault icon + wordmark
-    draw_vault_icon(c, ML_val, H - 8 * mm, size=26, on_dark=True)
+    draw_vault_icon(c, ML_val, H - 7 * mm, size=24, on_dark=True)
     c.setFillColor(colors.HexColor('#fdf6ec'))
-    c.setFont('Helvetica-Bold', 15)
-    c.drawString(ML_val + 32 * mm, H - 14 * mm, 'Digipass')
+    c.setFont('Helvetica-Bold', 14)
+    c.drawString(ML_val + 30 * mm, H - 12 * mm, 'Digipass')
     c.setFillColor(colors.HexColor('#8cbf9c'))
-    c.setFont('Helvetica', 7)
-    c.drawString(ML_val + 33 * mm, H - 19 * mm,
+    c.setFont('Helvetica', 6.5)
+    c.drawString(ML_val + 31 * mm, H - 16 * mm,
                  'DIGITAL  ESTATE')
 
     # Title
     c.setFillColor(colors.HexColor('#ffffff'))
-    c.setFont('Helvetica-Bold', 16)
-    c.drawString(ML_val, H - 27 * mm,
+    c.setFont('Helvetica-Bold', 14)
+    c.drawString(ML_val, H - 20 * mm,
                  'SIGNATURE AND EXECUTION PAGE')
 
     # Right meta
     c.setFillColor(colors.HexColor('#8cbf9c'))
-    c.setFont('Helvetica', 7)
-    c.drawRightString(MR_val, H - 27 * mm, f'Instrument No. {instr}')
-    c.drawRightString(MR_val, H - 32 * mm,
+    c.setFont('Helvetica', 6.5)
+    c.drawRightString(MR_val, H - 20 * mm, f'Instrument No. {instr}')
+    c.drawRightString(MR_val, H - 24 * mm,
         f'Digital Will and Estate Declaration of {name}')
 
-    y = H - 38 * mm - 8 * mm
+    y = H - 32 * mm - 8 * mm
 
     # ── 2. EXECUTION STATEMENT ──
     exec_text = (
