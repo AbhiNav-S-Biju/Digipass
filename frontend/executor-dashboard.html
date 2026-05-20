@@ -343,6 +343,11 @@
             stroke-width: 1.5;
         }
 
+        .asset-card-icon i {
+            font-size: 20px;
+            color: var(--text-muted);
+        }
+
         .asset-card-details h3 {
             font-size: 16px;
             font-weight: 600;
@@ -1891,6 +1896,30 @@
     <script>
         const API_URL = 'https://digipass-3l63.onrender.com';
 
+        const PLATFORM_ICONS = {
+            'Instagram': 'fab fa-instagram',
+            'Facebook': 'fab fa-facebook',
+            'Twitter': 'fab fa-twitter',
+            'LinkedIn': 'fab fa-linkedin',
+            'Gmail': 'fas fa-envelope',
+            'Outlook': 'fas fa-envelope',
+            'PayPal': 'fab fa-paypal',
+            'Google Pay': 'fab fa-google',
+            'Google Drive': 'fab fa-google-drive',
+            'Netflix': 'fas fa-tv',
+            'Disney+': 'fas fa-play-circle',
+            'Snapchat': 'fab fa-snapchat',
+            'TikTok': 'fab fa-tiktok',
+            'Apple Mail': 'fab fa-apple',
+            'Dropbox': 'fab fa-dropbox',
+            'Spotify': 'fab fa-spotify',
+            'Square': 'fas fa-square'
+        };
+
+        function getPlatformIcon(platformName) {
+            return PLATFORM_ICONS[platformName] || 'fas fa-lock';
+        }
+
         // Check if executor is logged in
         const token = localStorage.getItem('executorToken');
         console.log('[Dashboard] Token from sessionStorage:', token ? 'Present (' + token.substring(0, 20) + '...)' : 'MISSING');
@@ -2010,10 +2039,7 @@
                                 <div class="asset-card-top">
                                     <div class="asset-card-header">
                                         <div class="asset-card-icon">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                                <rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect>
-                                                <path d="M3 11h18"></path>
-                                            </svg>
+                                            <i class="${getPlatformIcon(asset.platform_name)}"></i>
                                         </div>
                                         <div class="asset-card-details">
                                             <h3>${escapeHtml(asset.platform_name)}</h3>

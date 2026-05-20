@@ -2132,16 +2132,16 @@
         // Helper function to get activity icon
         function getActivityIcon(type) {
             const icons = {
-                'asset': '',
-                'executor': '',
-                'will': '',
-                'switch': '',
-                'asset_created': '',
-                'executor_added': '',
-                'will_created': '',
-                'switch_checkin': '',
-                'switch_interval_updated': '',
-                'default': ''
+                'asset': '<i class="fas fa-box"></i>',
+                'executor': '<i class="fas fa-user-shield"></i>',
+                'will': '<i class="fas fa-file-contract"></i>',
+                'switch': '<i class="fas fa-toggle-on"></i>',
+                'asset_created': '<i class="fas fa-plus-circle"></i>',
+                'executor_added': '<i class="fas fa-user-plus"></i>',
+                'will_created': '<i class="fas fa-file-signature"></i>',
+                'switch_checkin': '<i class="fas fa-check-circle"></i>',
+                'switch_interval_updated': '<i class="fas fa-clock"></i>',
+                'default': '<i class="fas fa-info-circle"></i>'
             };
             return icons[type] || icons['default'];
         }
