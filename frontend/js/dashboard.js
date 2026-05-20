@@ -833,7 +833,7 @@ function renderAssets() {
     <article class="asset-card mb-3">
       <div class="asset-card-header d-flex justify-content-between align-items-start mb-2">
         <div class="d-flex gap-2 align-items-start flex-grow-1">
-          <div style="font-size: 1.5rem; color: #102c26; width: 40px; text-align: center;">
+          <div class="asset-card-icon">
             <i class="${platformIcon}"></i>
           </div>
           <div>

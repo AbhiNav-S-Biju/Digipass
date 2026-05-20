@@ -684,6 +684,27 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
         }
 
+        .asset-card-icon {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            background-color: var(--sand);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.25s ease;
+        }
+
+        .asset-card:hover .asset-card-icon {
+            transform: scale(1.1) rotate(-3deg);
+        }
+
+        .asset-card-icon i {
+            font-size: 20px;
+            color: var(--text-muted);
+        }
+
         .asset-card h4 {
             color: var(--forest-deep);
             font-weight: 600;
