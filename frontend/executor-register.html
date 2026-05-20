@@ -5,105 +5,230 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Executor Verification - DIGIPASS</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23102c26'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='%23f7e7ce'/%3E%3C/svg%3E">
-    <link rel="stylesheet" href="css/shared.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #102c26;
+            --primary-dark-hover: #081a16;
+            --bg-light: #f7e7ce;
+            --text-dark: #2d2d2d;
+            --text-muted: #6c757d;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #e8e0d0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header h1 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .auth-badge {
+            display: inline-block;
+            background-color: #f0e8e0;
+            color: var(--primary-dark);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .alert-info {
+            border: 1px solid #bfdbfe;
+            background-color: #dbeafe;
+            color: #1e40af;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-info-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border: 1px solid #e8e0d0;
+            border-radius: 6px;
+            padding: 0.75rem;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(16, 44, 38, 0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-dark) !important;
+            border-color: var(--primary-dark) !important;
+            color: white !important;
+            font-weight: 600;
+            padding: 0.75rem;
+            border-radius: 6px;
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark-hover) !important;
+            border-color: var(--primary-dark-hover) !important;
+        }
+
+        .auth-link {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .auth-link a {
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        .alert-error {
+            border-radius: 6px;
+            border: 1px solid #fed7d7;
+            background-color: #fff5f5;
+            color: #742a2a;
+        }
+
+        .form-check {
+            margin-bottom: 1rem;
+        }
+
+        .form-check-input {
+            border-color: #e8e0d0;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 1.5rem;
+            }
+
+            .auth-header h1 {
+                font-size: 1.3rem;
+            }
+
+            .auth-header p {
+                font-size: 0.85rem;
+            }
+
+            .alert-info {
+                padding: 0.75rem;
+            }
+
+            .alert-info-text {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
 </head>
 <body>
-
-    <!-- Navbar -->
-    <nav class="page-nav">
-        <a href="index.html" class="nav-logo">
-            <svg width="30" height="30" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="64" height="64" rx="14" fill="#1b3a2d"/>
-                <path d="M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z" fill="#f5ead8"/>
-            </svg>
-            <span class="nav-logo-text">DIGIPASS</span>
-        </a>
-        <div class="nav-actions">
-            <a href="index.html" class="nav-button">Home</a>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="auth-badge">Executor Portal</div>
+            <h1>Verify Your Identity</h1>
+            <p>Complete your executor setup</p>
         </div>
-    </nav>
 
-    <!-- Animated background -->
-    <div class="page-bg">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
-
-    <!-- Main content -->
-    <div class="page-content">
-        <div class="auth-card">
-
-            <!-- Badge -->
-            <div class="card-badge-row">
-                <span class="executor-badge-pill">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                    Executor Portal
-                </span>
-            </div>
-
-            <h1 class="card-title">Verify Your Identity</h1>
-            <p class="card-subtitle">Complete your executor setup</p>
-
-            <!-- Info box -->
-            <div class="info-box">
-                <strong>📋 About This Page</strong><br>
+        <div class="alert-info">
+            <div class="alert-info-title">📋 About This Page</div>
+            <div class="alert-info-text">
                 You've been invited to be an executor. Follow the link or QR code from the invitation email to get started.
             </div>
+        </div>
 
-            <!-- Error message -->
-            <div id="errorMsg" class="d-none"></div>
+        <div id="errorMsg" class="alert alert-error d-none"></div>
 
-            <!-- Registration form -->
-            <form id="executorRegisterForm">
-                <div>
-                    <label for="token" class="form-label">Verification Token</label>
-                    <input type="text" class="form-control" id="token" name="token" placeholder="Paste the token from your invite" required>
-                    <small class="text-muted d-block mt-2">This was sent to you via QR code or email link</small>
-                </div>
-
-                <div>
-                    <label for="password" class="form-label">Set Your Password</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="At least 8 characters" required>
-                </div>
-
-                <div>
-                    <label for="confirmPassword" class="form-label">Confirm Password</label>
-                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="agree" name="agree" required>
-                    <label class="form-check-label" for="agree">
-                        I understand my responsibilities as executor
-                    </label>
-                </div>
-
-                <button type="submit" id="verifyBtn" class="btn btn-primary">Verify &amp; Complete Setup</button>
-            </form>
-
-            <!-- Card footer -->
-            <div class="card-footer">
-                <div class="footer-link">
-                    Already verified? <a href="executor-login.html">Sign in here</a>
-                </div>
-                <a href="index.html" class="back-link">
-                    <svg class="back-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="15 18 9 12 15 6"/>
-                    </svg>
-                    Back to home
-                </a>
+        <form id="executorRegisterForm">
+            <div>
+                <label for="token" class="form-label">Verification Token</label>
+                <input type="text" class="form-control" id="token" name="token" placeholder="Paste the token from your invite" required>
+                <small class="text-muted d-block mt-2">This was sent to you via QR code or email link</small>
             </div>
 
+            <div>
+                <label for="password" class="form-label">Set Your Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="At least 8 characters" required>
+            </div>
+
+            <div>
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="agree" name="agree" required>
+                <label class="form-check-label" for="agree">
+                    I understand my responsibilities as executor
+                </label>
+            </div>
+
+            <button type="submit" id="verifyBtn" class="btn btn-primary">Verify & Complete Setup</button>
+        </form>
+
+        <div class="auth-link">
+            Already verified? <a href="executor-login.html">Sign in here</a>
+        </div>
+        <div class="auth-link" style="margin-top: 1rem;">
+            <a href="index.html">← Back to home</a>
         </div>
     </div>
-
-    <!-- Page footer -->
-    <footer class="page-footer">
-        <span class="footer-item">© 2026 DIGIPASS</span>
-    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>

@@ -4,20 +4,418 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Executor Sign In - DIGIPASS</title>
-    <meta name="description" content="Sign in to the Digipass Executor Portal to access and manage your assigned digital assets securely.">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23102c26'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='%23f7e7ce'/%3E%3C/svg%3E">
-    <link rel="stylesheet" href="css/shared.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cream: #f5ead8;
+            --cream-light: #fdf6ec;
+            --forest: #1b3a2d;
+            --forest-mid: #2d5a42;
+            --forest-light: #3d7a5a;
+            --sand: #e8d9c0;
+            --sand-deep: #d4c4a0;
+            --text-dark: #1a2e22;
+            --text-muted: #5a7260;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text-dark);
+        }
+
+        body {
+            background-color: var(--cream);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Background decoration layer */
+        .page-decorations {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        /* Page structure */
+        .page-nav {
+            position: relative;
+            z-index: 10;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(212, 196, 160, 0.2);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        .nav-logo svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .nav-logo-text {
+            font-family: 'DM Serif Display', serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--forest);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--text-dark);
+        }
+
+        .nav-button {
+            background: var(--forest);
+            color: var(--cream-light);
+            border: none;
+            padding: 8px 18px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-button:hover {
+            background: var(--forest-mid);
+        }
+
+        /* Page content */
+        .page-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Auth card */
+        .auth-card {
+            background: white;
+            border: 1px solid rgba(212, 196, 160, 0.4);
+            border-radius: 20px;
+            padding: 36px 40px 32px;
+            width: 100%;
+            max-width: 440px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .executor-badge {
+            display: inline-block;
+            background: var(--sand);
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 4px 11px;
+            border-radius: 20px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            width: fit-content;
+        }
+
+        .executor-badge svg {
+            width: 10px;
+            height: 10px;
+        }
+
+        .card-badge-row {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .card-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 26px;
+            font-weight: 600;
+            text-align: center;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            text-align: center;
+            color: var(--text-muted);
+            line-height: 1.55;
+            margin-bottom: 24px;
+        }
+
+        .security-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            padding: 11px 13px;
+            background: var(--sand);
+            border-radius: 9px;
+            margin-bottom: 18px;
+        }
+
+        .security-icon {
+            width: 15px;
+            height: 15px;
+            min-width: 15px;
+            min-height: 15px;
+            stroke: var(--text-muted);
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .security-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        .security-text strong {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* Form */
+        #executorLoginForm {
+            width: 100%;
+        }
+
+        .form-field {
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text-dark);
+            letter-spacing: 0.03em;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--cream-light);
+            border: 1.5px solid var(--sand-deep);
+            border-radius: 9px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13.5px;
+            color: var(--text-dark);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+
+        .form-control::placeholder {
+            color: #b8c4bc;
+        }
+
+        .form-control:focus {
+            border-color: var(--forest-light);
+            box-shadow: 0 0 0 3px rgba(61, 122, 90, 0.1);
+            background: white;
+        }
+
+        /* Button */
+        .submit-button {
+            width: 100%;
+            background: var(--forest);
+            color: var(--cream-light);
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 13px;
+            border-radius: 9px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+            margin-top: 14px;
+        }
+
+        .submit-button:hover {
+            background: var(--forest-mid);
+        }
+
+        .button-icon {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Error message */
+        #errorMsg {
+            padding: 12px 14px;
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 9px;
+            color: #742a2a;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        #errorMsg:not(.d-none) {
+            display: block;
+        }
+
+        /* Card footer links */
+        .card-footer {
+            margin-top: 18px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .footer-link {
+            font-size: 12.5px;
+            color: var(--text-muted);
+        }
+
+        .footer-link a {
+            color: var(--forest);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--text-dark);
+        }
+
+        .back-arrow {
+            width: 12px;
+            height: 12px;
+        }
+
+        /* Page footer */
+        .page-footer {
+            text-align: center;
+            padding: 10px 40px 16px;
+            font-size: 11.5px;
+            color: var(--text-muted);
+            position: relative;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-link-text {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-link-text:hover {
+            color: var(--text-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .page-decorations {
+                display: none;
+            }
+
+            .page-nav {
+                padding: 14px 1rem;
+            }
+
+            .nav-logo-text {
+                font-size: 16px;
+            }
+
+            .page-content {
+                padding: 20px 1rem;
+            }
+
+            .auth-card {
+                padding: 28px 24px;
+                max-width: 100%;
+            }
+
+            .card-title {
+                font-size: 22px;
+            }
+
+            .page-footer {
+                padding: 10px 1rem 16px;
+            }
+
+            .footer-item:not(:last-child)::after {
+                content: '•';
+                margin-left: 16px;
+                color: var(--sand-deep);
+            }
+        }
+    </style>
 </head>
 <body>
-
-    <!-- Animated orb background -->
-    <div class="page-bg">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
-
-    <!-- Navbar -->
     <nav class="page-nav">
         <a href="index.html" class="nav-logo">
             <svg width="28" height="28" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
@@ -36,14 +434,93 @@
         </div>
     </nav>
 
-    <!-- Main content -->
+    <div class="page-decorations">
+        <svg width="100%" height="100%" viewBox="0 0 1200 800" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="position: absolute; inset: 0;">
+            <!-- Polka-dot block - bottom left -->
+            <rect x="40" y="680" width="65" height="80" rx="8" fill="#e8d9c0"/>
+            <circle cx="53" cy="693" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="70" cy="693" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="87" cy="693" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="53" cy="710" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="70" cy="710" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="87" cy="710" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="53" cy="727" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="70" cy="727" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="87" cy="727" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="53" cy="744" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="70" cy="744" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="87" cy="744" r="4" fill="#1b3a2d" opacity=".3"/>
+
+            <!-- Polka-dot block - bottom right -->
+            <rect x="1095" y="680" width="65" height="80" rx="8" fill="#e8d9c0"/>
+            <circle cx="1108" cy="693" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="1125" cy="693" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="1142" cy="693" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="1108" cy="710" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="1125" cy="710" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="1142" cy="710" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="1108" cy="727" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="1125" cy="727" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="1142" cy="727" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="1108" cy="744" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="1125" cy="744" r="4" fill="#1b3a2d" opacity=".3"/>
+            <circle cx="1142" cy="744" r="4" fill="#1b3a2d" opacity=".3"/>
+
+            <!-- LEFT SIDE - Vault door -->
+            <!-- Outer frame -->
+            <rect x="80" y="200" width="110" height="130" rx="8" fill="none" stroke="#e8d9c0" stroke-width="2.5"/>
+
+            <!-- Two large concentric circles (locks) -->
+            <circle cx="135" cy="270" r="30" fill="none" stroke="#e8d9c0" stroke-width="2" opacity=".8"/>
+            <circle cx="135" cy="270" r="20" fill="none" stroke="#e8d9c0" stroke-width="1.5" opacity=".6"/>
+
+            <!-- Center filled circle -->
+            <circle cx="135" cy="270" r="6" fill="#e8d9c0"/>
+
+            <!-- Handle lines (N, S, E, W) -->
+            <line x1="135" y1="200" x2="135" y2="210" stroke="#e8d9c0" stroke-width="2" opacity=".5"/>
+            <line x1="135" y1="330" x2="135" y2="340" stroke="#e8d9c0" stroke-width="2" opacity=".5"/>
+            <line x1="80" y1="270" x2="90" y2="270" stroke="#e8d9c0" stroke-width="2" opacity=".5"/>
+            <line x1="180" y1="270" x2="190" y2="270" stroke="#e8d9c0" stroke-width="2" opacity=".5"/>
+
+            <!-- Small lock rect + shackle in center -->
+            <rect x="125" y="280" width="20" height="18" rx="2" fill="none" stroke="#e8d9c0" stroke-width="1.5" opacity=".5"/>
+            <path d="M128 280 Q128 270 135 270 Q142 270 142 280" stroke="#e8d9c0" stroke-width="1.5" fill="none" opacity=".4" stroke-linecap="round"/>
+
+            <!-- Wavy line -->
+            <path d="M270 240 Q300 230 330 240 Q360 250 390 240" stroke="#d4c4a0" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+            <!-- RIGHT SIDE - Key/ring illustration -->
+            <!-- Two concentric circles (ring) -->
+            <circle cx="930" cy="280" r="28" fill="none" stroke="#d4c4a0" stroke-width="2.5"/>
+            <circle cx="930" cy="280" r="18" fill="none" stroke="#d4c4a0" stroke-width="1.5"/>
+
+            <!-- Center filled circle -->
+            <circle cx="930" cy="280" r="5" fill="#d4c4a0" opacity=".8"/>
+
+            <!-- Key shaft - diagonal with teeth -->
+            <line x1="945" y1="265" x2="1000" y2="200" stroke="#d4c4a0" stroke-width="3" stroke-linecap="round"/>
+
+            <!-- Key teeth notches -->
+            <line x1="955" y1="254" x2="960" y2="249" stroke="#d4c4a0" stroke-width="1.5"/>
+            <line x1="970" y1="238" x2="975" y2="233" stroke="#d4c4a0" stroke-width="1.5"/>
+            <line x1="985" y1="222" x2="990" y2="217" stroke="#d4c4a0" stroke-width="1.5"/>
+
+            <!-- Wavy line -->
+            <path d="M820 300 Q790 310 760 300" stroke="#d4c4a0" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+            <!-- Floating circles - decorative -->
+            <circle cx="350" cy="150" r="5" fill="none" stroke="#d4c4a0" stroke-width="1.5"/>
+            <circle cx="900" cy="450" r="6" fill="none" stroke="#d4c4a0" stroke-width="1.5"/>
+            <circle cx="200" cy="500" r="4" fill="none" stroke="#d4c4a0" stroke-width="1.5"/>
+        </svg>
+    </div>
+
     <div class="page-content">
         <div class="auth-card">
-
-            <!-- Badge -->
             <div class="card-badge-row">
-                <div class="executor-badge-pill">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <div class="executor-badge">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     </svg>
                     Executor Portal
@@ -53,9 +530,8 @@
             <h1 class="card-title">Welcome, Executor</h1>
             <p class="card-subtitle">Sign in to access your assigned digital assets</p>
 
-            <!-- Security note -->
             <div class="security-note">
-                <svg class="security-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg class="security-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                 </svg>
                 <div class="security-text">
@@ -63,10 +539,8 @@
                 </div>
             </div>
 
-            <!-- Error message -->
             <div id="errorMsg" class="d-none"></div>
 
-            <!-- Login form -->
             <form id="executorLoginForm">
                 <div class="form-field">
                     <label for="email" class="form-label">Email Address</label>
@@ -86,7 +560,6 @@
                 </button>
             </form>
 
-            <!-- Card footer -->
             <div class="card-footer">
                 <div class="footer-link">
                     Don't have an account? <a href="executor-register.html">Verify here</a>
@@ -99,11 +572,9 @@
                     Back to home
                 </a>
             </div>
-
         </div>
     </div>
 
-    <!-- Page footer -->
     <footer class="page-footer">
         <div class="footer-item">© 2026 DIGIPASS</div>
         <div class="footer-item">

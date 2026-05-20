@@ -5,69 +5,243 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Executor Verification - DIGIPASS</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23102c26'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='%23f7e7ce'/%3E%3C/svg%3E">
-    <link rel="stylesheet" href="css/shared.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #102c26;
+            --primary-dark-hover: #081a16;
+            --bg-light: #f7e7ce;
+            --text-dark: #2d2d2d;
+            --text-muted: #6c757d;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .verify-container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #e8e0d0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .verify-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .verify-header h1 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .verify-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .qr-display {
+            background-color: #f8f9fa;
+            border: 1px solid #e8e0d0;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .qr-display img {
+            max-width: 100%;
+            border-radius: 6px;
+        }
+
+        .qr-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #e8e0d0;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .link-section {
+            margin-bottom: 2rem;
+        }
+
+        .link-section h3 {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .link-display {
+            background-color: #f8f9fa;
+            border: 1px solid #e8e0d0;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            word-break: break-all;
+            color: var(--primary-dark);
+            margin-bottom: 0.75rem;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-dark) !important;
+            border-color: var(--primary-dark) !important;
+            color: white !important;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark-hover) !important;
+            border-color: var(--primary-dark-hover) !important;
+        }
+
+        .btn-secondary {
+            background-color: white !important;
+            color: var(--primary-dark) !important;
+            border: 1px solid #e8e0d0 !important;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-dark) !important;
+            background-color: #fafbfc !important;
+        }
+
+        .info-box {
+            background-color: #dbeafe;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #1e40af;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: #1e3a8a;
+        }
+
+        @media (max-width: 480px) {
+            .verify-container {
+                padding: 1.5rem;
+            }
+
+            .verify-header h1 {
+                font-size: 1.3rem;
+            }
+
+            .verify-icon {
+                font-size: 2.5rem;
+            }
+
+            .qr-display {
+                padding: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-
-    <nav class="page-nav">
-        <a href="index.html" class="nav-logo">
-            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                <rect width="64" height="64" rx="14" fill="#102c26"/>
-                <path d="M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z" fill="#f7e7ce"/>
-            </svg>
-            DIGIPASS
-        </a>
-        <div class="nav-links">
-            <a href="index.html" class="nav-button">Home</a>
+    <div class="verify-container">
+        <div class="verify-header">
+            <div class="verify-icon">✓</div>
+            <h1>You're Invited!</h1>
         </div>
-    </nav>
 
-    <div class="page-bg">
-        <div class="orb"></div>
-        <div class="orb"></div>
-        <div class="orb"></div>
-    </div>
+        <div class="info-box">
+            <strong>🔐 Executor Verification</strong><br>
+            You've been invited to be an executor for a digital estate. Complete your setup to access the assets assigned to you.
+        </div>
 
-    <main class="page-content">
-        <div class="auth-card" style="max-width: 500px;">
+        <div class="qr-display" id="qrCodeDisplay">
+            <p class="text-muted" id="qrLoading">Loading QR code...</p>
+            <img id="qrImage" style="display: none;" alt="Verification QR Code">
+        </div>
+        <p class="qr-text">Scan this code with your phone camera to verify</p>
 
-            <div class="verify-icon" style="font-size: 3rem; text-align: center; margin-bottom: 1rem;">✓</div>
+        <div class="divider">
+            <span>or</span>
+        </div>
 
-            <h1 class="card-title">You're Invited!</h1>
-
-            <div class="info-box">
-                <strong>🔐 Executor Verification</strong><br>
-                You've been invited to be an executor for a digital estate. Complete your setup to access the assets assigned to you.
-            </div>
-
-            <div class="qr-display" id="qrCodeDisplay">
-                <p>Loading QR code...</p>
-                <img id="qrImage" style="display: none;" alt="Verification QR Code">
-            </div>
-            <p class="qr-text">Scan this code with your phone camera to verify</p>
-
-            <div class="divider-or"><span>or</span></div>
-
-            <div class="link-section">
-                <h3>Direct Link</h3>
-                <div id="verificationLink" class="link-display">Loading link...</div>
-                <div class="button-group">
-                    <button onclick="copyLink()" class="btn-secondary-outline">Copy Link</button>
-                    <button onclick="openLink()" class="btn-secondary-outline">Open Link</button>
-                </div>
-            </div>
-
+        <div class="link-section">
+            <h3>Direct Link</h3>
+            <div class="link-display" id="verificationLink">Loading link...</div>
             <div class="button-group">
-                <button onclick="location.href='executor-login.html'" class="btn-secondary-outline">Already Verified?</button>
-                <button onclick="location.href='index.html'" class="btn-secondary-outline">Back Home</button>
+                <button onclick="copyLink()" class="btn btn-secondary btn-sm">Copy Link</button>
+                <button onclick="openLink()" class="btn btn-primary btn-sm">Open Link</button>
             </div>
-
         </div>
-    </main>
 
-    <footer class="page-footer">
-        &copy; 2026 DIGIPASS
-    </footer>
+        <div class="button-group">
+            <button onclick="location.href='executor-login.html'" class="btn btn-secondary">Already Verified?</button>
+            <button onclick="location.href='index.html'" class="btn btn-secondary">Back Home</button>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode.js/1.5.0/qrcode.min.js"></script>
