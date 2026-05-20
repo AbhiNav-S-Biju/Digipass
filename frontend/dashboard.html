@@ -47,13 +47,13 @@
             left: -200px;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, var(--forest-mid), transparent 70%);
+            background: radial-gradient(circle, var(--forest-mid) 0%, transparent 70%);
             opacity: 0.06;
             border-radius: 50%;
-            filter: blur(80px);
             z-index: 0;
             animation: orbDrift 18s ease-in-out infinite;
             pointer-events: none;
+            will-change: transform;
         }
 
         body::after {
@@ -63,13 +63,13 @@
             right: -150px;
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, var(--forest-light), transparent 70%);
+            background: radial-gradient(circle, var(--forest-light) 0%, transparent 70%);
             opacity: 0.05;
             border-radius: 50%;
-            filter: blur(80px);
             z-index: 0;
             animation: orbDrift 22s ease-in-out infinite reverse;
             pointer-events: none;
+            will-change: transform;
         }
 
         @keyframes orbDrift {
