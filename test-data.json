@@ -1,11 +1,29 @@
 {
   "user": {
     "id": 15,
-    "full_name": "Test User",
-    "email": "test@example.com",
+    "full_name": "John Doe",
+    "email": "johndoe@example.com",
     "created_at": "May 16, 2026"
   },
-  "assets": [],
-  "executors": [],
-  "emergency_contacts": []
+  "assets": [
+    {
+      "name": "Google Workspace",
+      "category": "email",
+      "platform": "Google",
+      "account_username": "johndoe@gmail.com",
+      "preferred_action": "pass_executor",
+      "final_message": "Please make sure to delete this account after retrieving my photos."
+    }
+  ],
+  "executors": [
+    {
+      "name": "Jane Doe",
+      "email": "janedoe@example.com",
+      "phone": "+1234567890",
+      "relationship": "Spouse",
+      "role": "PRIMARY",
+      "status": "verified"
+    }
+  ],
+  "custom_content": "This is a custom message.\n\nI want to make sure everyone knows that I loved them very much. Please take care of the dog."
 }
