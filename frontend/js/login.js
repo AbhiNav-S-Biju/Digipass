@@ -1,4 +1,4 @@
-const API_URL = 'https://digipass-3l63.onrender.com/api';
+const API_URL = (window.DIGIPASS_API_ORIGIN || '') + '/api';
 
 // UI helper functions (embedded for client-side use)
 function setButtonLoading(button, isLoading, loadingText = 'Logging in...') {

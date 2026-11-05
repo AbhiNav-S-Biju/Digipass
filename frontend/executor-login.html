@@ -414,6 +414,7 @@
             }
         }
     </style>
+    <script src="js/config.js"></script>
 </head>
 <body>
     <nav class="page-nav">
@@ -586,7 +587,7 @@
     </footer>
 
     <script>
-        const API_URL = 'https://digipass-3l63.onrender.com';
+        const API_URL = (window.DIGIPASS_API_ORIGIN || '');
 
         document.getElementById('executorLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();

@@ -29,9 +29,9 @@ const PdfPreview = {
       // Determine correct endpoint based on token type
       let endpoint;
       if (isExecutor || localStorage.getItem('executorToken') || sessionStorage.getItem('executorToken')) {
-        endpoint = `https://digipass-3l63.onrender.com/api/executor/will/preview/${userId}`;
+        endpoint = `${window.DIGIPASS_API_ORIGIN || ''}/api/executor/will/preview/${userId}`;
       } else {
-        endpoint = `https://digipass-3l63.onrender.com/api/will/preview/${userId}`;
+        endpoint = `${window.DIGIPASS_API_ORIGIN || ''}/api/will/preview/${userId}`;
       }
 
       console.log(`[PDF Preview] Using endpoint: ${endpoint}`);
@@ -103,7 +103,7 @@ const PdfPreview = {
       }
 
       // Fetch PDF from backend
-      const response = await fetch(`https://digipass-3l63.onrender.com/api/will/preview/${userId}`, {
+      const response = await fetch(`${window.DIGIPASS_API_ORIGIN || ''}/api/will/preview/${userId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`

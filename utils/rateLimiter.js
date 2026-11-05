@@ -1,18 +1,15 @@
 // Rate limiting middleware
-const rateLimit = {};
 
 const getRateLimitKey = (req) => {
-  // Use IP address as key
+  // Use IP address as key (requires app.set('trust proxy') behind Render/Vercel)
   return req.ip || req.connection.remoteAddress || 'unknown';
 };
 
-const resetRateLimit = (key, windowMs) => {
-  setTimeout(() => {
-    delete rateLimit[key];
-  }, windowMs);
-};
-
 const createRateLimiter = (options = {}) => {
+  // Each limiter keeps its own store. A shared store made the auth limiter (max 5)
+  // and the general API limiter count the same requests, so a few dashboard calls
+  // locked users out of login.
+  const rateLimit = {};
   // Disable rate limiting if explicitly disabled via env var or in dev/test mode
   const disableRateLimit = process.env.DISABLE_RATE_LIMIT === 'true' || process.env.NODE_ENV !== 'production';
   if (disableRateLimit) {
@@ -23,7 +20,16 @@ const createRateLimiter = (options = {}) => {
   const windowMs = options.windowMs || 15 * 60 * 1000; // 15 minutes
   const maxRequests = options.maxRequests || 100;
   const message = options.message || 'Too many requests. Please try again later.';
-  const skipSuccessfulRequests = options.skipSuccessfulRequests !== false;
+  const skipSuccessfulRequests = options.skipSuccessfulRequests === true;
+
+  // Drop expired entries periodically so the store does not grow forever.
+  const cleanup = setInterval(() => {
+    const now = Date.now();
+    for (const key of Object.keys(rateLimit)) {
+      if (now > rateLimit[key].resetTime) delete rateLimit[key];
+    }
+  }, windowMs);
+  if (cleanup.unref) cleanup.unref();
 
   return (req, res, next) => {
     const key = getRateLimitKey(req);
@@ -46,13 +52,6 @@ const createRateLimiter = (options = {}) => {
       record.resetTime = now + windowMs;
     }
 
-    // Log request
-    record.requests.push({
-      timestamp: now,
-      path: req.path,
-      method: req.method
-    });
-
     // Check if limit exceeded
     if (record.count >= maxRequests) {
       return res.status(429).json({
@@ -74,15 +73,14 @@ const createRateLimiter = (options = {}) => {
     res.setHeader('X-RateLimit-Reset', record.resetTime);
     res.setHeader('Retry-After', retryAfter);
 
-    // Hook into response to skip count on success if configured
+    // Only failed requests count toward the limit when configured (e.g. login attempts)
     if (skipSuccessfulRequests) {
-      const originalJson = res.json;
-      res.json = function(data) {
-        if (data?.success === false || res.statusCode >= 400) {
-          // Keep the count for errors
+      const windowStart = record.resetTime;
+      res.on('finish', () => {
+        if (res.statusCode < 400 && rateLimit[key] && rateLimit[key].resetTime === windowStart) {
+          rateLimit[key].count = Math.max(0, rateLimit[key].count - 1);
         }
-        return originalJson.call(this, data);
-      };
+      });
     }
 
     next();
@@ -92,13 +90,14 @@ const createRateLimiter = (options = {}) => {
 // Specific rate limiters
 const createAuthRateLimiter = () => createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 5, // 5 attempts
+  maxRequests: 5, // 5 failed attempts
+  skipSuccessfulRequests: true,
   message: 'Too many login attempts. Please try again in 15 minutes.'
 });
 
 const createApiRateLimiter = () => createRateLimiter({
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 30, // 30 requests per minute
+  maxRequests: 120, // a single dashboard load fires ~10 calls; 30/min was too tight
   message: 'Too many API requests. Please slow down.'
 });
 

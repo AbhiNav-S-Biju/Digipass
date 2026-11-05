@@ -1,6 +1,6 @@
 // Utility functions for protected pages
 
-const API_URL = 'https://digipass-3l63.onrender.com/api';
+const API_URL = (window.DIGIPASS_API_ORIGIN || '') + '/api';
 
 // Get token from localStorage
 function getToken() {
@@ -35,14 +35,19 @@ async function apiCall(endpoint, method = 'GET', body = null) {
 
   try {
     const response = await fetch(`${API_URL}${endpoint}`, options);
-    const data = await response.json();
+    // Error pages from a proxy / cold-starting host are often HTML, not JSON.
+    // Parse defensively so the real status is handled instead of a parse error.
+    const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         // Token expired or invalid
         logout();
       }
-      throw new Error(data.message || 'API Error');
+      if (response.status === 429) {
+        throw new Error(data.message || 'Too many requests. Please wait a moment and try again.');
+      }
+      throw new Error(data.message || `API Error (${response.status})`);
     }
 
     return data;

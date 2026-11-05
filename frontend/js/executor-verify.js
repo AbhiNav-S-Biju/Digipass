@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://digipass-3l63.onrender.com/api';
+const API_BASE_URL = (window.DIGIPASS_API_ORIGIN || '') + '/api';
 let executorData = null;
 
 async function verifyToken() {

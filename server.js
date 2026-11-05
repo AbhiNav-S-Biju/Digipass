@@ -22,17 +22,22 @@ const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:8080,http:/
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-// Middleware
-app.use(cors({
-  origin(origin, callback) {
-    // Allow browser requests from configured frontends and tools like curl/Postman with no Origin header.
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+// Render/Vercel sit behind a reverse proxy: trust it so req.ip is the real client IP
+// (otherwise every user shares one rate-limit bucket) and req.protocol reflects https.
+app.set('trust proxy', 1);
 
-    return callback(new Error(`CORS blocked for origin: ${origin}`));
-  },
-  credentials: true
+// Middleware
+app.use(cors((req, callback) => {
+  const origin = req.header('Origin');
+  const selfOrigin = `${req.protocol}://${req.get('host')}`;
+  // Allow: no Origin (curl/Postman), same-origin pages served by this server
+  // (browsers send Origin on same-origin POST/PATCH/DELETE), and configured frontends.
+  const allowed = !origin || origin === selfOrigin || allowedOrigins.includes(origin);
+  if (!allowed) {
+    console.warn(`[CORS] Blocked origin: ${origin}`);
+  }
+  // Never throw here: throwing turned every cross-origin request into a 500.
+  callback(null, { origin: allowed, credentials: true });
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));

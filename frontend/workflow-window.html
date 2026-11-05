@@ -808,6 +808,7 @@
             }
         }
     </style>
+    <script src="js/config.js"></script>
 </head>
 <body>
     <div class="shell">
@@ -864,7 +865,7 @@
 
     <script src="js/workflow-steps-detailed.js"></script>
     <script>
-        const API_URL = 'https://digipass-3l63.onrender.com/api';
+        const API_URL = (window.DIGIPASS_API_ORIGIN || '') + '/api';
         let allSteps = [];
         let current = 0;
         let assetInfo = null;

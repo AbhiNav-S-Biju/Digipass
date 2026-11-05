@@ -643,6 +643,7 @@
             }
         }
     </style>
+    <script src="js/config.js"></script>
 </head>
 <body>
     <!-- Navbar -->
@@ -1062,7 +1063,7 @@
         // Fetch profile statistics from API
         async function fetchProfileStats(token) {
             try {
-                const apiUrl = 'https://digipass-3l63.onrender.com';
+                const apiUrl = (window.DIGIPASS_API_ORIGIN || '');
                 
                 // Fetch assets
                 const assetsRes = await fetch(`${apiUrl}/api/assets`, {
@@ -1102,7 +1103,7 @@
         // Fetch and display user activities
         async function fetchActivities(token) {
             try {
-                const apiUrl = 'https://digipass-3l63.onrender.com';
+                const apiUrl = (window.DIGIPASS_API_ORIGIN || '');
                 const activitiesRes = await fetch(`${apiUrl}/api/activity?limit=10`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });

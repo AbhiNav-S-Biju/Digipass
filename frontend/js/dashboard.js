@@ -171,8 +171,21 @@ function loadPageData(pageName) {
   }
 }
 
-// Load dashboard data
-async function loadDashboardData() {
+// Load dashboard data. Concurrent callers share one in-flight load instead of
+// each firing their own set of requests.
+let dashboardLoadPromise = null;
+function loadDashboardData() {
+  if (!dashboardLoadPromise) {
+    dashboardLoadPromise = loadDashboardDataOnce().finally(() => {
+      dashboardLoadPromise = null;
+    });
+  }
+  return dashboardLoadPromise;
+}
+
+async function loadDashboardDataOnce() {
+  let willExists = false;
+  let switchActive = false;
   try {
     if (!assetsState.loaded) {
       await loadAssetsData();
@@ -190,6 +203,7 @@ async function loadDashboardData() {
     try {
       const willRes = await apiCall('/will', 'GET');
       if (willRes && willRes.data && willRes.data.will_id) {
+        willExists = true;
         document.getElementById('willCount').textContent = '1';
       } else {
         document.getElementById('willCount').textContent = '0';
@@ -202,7 +216,8 @@ async function loadDashboardData() {
     try {
       const statusRes = await apiCall('/dead-mans-switch/status', 'GET');
       if (statusRes && statusRes.success) {
-        const status = statusRes.data.status === 'active' ? 'Active' : 'Triggered';
+        switchActive = statusRes.data.status === 'active';
+        const status = switchActive ? 'Active' : 'Triggered';
         document.getElementById('switchStatus').textContent = status;
       } else {
         document.getElementById('switchStatus').textContent = 'Inactive';
@@ -211,9 +226,11 @@ async function loadDashboardData() {
       document.getElementById('switchStatus').textContent = 'Inactive';
     }
 
-    // Refresh dashboard widgets after loading data
+    // Refresh dashboard widgets with what we just fetched (they re-use assets/
+    // executors state, so this adds only the activity-feed request).
+    // updateDashboardWidgets must never call back into loadDashboardData.
     if (window.updateDashboardWidgets) {
-      setTimeout(() => window.updateDashboardWidgets(), 500);
+      window.updateDashboardWidgets({ willExists, switchActive });
     }
   } catch (error) {
     console.error('Error loading dashboard data:', error);
@@ -286,17 +303,14 @@ async function loadWillData() {
     console.error('Error loading will data:', error);
   }
 
-  // Bind will generation button
+  // Bind will buttons. Assign (not addEventListener) because this function runs
+  // on every visit to the Will page; stacking listeners made one click fire the
+  // request several times.
   const generateBtn = document.getElementById('generateWillBtn');
-  generateBtn.addEventListener('click', handleGenerateWill);
-  
-  const refreshBtn = document.getElementById('refreshWillBtn');
-  refreshBtn.addEventListener('click', loadWillData);
+  if (generateBtn) generateBtn.onclick = handleGenerateWill;
 
-  // Refresh dashboard widgets after loading will data
-  if (window.updateDashboardWidgets) {
-    setTimeout(() => window.updateDashboardWidgets(), 500);
-  }
+  const refreshBtn = document.getElementById('refreshWillBtn');
+  if (refreshBtn) refreshBtn.onclick = loadWillData;
 }
 
 function renderWillContent(assets, executors) {
@@ -435,15 +449,8 @@ async function handleGenerateWill() {
         willStatus.textContent = '✓ Ready';
 
         // Update dashboard widgets and data to reflect the new will
-        if (window.updateDashboardWidgets) {
-          setTimeout(() => {
-            window.updateDashboardWidgets();
-            // Also refresh the dashboard data to update the willCount in overview
-            if (typeof loadDashboardData === 'function') {
-              loadDashboardData();
-            }
-          }, 1000);
-        }
+        // loadDashboardData refreshes the overview counts and the widgets.
+        setTimeout(() => loadDashboardData(), 1000);
 
         // Hide progress bar after 2 seconds
         setTimeout(() => {
@@ -896,7 +903,13 @@ function openEditAssetModal(assetId) {
   modal.show();
 }
 
+let editAssetHandlersBound = false;
 function bindEditAssetHandlers() {
+  // Called after every assets load; bind only once or each Save click sends
+  // one PUT per previous load.
+  if (editAssetHandlersBound) return;
+  editAssetHandlersBound = true;
+
   // Handle action type radio button changes
   const actionRadios = document.querySelectorAll('.edit-action-radio');
   actionRadios.forEach(radio => {

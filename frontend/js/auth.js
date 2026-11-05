@@ -1,5 +1,5 @@
 // API configuration - works on both localhost and production
-const API_BASE_URL = 'https://digipass-3l63.onrender.com/api';
+const API_BASE_URL = (window.DIGIPASS_API_ORIGIN || '') + '/api';
 
 // Check if user is logged in
 function checkAuth() {

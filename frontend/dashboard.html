@@ -2037,24 +2037,39 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/utils.js?v=9"></script>
-    <script src="js/dashboard.js?v=9"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js?v=11"></script>
+    <script src="js/dashboard.js?v=10"></script>
     
     <!-- Dashboard Widgets Initialization -->
     <script>
-        // Initialize Checklist Widget
-        async function initializeChecklist() {
-            try {
-                // Fetch real data
-                const assetsRes = await apiCall('/assets', 'GET').catch(() => ({ data: [] }));
-                const executorsRes = await apiCall('/executors', 'GET').catch(() => ({ data: [] }));
-                const willRes = await apiCall('/will', 'GET').catch(() => ({ data: null }));
-                const switchRes = await apiCall('/dead-mans-switch/status', 'GET').catch(() => ({ data: { status: 'inactive' } }));
+        // Gather the data every widget needs in ONE round of requests.
+        // Assets/executors come from dashboard.js state when already loaded, and
+        // will/switch status can be handed in by loadDashboardData() so they are
+        // not fetched twice.
+        async function fetchWidgetData(known = {}) {
+            const hasAssets = typeof assetsState !== 'undefined' && assetsState.loaded;
+            const hasExecutors = typeof executorsState !== 'undefined' && executorsState.loaded;
 
-                const assets = Array.isArray(assetsRes.data) ? assetsRes.data : [];
-                const executors = Array.isArray(executorsRes.data) ? executorsRes.data : [];
-                const willExists = willRes && willRes.data && willRes.data.will_id;
-                const switchActive = switchRes && switchRes.data && switchRes.data.status === 'active';
+            const [assetsRes, executorsRes, willRes, switchRes] = await Promise.all([
+                hasAssets ? { data: assetsState.items } : apiCall('/assets', 'GET').catch(() => ({ data: [] })),
+                hasExecutors ? { data: executorsState.items } : apiCall('/executors', 'GET').catch(() => ({ data: [] })),
+                'willExists' in known ? null : apiCall('/will', 'GET').catch(() => ({ data: null })),
+                'switchActive' in known ? null : apiCall('/dead-mans-switch/status', 'GET').catch(() => ({ data: { status: 'inactive' } }))
+            ]);
+
+            return {
+                assets: Array.isArray(assetsRes.data) ? assetsRes.data : [],
+                executors: Array.isArray(executorsRes.data) ? executorsRes.data : [],
+                willExists: 'willExists' in known ? !!known.willExists : !!(willRes && willRes.data && willRes.data.will_id),
+                switchActive: 'switchActive' in known ? !!known.switchActive : !!(switchRes && switchRes.data && switchRes.data.status === 'active')
+            };
+        }
+
+        // Initialize Checklist Widget (render only - no requests)
+        function initializeChecklist(data) {
+            try {
+                const { assets, executors, willExists, switchActive } = data;
 
                 const checklist = [
                     { id: 1, title: 'Add Digital Assets', description: 'Log your social media and email accounts', completed: assets.length > 0, icon: '' },
@@ -2194,19 +2209,10 @@
             return 'default';
         }
 
-        // Initialize Health Score
-        async function initializeHealthScore() {
+        // Initialize Health Score (render only - no requests)
+        function initializeHealthScore(data) {
             try {
-                // Fetch real data
-                const assetsRes = await apiCall('/assets', 'GET').catch(() => ({ data: [] }));
-                const executorsRes = await apiCall('/executors', 'GET').catch(() => ({ data: [] }));
-                const willRes = await apiCall('/will', 'GET').catch(() => ({ data: null }));
-                const switchRes = await apiCall('/dead-mans-switch/status', 'GET').catch(() => ({ data: { status: 'inactive' } }));
-
-                const assets = Array.isArray(assetsRes.data) ? assetsRes.data : [];
-                const executors = Array.isArray(executorsRes.data) ? executorsRes.data : [];
-                const willExists = willRes && willRes.data && willRes.data.will_id;
-                const switchActive = switchRes && switchRes.data && switchRes.data.status === 'active';
+                const { assets, executors, willExists, switchActive } = data;
 
                 // Score calculation: Assets (20) + Executors (20) + Will (30) + Switch (30)
                 let score = 0;
@@ -2244,23 +2250,47 @@
             }
         }
 
-        // Initialize all widgets when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeChecklist();
-            initializeActivityFeed();
-            initializeHealthScore();
-        });
+        // Refresh widgets. Initial render is triggered by loadDashboardData() in
+        // dashboard.js once its data is in, so there is no separate DOMContentLoaded
+        // fetch here.
+        //
+        // IMPORTANT: this must never call loadDashboardData(). loadDashboardData()
+        // calls this function when it finishes, so calling it back created an
+        // endless request loop (~11 API calls every cycle) that tripped the rate
+        // limiter and left the page unable to load or save anything.
+        let widgetRefreshTimer = null;
+        let widgetRefreshInFlight = false;
+        let widgetRefreshQueued = null;
 
-        // Re-initialize when data updates
-        window.updateDashboardWidgets = function() {
-            // Reload dashboard data first to update counts
-            if (typeof loadDashboardData === 'function') {
-              loadDashboardData();
+        async function refreshDashboardWidgets(known) {
+            if (widgetRefreshInFlight) {
+                widgetRefreshQueued = known || {};
+                return;
             }
-            // Then update the visual widgets
-            initializeHealthScore();
-            initializeChecklist();
-            initializeActivityFeed();
+            widgetRefreshInFlight = true;
+            try {
+                const [data] = await Promise.all([
+                    fetchWidgetData(known),
+                    initializeActivityFeed()
+                ]);
+                initializeHealthScore(data);
+                initializeChecklist(data);
+            } catch (error) {
+                console.error('Error refreshing dashboard widgets:', error);
+            } finally {
+                widgetRefreshInFlight = false;
+                if (widgetRefreshQueued) {
+                    const next = widgetRefreshQueued;
+                    widgetRefreshQueued = null;
+                    refreshDashboardWidgets(next);
+                }
+            }
+        }
+
+        // Debounced: several callers in a row produce a single refresh.
+        window.updateDashboardWidgets = function(known) {
+            clearTimeout(widgetRefreshTimer);
+            widgetRefreshTimer = setTimeout(() => refreshDashboardWidgets(known), 300);
         };
     </script>
     
