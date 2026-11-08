@@ -49,13 +49,27 @@ function getPlatformIcon(platformName) {
   return PLATFORM_ICONS[platformName] || 'fas fa-lock';
 }
 
+// Board columns for the owner's assets: one per after-death action
+const ACTION_META = {
+  pass: { label: 'Pass on', column: 'Pass on to executor', hint: 'Your executor takes these over.', icon: 'fa-hand-holding-heart', tagClass: 'tag-pass', dot: 'var(--forest-light)' },
+  delete: { label: 'Delete', column: 'Delete account', hint: 'Closed for good.', icon: 'fa-trash-can', tagClass: 'tag-delete', dot: 'var(--sand-deep)' },
+  last_message: { label: 'Last message', column: 'Leave a last message', hint: 'A final post, then closed.', icon: 'fa-feather', tagClass: 'tag-message', dot: 'var(--forest-deep)' }
+};
+
+const CATEGORY_LABELS = {
+  social: 'Social', email: 'Email', finance: 'Finance', storage: 'Storage', entertainment: 'Entertainment', other: 'Other'
+};
+
+const assetView = { mode: 'board', query: '', category: '' };
+
 // Check authentication on page load
 document.addEventListener('DOMContentLoaded', () => {
   if (!checkAuth()) return;
 
   const user = getUser();
   if (user) {
-    document.getElementById('userName').textContent = user.fullName || user.email;
+    const firstName = (user.fullName || '').trim().split(/\s+/)[0];
+    document.getElementById('userName').textContent = firstName || user.email;
   }
 
   // Initialize dashboard
@@ -70,18 +84,23 @@ document.addEventListener('DOMContentLoaded', () => {
 // Initialize dashboard page navigation
 function initDashboard() {
   // Get all navigation links with data-page attribute
-  const navLinks = document.querySelectorAll('a[data-page]');
-  const pages = document.querySelectorAll('.page');
+  // One delegated listener covers the rail, the side panel and any link rendered
+  // later inside cards (e.g. the overview checklist).
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[data-page]');
+    if (!link) return;
+    e.preventDefault();
+    const pageName = link.dataset.page;
+    dashboardDebug('[Link Click] Navigating to:', pageName);
+    if (window.location.hash !== `#${pageName}`) {
+      history.replaceState(null, '', `#${pageName}`);
+    }
+    navigateToPage(pageName);
+  });
 
-  dashboardDebug('[Dashboard Init] Found navLinks:', navLinks.length, 'pages:', pages.length);
-
-  navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const pageName = link.dataset.page;
-      dashboardDebug('[Link Click] Navigating to:', pageName);
-      navigateToPage(pageName);
-    });
+  // Close any open "..." menu when clicking elsewhere
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.more')) closeMoreMenus();
   });
 
   // Also listen for hash changes (for anchor links and back button)
@@ -105,45 +124,22 @@ function initDashboard() {
 function navigateToPage(pageName) {
   dashboardDebug('[navigateToPage]', pageName);
   
-  const navLinks = document.querySelectorAll('a[data-page]');
-  const pages = document.querySelectorAll('.page');
+  const targetPage = document.getElementById(`${pageName}Page`);
+  if (!targetPage) {
+    dashboardDebug('[navigateToPage] NO PAGE FOUND for:', pageName);
+    return;
+  }
 
-  dashboardDebug('[navigateToPage] Total pages:', pages.length);
-
-  // Remove active class from all links and pages
-  navLinks.forEach(l => l.classList.remove('active'));
-  pages.forEach(p => {
-    p.classList.remove('active');
-    dashboardDebug('[navigateToPage] Removed active from:', p.id);
+  // Rail and side panel both carry links for each page; keep them in sync.
+  document.querySelectorAll('.rail a[data-page], .panel-nav a[data-page]').forEach(l => {
+    const isActive = l.dataset.page === pageName;
+    l.classList.toggle('active', isActive);
+    if (isActive) l.setAttribute('aria-current', 'page'); else l.removeAttribute('aria-current');
   });
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p === targetPage));
 
-  // Find and activate the link and page for this pageName
-  const activeLink = document.querySelector(`a[data-page="${pageName}"]`);
-  if (activeLink) {
-    dashboardDebug('[navigateToPage] Found link for:', pageName);
-    activeLink.classList.add('active');
-  } else {
-    dashboardDebug('[navigateToPage] NO LINK FOUND for:', pageName);
-  }
-
-  const targetPageId = `${pageName}Page`;
-  const targetPage = document.getElementById(targetPageId);
-  if (targetPage) {
-    dashboardDebug('[navigateToPage] Found page:', targetPageId, '- adding active class');
-    targetPage.classList.add('active');
-  } else {
-    dashboardDebug('[navigateToPage] NO PAGE FOUND with ID:', targetPageId);
-  }
-
-  // Close navbar menu on mobile using Bootstrap method
-  const navbarToggler = document.querySelector('.navbar-toggler');
-  const navbarCollapse = document.getElementById('navbarNav');
-  
-  // Check if navbar is shown (mobile view) and close it
-  if (navbarToggler && navbarCollapse && navbarCollapse.classList.contains('show')) {
-    // Click the toggler to close the menu
-    navbarToggler.click();
-  }
+  // Close the slide-in panel on small screens
+  if (typeof togglePanel === 'function') togglePanel(false);
 
   // Load page data
   dashboardDebug('[navigateToPage] Loading data for:', pageName);
@@ -204,26 +200,30 @@ async function loadDashboardDataOnce() {
       const willRes = await apiCall('/will', 'GET');
       if (willRes && willRes.data && willRes.data.will_id) {
         willExists = true;
-        document.getElementById('willCount').textContent = '1';
-      } else {
-        document.getElementById('willCount').textContent = '0';
       }
     } catch (err) {
-      document.getElementById('willCount').textContent = '0';
+      willExists = false;
     }
+    document.getElementById('willCount').textContent = willExists ? 'ready' : 'not yet';
+    setText('navCountWill', willExists ? 'PDF' : '–');
     
     // Load dead man's switch status
     try {
       const statusRes = await apiCall('/dead-mans-switch/status', 'GET');
       if (statusRes && statusRes.success) {
         switchActive = statusRes.data.status === 'active';
-        const status = switchActive ? 'Active' : 'Triggered';
+        const status = switchActive ? 'on' : 'triggered';
         document.getElementById('switchStatus').textContent = status;
+        setText('navCountSwitch', switchActive ? `${statusRes.data.daysUntilTrigger}d` : '!');
+        updatePromo(statusRes.data);
       } else {
-        document.getElementById('switchStatus').textContent = 'Inactive';
+        document.getElementById('switchStatus').textContent = 'off';
+        setText('navCountSwitch', 'off');
+        updatePromo(null);
       }
     } catch (err) {
-      document.getElementById('switchStatus').textContent = 'Inactive';
+      document.getElementById('switchStatus').textContent = 'off';
+      updatePromo(null);
     }
 
     // Refresh dashboard widgets with what we just fetched (they re-use assets/
@@ -234,6 +234,74 @@ async function loadDashboardDataOnce() {
     }
   } catch (error) {
     console.error('Error loading dashboard data:', error);
+  }
+}
+
+// ---------- Shell helpers ----------
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+// Sidebar check-in card, driven by the Dead Man's Switch status
+function updatePromo(status) {
+  window.__switchStatus = status || null;
+  const text = document.getElementById('promoText');
+  const meter = document.getElementById('promoMeter');
+  if (!text || !meter) return;
+
+  if (!status) {
+    text.textContent = 'Your executors are only told if you stop checking in.';
+    meter.style.width = '0%';
+    return;
+  }
+
+  const interval = Number(status.check_interval_days) || 30;
+  const daysLeft = Math.max(0, Number(status.daysUntilTrigger) || 0);
+  if (status.status !== 'active') {
+    text.textContent = 'Your switch has been triggered and executors were notified.';
+    meter.style.width = '0%';
+    return;
+  }
+  text.textContent = `${daysLeft} of ${interval} days left before your executors are told.`;
+  meter.style.width = `${Math.round((daysLeft / interval) * 100)}%`;
+}
+
+function getInitials(name) {
+  return String(name || '?').trim().split(/\s+/).filter(Boolean)
+    .map(part => part[0]).join('').substring(0, 2).toUpperCase() || '?';
+}
+
+// Stable 1-5 tone per name so a person keeps the same avatar colour
+function avatarTone(name) {
+  let hash = 0;
+  for (const ch of String(name || '')) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  return (hash % 5) + 1;
+}
+
+function closeMoreMenus(except) {
+  document.querySelectorAll('.more-menu.open').forEach(menu => {
+    if (menu === except) return;
+    menu.classList.remove('open');
+    const btn = menu.parentElement && menu.parentElement.querySelector('[aria-expanded]');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  });
+}
+
+function toggleMoreMenu(button) {
+  const menu = button.parentElement.querySelector('.more-menu');
+  if (!menu) return;
+  const open = !menu.classList.contains('open');
+  closeMoreMenus(menu);
+  menu.classList.toggle('open', open);
+  button.setAttribute('aria-expanded', String(open));
+}
+
+function hideDrawer(id) {
+  const el = document.getElementById(id);
+  if (el && window.bootstrap) {
+    const inst = bootstrap.Offcanvas.getInstance(el);
+    if (inst) inst.hide();
   }
 }
 
@@ -252,8 +320,14 @@ async function loadAssetsData() {
     bindEditAssetHandlers();
   } catch (error) {
     assetsStatus.textContent = 'Unable to load assets right now.';
+    document.getElementById('assetsList').innerHTML = statePanel('fa-plug-circle-exclamation',
+      'Your accounts could not be loaded', 'Check your connection, then use Refresh to try again.');
     showNotification(error.message || 'Failed to load assets', 'error');
   }
+}
+
+function statePanel(icon, title, body) {
+  return `<div class="state-panel"><div class="state-icon"><i class="fas ${icon}"></i></div><h2>${title}</h2><p>${body}</p></div>`;
 }
 
 async function loadExecutorsData() {
@@ -270,6 +344,10 @@ async function loadExecutorsData() {
     updateExecutorCount();
   } catch (error) {
     executorsStatus.textContent = 'Unable to load executors right now.';
+    document.getElementById('executorsList').innerHTML = statePanel('fa-plug-circle-exclamation',
+      'Your executors could not be loaded', 'Check your connection, then use Refresh to try again.');
+    const people = document.getElementById('panelPeople');
+    if (people) people.innerHTML = '<li class="people-empty">Could not load executors.</li>';
     showNotification(error.message || 'Failed to load executors', 'error');
   }
 }
@@ -314,71 +392,42 @@ async function loadWillData() {
 }
 
 function renderWillContent(assets, executors) {
-  const willContent = document.getElementById('willContent');
-  let content = '';
+  const assetsCol = document.getElementById('willAssetsCol');
+  const executorsCol = document.getElementById('willExecutorsCol');
 
-  const actionLabels = {
-    'pass': 'Pass to Executor',
-    'delete': 'Delete Account',
-    'last_message': 'Final Message'
-  };
+  // Grouped by action, like the will's own table of contents
+  assetsCol.innerHTML = assets.length
+    ? Object.entries(ACTION_META).map(([key, action]) => {
+        const group = assets.filter(a => (a.action_type || 'pass') === key);
+        if (!group.length) return '';
+        return `
+          <article class="bcard">
+            <div class="tags"><span class="tag ${action.tagClass}"><i class="fas ${action.icon}"></i>${action.column}</span><span class="tag tag-neutral">${group.length}</span></div>
+            <ul class="row-list">
+              ${group.map(asset => `
+                <li>
+                  <span class="plat"><i class="${getPlatformIcon(asset.platform_name)}"></i></span>
+                  <div class="row-main"><div class="row-title">${escapeHtml(asset.platform_name || 'Account')}</div><div class="row-sub">${escapeHtml(asset.account_identifier || '')}</div></div>
+                </li>`).join('')}
+            </ul>
+          </article>`;
+      }).join('')
+    : `<div class="column-empty">No accounts yet. <a href="#assets" data-page="assets">Add your first account</a>.</div>`;
 
-  // Assets Section
-  content += '<div class="will-section">';
-  content += '<h4>📋 Digital Assets (' + assets.length + ')</h4>';
-  
-  if (assets.length === 0) {
-    content += '<p><em>No assets added yet. Add assets from the Digital Assets tab.</em></p>';
-  } else {
-    assets.forEach(asset => {
-      content += '<div class="will-item">';
-      content += '<div class="will-item-name">' + escapeHtml(asset.platform_name || 'Unknown') + '</div>';
-      content += '<div class="will-item-meta">Account: ' + escapeHtml(asset.account_identifier || 'N/A') + '</div>';
-      content += '<div class="will-item-meta">Action: ' + (actionLabels[asset.action_type] || asset.action_type) + '</div>';
-      if (asset.last_message) {
-        content += '<div class="will-item-meta small">Message: ' + escapeHtml(asset.last_message.substring(0, 75)) + (asset.last_message.length > 75 ? '...' : '') + '</div>';
-      }
-      content += '<div class="will-item-meta">Added: ' + formatAssetDate(asset.created_at) + '</div>';
-      content += '</div>';
-    });
-  }
-  content += '</div>';
-
-  // Executors Section
-  content += '<div class="will-section">';
-  content += '<h4>👥 Executors (' + executors.length + ')</h4>';
-  
-  if (executors.length === 0) {
-    content += '<p><em>No executors assigned yet. Add executors from the Executors tab.</em></p>';
-  } else {
-    executors.forEach(executor => {
-      content += '<div class="will-item">';
-      content += '<div class="will-item-name">' + escapeHtml(executor.executor_name) + '</div>';
-      content += '<div class="will-item-meta">Email: ' + escapeHtml(executor.executor_email) + '</div>';
-      content += '<div class="will-item-meta">Status: ' + escapeHtml(executor.verification_status) + '</div>';
-      content += '<div class="will-item-meta">Access: ' + (executor.access_granted ? '✓ Granted' : '✗ Not Granted') + '</div>';
-      if (executor.relationship) {
-        content += '<div class="will-item-meta">Relationship: ' + escapeHtml(executor.relationship) + '</div>';
-      }
-      content += '</div>';
-    });
-  }
-  content += '</div>';
-
-  // Instructions Section
-  content += '<div class="will-section">';
-  content += '<h4>📝 Instructions</h4>';
-  content += '<p>Your digital will automatically includes:</p>';
-  content += '<ul style="margin: 0.5rem 0; padding-left: 1.5rem; color: #6b7280;">';
-  content += '<li>All registered digital assets</li>';
-  content += '<li>All assigned executors and their status</li>';
-  content += '<li>Your personal information</li>';
-  content += '<li>Asset type categorization</li>';
-  content += '</ul>';
-  content += '<p style="margin-top: 1rem; font-size: 0.9rem; color: #999;">Click "Generate Digital Will (PDF)" to create an official PDF document.</p>';
-  content += '</div>';
-
-  willContent.innerHTML = content;
+  executorsCol.innerHTML = executors.length
+    ? executors.map(executor => {
+        const granted = executor.access_granted === true || executor.access_granted === 'true';
+        return `
+          <article class="bcard">
+            <div class="tags">
+              <span class="tag ${granted ? 'tag-forest' : 'tag-neutral'}">${granted ? 'Has access' : 'No access yet'}</span>
+              ${executor.relationship ? `<span class="tag tag-delete">${escapeHtml(executor.relationship)}</span>` : ''}
+            </div>
+            <div class="bcard-title"><span class="avatar sm" data-tone="${avatarTone(executor.executor_name)}">${getInitials(executor.executor_name)}</span>${escapeHtml(executor.executor_name)}</div>
+            <p class="bcard-desc">${escapeHtml(executor.executor_email)}</p>
+          </article>`;
+      }).join('')
+    : `<div class="column-empty">No executors yet. <a href="#executors" data-page="executors">Invite someone you trust</a>.</div>`;
 }
 
 async function handleGenerateWill() {
@@ -388,10 +437,11 @@ async function handleGenerateWill() {
   const willStatusFill = document.getElementById('willStatusFill');
   const willStatusText = document.getElementById('willStatusText');
 
+  const generateLabel = generateBtn.innerHTML;
   generateBtn.disabled = true;
-  generateBtn.textContent = 'Generating...';
-  willStatus.textContent = 'Generating...';
-  willStatusBar.classList.add('active');
+  generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>Generating…';
+  willStatus.textContent = 'Generating';
+  willStatusBar.hidden = false;
   willStatusText.textContent = '0%';
   willStatusFill.style.width = '0%';
 
@@ -445,8 +495,8 @@ async function handleGenerateWill() {
         // Complete progress
         willStatusFill.style.width = '100%';
         willStatusText.textContent = '100%';
-        showNotification('Digital will generated and downloaded successfully!', 'success');
-        willStatus.textContent = '✓ Ready';
+        showNotification('Your digital will has been generated and downloaded.', 'success');
+        willStatus.textContent = 'Downloaded';
 
         // Update dashboard widgets and data to reflect the new will
         // loadDashboardData refreshes the overview counts and the widgets.
@@ -454,8 +504,8 @@ async function handleGenerateWill() {
 
         // Hide progress bar after 2 seconds
         setTimeout(() => {
-          willStatusBar.classList.remove('active');
-          willStatusText.textContent = '';
+          willStatusBar.hidden = true;
+          willStatusText.textContent = '0%';
         }, 2000);
       } else {
         throw new Error('No download URL provided');
@@ -466,13 +516,12 @@ async function handleGenerateWill() {
   } catch (error) {
     console.error('Will generation error:', error);
     clearInterval(progressInterval);
-    willStatusBar.classList.remove('active');
-    willStatus.textContent = '✗ Error';
-    willStatusText.textContent = 'Failed';
-    showNotification(error.message || 'Failed to generate digital will', 'error');
+    willStatusBar.hidden = true;
+    willStatus.textContent = 'Not generated';
+    showNotification(error.message || 'Your will could not be generated. Please try again.', 'error');
   } finally {
     generateBtn.disabled = false;
-    generateBtn.textContent = 'Generate Digital Will (PDF)';
+    generateBtn.innerHTML = generateLabel;
   }
 }
 
@@ -488,8 +537,7 @@ async function openEditWillModal() {
     }
     
     // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('editWillModal'));
-    modal.show();
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('editWillModal')).show();
   } catch (error) {
     console.error('Error loading will content:', error);
     showNotification('Failed to load will content', 'error');
@@ -582,6 +630,8 @@ function bindAssetActions() {
   // Use event delegation for asset list actions (edit and delete)
   const assetsList = document.getElementById('assetsList');
   assetsList.addEventListener('click', handleAssetListClick);
+
+  bindAssetToolbar();
 }
 
 // Update available action buttons based on selected platform
@@ -708,6 +758,14 @@ function bindExecutorActions() {
   refreshExecutorsBtn.addEventListener('click', () => {
     loadExecutorsData();
   });
+
+  const search = document.getElementById('executorSearch');
+  if (search) {
+    search.addEventListener('input', () => {
+      executorView.query = search.value;
+      renderExecutors();
+    });
+  }
 }
 
 async function handleAssetSubmit(event) {
@@ -761,7 +819,12 @@ async function handleAssetSubmit(event) {
 
     event.target.reset();
     document.getElementById('messageContainer').style.display = 'none';
-    showNotification('Asset added successfully.', 'success');
+    const iconDisplay = document.querySelector('.platform-icon-display');
+    const textDisplay = document.querySelector('.platform-text-display');
+    if (iconDisplay) iconDisplay.innerHTML = '<i class="fas fa-layer-group"></i>';
+    if (textDisplay) textDisplay.textContent = 'Choose a platform…';
+    hideDrawer('assetDrawer');
+    showNotification(`${platformName} added.`, 'success');
 
     // Update dashboard widgets to reflect the new asset
     if (window.updateDashboardWidgets) {
@@ -778,12 +841,25 @@ async function handleAssetSubmit(event) {
 }
 
 async function handleAssetListClick(event) {
+  const moreButton = event.target.closest('[data-more]');
+  if (moreButton) {
+    event.stopPropagation();
+    toggleMoreMenu(moreButton);
+    return;
+  }
+
+  const addButton = event.target.closest('[data-add-action]');
+  if (addButton) {
+    openAssetDrawer(addButton.dataset.addAction);
+    return;
+  }
+
   // Handle edit button click
   const editButton = event.target.closest('[data-edit-id]');
   if (editButton) {
     event.preventDefault();
-    const assetId = editButton.dataset.editId;
-    openEditAssetModal(assetId);
+    closeMoreMenus();
+    openEditAssetModal(editButton.dataset.editId);
     return;
   }
 
@@ -791,84 +867,178 @@ async function handleAssetListClick(event) {
   const deleteButton = event.target.closest('[data-delete-id]');
   if (deleteButton) {
     const assetId = deleteButton.dataset.deleteId;
+    const asset = assetsState.items.find(a => String(a.asset_id) === String(assetId));
+    closeMoreMenus();
+    if (!confirm(`Remove ${asset ? asset.platform_name : 'this account'} from DIGIPASS? Your executors will no longer see it.`)) {
+      return;
+    }
     deleteButton.disabled = true;
-    deleteButton.textContent = 'Deleting...';
 
     try {
       await apiCall(`/assets/${assetId}`, 'DELETE');
 
-      assetsState.items = assetsState.items.filter((asset) => String(asset.asset_id) !== String(assetId));
+      assetsState.items = assetsState.items.filter((a) => String(a.asset_id) !== String(assetId));
       renderAssets();
       updateAssetCount();
-      showNotification('Asset deleted successfully.', 'success');
+      showNotification('Account removed.', 'success');
+      if (window.updateDashboardWidgets) window.updateDashboardWidgets();
     } catch (error) {
       deleteButton.disabled = false;
-      deleteButton.textContent = 'Delete';
-      showNotification(error.message || 'Failed to delete asset', 'error');
+      showNotification(error.message || 'Failed to remove account', 'error');
     }
   }
 }
 
+function bindAssetToolbar() {
+  const search = document.getElementById('assetSearch');
+  if (search) {
+    search.addEventListener('input', () => {
+      assetView.query = search.value;
+      renderAssets();
+    });
+  }
+
+  document.querySelectorAll('[data-asset-view]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      assetView.mode = tab.dataset.assetView;
+      document.querySelectorAll('[data-asset-view]').forEach(t =>
+        t.setAttribute('aria-selected', String(t === tab)));
+      renderAssets();
+    });
+  });
+
+  const catBtn = document.getElementById('assetCategoryBtn');
+  const catMenu = document.getElementById('assetCategoryMenu');
+  if (catBtn && catMenu) {
+    catBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMoreMenu(catBtn);
+    });
+    catMenu.addEventListener('click', (e) => {
+      const option = e.target.closest('[data-category]');
+      if (!option) return;
+      assetView.category = option.dataset.category;
+      setText('assetCategoryLabel', assetView.category ? CATEGORY_LABELS[assetView.category] : 'All categories');
+      catBtn.setAttribute('aria-pressed', String(Boolean(assetView.category)));
+      closeMoreMenus();
+      renderAssets();
+    });
+  }
+}
+
+function filteredAssets() {
+  const q = assetView.query.trim().toLowerCase();
+  return assetsState.items.filter(asset => {
+    if (assetView.category && (asset.category || 'other') !== assetView.category) return false;
+    if (!q) return true;
+    return [asset.platform_name, asset.account_identifier, asset.category]
+      .some(v => String(v || '').toLowerCase().includes(q));
+  });
+}
+
+function assetMenu(asset) {
+  return `
+    <div class="more">
+      <button type="button" class="more-btn" data-more aria-haspopup="true" aria-expanded="false" aria-label="Options for ${escapeHtml(asset.platform_name)}"><i class="fas fa-ellipsis"></i></button>
+      <div class="more-menu" role="menu">
+        <button type="button" role="menuitem" data-edit-id="${asset.asset_id}"><i class="fas fa-pen"></i>Edit account</button>
+        <hr>
+        <button type="button" role="menuitem" class="danger" data-delete-id="${asset.asset_id}"><i class="fas fa-trash-can"></i>Remove from DIGIPASS</button>
+      </div>
+    </div>`;
+}
+
+function assetCard(asset) {
+  const action = ACTION_META[asset.action_type] || ACTION_META.pass;
+  const category = asset.category || 'other';
+  const message = asset.last_message
+    ? `<p class="bcard-quote"><i class="fas fa-quote-left"></i>${escapeHtml(asset.last_message.substring(0, 110))}${asset.last_message.length > 110 ? '…' : ''}</p>`
+    : '';
+  return `
+    <article class="bcard" data-asset-id="${asset.asset_id}">
+      <div class="bcard-top">
+        <div class="tags">
+          <span class="tag ${action.tagClass}"><i class="fas ${action.icon}"></i>${action.label}</span>
+          <span class="tag tag-neutral">${CATEGORY_LABELS[category] || escapeHtml(category)}</span>
+        </div>
+        ${assetMenu(asset)}
+      </div>
+      <div class="bcard-title"><span class="plat"><i class="${getPlatformIcon(asset.platform_name)}"></i></span>${escapeHtml(asset.platform_name)}</div>
+      <p class="bcard-desc">${escapeHtml(asset.account_identifier)}</p>
+      ${message}
+      <div class="bcard-foot">
+        <span class="meta"><i class="fas fa-key"></i>${asset.account_password ? 'Password saved' : 'No password'}</span>
+        <span class="meta push"><i class="far fa-calendar"></i>${formatShortDate(asset.created_at)}</span>
+      </div>
+    </article>`;
+}
+
+
 function renderAssets() {
   const assetsList = document.getElementById('assetsList');
   const assetsStatus = document.getElementById('assetsStatus');
+  const total = assetsState.items.length;
+  const items = filteredAssets();
+  const filtering = Boolean(assetView.query || assetView.category);
 
-  if (!assetsState.items.length) {
-    assetsList.innerHTML = '';
-    assetsStatus.textContent = 'No assets added yet.';
+  assetsStatus.textContent = total ? `${items.length} of ${total} accounts shown` : 'No accounts added yet.';
+
+  if (!total) {
+    assetsList.innerHTML = `
+      <div class="state-panel">
+        <div class="state-icon"><i class="fas fa-key"></i></div>
+        <h2>No accounts yet</h2>
+        <p>Add the accounts someone would need to deal with, and choose what should happen to each.</p>
+        <button type="button" class="pill pill-primary" style="margin-top:16px" onclick="openAssetDrawer()"><i class="fas fa-plus"></i>Add your first account</button>
+      </div>`;
     return;
   }
 
-  assetsStatus.textContent = `${assetsState.items.length} asset(s) saved`;
-  
-  const actionEmojis = {
-    'pass': '',
-    'delete': '',
-    'last_message': ''
-  };
+  if (assetView.mode === 'list') {
+    assetsList.innerHTML = items.length ? `
+      <div class="list" role="table" aria-label="Accounts">
+        <div class="list-row list-head" role="row"><span>Account</span><span class="hide-sm">Sign-in</span><span class="hide-sm">After you</span><span class="hide-sm">Added</span><span></span></div>
+        ${items.map(asset => {
+          const action = ACTION_META[asset.action_type] || ACTION_META.pass;
+          return `
+            <div class="list-row" role="row">
+              <span class="bcard-title"><span class="plat"><i class="${getPlatformIcon(asset.platform_name)}"></i></span>${escapeHtml(asset.platform_name)}</span>
+              <span class="cell-muted hide-sm">${escapeHtml(asset.account_identifier)}</span>
+              <span class="hide-sm"><span class="tag ${action.tagClass}"><i class="fas ${action.icon}"></i>${action.label}</span></span>
+              <span class="cell-muted hide-sm">${formatShortDate(asset.created_at)}</span>
+              ${assetMenu(asset)}
+            </div>`;
+        }).join('')}
+      </div>` : statePanel('fa-magnifying-glass', 'No matching accounts', 'Try a different search or category.');
+    return;
+  }
 
-  assetsList.innerHTML = assetsState.items.map((asset) => {
-    const actionLabel = {
-      'pass': 'Pass to Executor',
-      'delete': 'Delete Account',
-      'last_message': 'Final Message'
-    }[asset.action_type] || asset.action_type;
+  assetsList.innerHTML = `
+    <div class="board" style="--cols:3">
+      ${Object.entries(ACTION_META).map(([key, meta]) => {
+        const colItems = items.filter(a => (a.action_type || 'pass') === key);
+        return `
+          <section class="column" aria-label="${meta.column}">
+            <div class="column-head"><span class="dot" style="--dot:${meta.dot}"></span><h2>${meta.column}</h2><span class="col-count">${colItems.length}</span></div>
+            <p class="column-hint">${meta.hint}</p>
+            <div class="column-body">
+              ${colItems.length ? colItems.map(assetCard).join('') : `<div class="column-empty">${filtering ? 'Nothing matches here.' : 'No accounts here yet.'}</div>`}
+            </div>
+            <button type="button" class="column-add" data-add-action="${key}"><i class="fas fa-plus"></i>Add account</button>
+          </section>`;
+      }).join('')}
+    </div>`;
+}
 
-    const platformIcon = getPlatformIcon(asset.platform_name);
-
-    return `
-    <article class="asset-card mb-3">
-      <div class="asset-card-header d-flex justify-content-between align-items-start mb-2">
-        <div class="d-flex gap-2 align-items-start flex-grow-1">
-          <div class="asset-card-icon">
-            <i class="${platformIcon}"></i>
-          </div>
-          <div>
-            <h4 class="mb-1">${escapeHtml(asset.platform_name)}</h4>
-            <p class="text-muted small mb-2">${escapeHtml(asset.account_identifier)}</p>
-            <span class="badge bg-secondary">${asset.category}</span>
-          </div>
-        </div>
-        <div class="d-flex gap-2">
-          <button type="button" class="btn btn-sm btn-outline-primary" data-edit-id="${asset.asset_id}">Edit</button>
-          <button type="button" class="btn btn-sm btn-outline-danger" data-delete-id="${asset.asset_id}">Delete</button>
-        </div>
-      </div>
-      <div class="d-flex align-items-center gap-2 mt-2">
-        <span class="fw-500">${actionLabel}</span>
-      </div>
-      ${asset.last_message ? `<div class="alert alert-info small mt-2 mb-0"><strong>Message:</strong> ${escapeHtml(asset.last_message.substring(0, 100))}${asset.last_message.length > 100 ? '...' : ''}</div>` : ''}
-      <p class="small text-muted mt-2 mb-0">Added ${formatAssetDate(asset.created_at)}</p>
-    </article>
-    `;
-  }).join('');
-
-  // Bind edit and delete buttons after rendering
-  // (Note: edit handler uses event delegation, no need to rebind)
+function formatShortDate(value) {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return 'Recently';
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function updateAssetCount() {
   document.getElementById('assetCount').textContent = String(assetsState.items.length);
+  setText('navCountAssets', String(assetsState.items.length));
 }
 
 function openEditAssetModal(assetId) {
@@ -899,8 +1069,7 @@ function openEditAssetModal(assetId) {
   }
 
   // Show modal
-  const modal = new bootstrap.Modal(document.getElementById('editAssetModal'));
-  modal.show();
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('editAssetModal')).show();
 }
 
 let editAssetHandlersBound = false;
@@ -1031,6 +1200,7 @@ async function handleExecutorSubmit(event) {
     updateExecutorCount();
 
     event.target.reset();
+    hideDrawer('executorDrawer');
     if (response.data.verification_email_sent) {
       showNotification(`Executor added successfully. Verification email sent to ${response.data.executor_email}`, 'success');
     } else {
@@ -1051,41 +1221,105 @@ async function handleExecutorSubmit(event) {
   }
 }
 
+const EXECUTOR_COLUMNS = [
+  { key: 'Invited', title: 'Invited', hint: 'Waiting for them to verify their email.', dot: 'var(--sand-deep)' },
+  { key: 'Verified', title: 'Verified', hint: 'Ready. Grant access when you choose.', dot: 'var(--forest-light)' },
+  { key: 'Active', title: 'Has access', hint: 'Can see your accounts once the switch triggers.', dot: 'var(--forest-deep)' }
+];
+
+const executorView = { query: '' };
+
+function executorCard(executor) {
+  const status = getExecutorStatus(executor);
+  const tone = avatarTone(executor.executor_name);
+  return `
+    <article class="bcard" data-executor-id="${executor.executor_id}">
+      <div class="bcard-top">
+        <div class="tags">
+          ${executor.relationship ? `<span class="tag tag-delete">${escapeHtml(executor.relationship)}</span>` : '<span class="tag tag-neutral">Executor</span>'}
+          ${status === 'Active' ? '<span class="tag tag-forest"><i class="fas fa-lock-open"></i>Has access</span>' : ''}
+        </div>
+        <div class="more">
+          <button type="button" class="more-btn" data-more aria-haspopup="true" aria-expanded="false" aria-label="Options for ${escapeHtml(executor.executor_name)}"><i class="fas fa-ellipsis"></i></button>
+          <div class="more-menu" role="menu">
+            ${status === 'Active' ? `<button type="button" role="menuitem" data-revoke-id="${executor.executor_id}"><i class="fas fa-lock"></i>Revoke access</button><hr>` : ''}
+            <button type="button" role="menuitem" class="danger" data-delete-id="${executor.executor_id}"><i class="fas fa-user-minus"></i>Remove executor</button>
+          </div>
+        </div>
+      </div>
+      <div class="bcard-title"><span class="avatar" data-tone="${tone}">${getInitials(executor.executor_name)}</span>${escapeHtml(executor.executor_name)}</div>
+      <p class="bcard-desc">${escapeHtml(executor.executor_email)}${executor.executor_phone ? ` · ${escapeHtml(executor.executor_phone)}` : ''}</p>
+      ${getExecutorActionButtons(executor)}
+      <div class="bcard-foot"><span class="meta"><i class="far fa-calendar"></i>Added ${formatShortDate(executor.created_at)}</span></div>
+    </article>`;
+}
+
 function renderExecutors() {
   const executorsList = document.getElementById('executorsList');
   const executorsStatus = document.getElementById('executorsStatus');
+  const total = executorsState.items.length;
 
-  if (!executorsState.items.length) {
-    executorsList.innerHTML = '';
-    executorsStatus.textContent = 'No executors added yet.';
+  renderPanelPeople();
+  updateExecutorCount();
+  executorsStatus.textContent = total ? `${total} executors` : 'No executors added yet.';
+
+  if (!total) {
+    executorsList.innerHTML = `
+      <div class="state-panel">
+        <div class="state-icon"><i class="fas fa-user-shield"></i></div>
+        <h2>No executors yet</h2>
+        <p>Invite someone you trust. They verify by email, and you decide when they get access.</p>
+        <button type="button" class="pill pill-primary" style="margin-top:16px" onclick="openExecutorDrawer()"><i class="fas fa-user-plus"></i>Invite an executor</button>
+      </div>`;
+    bindExecutorButtons();
     return;
   }
 
-  executorsStatus.textContent = `${executorsState.items.length} executor(s) saved`;
-  executorsList.innerHTML = executorsState.items.map((executor) => {
-    const executorStatus = getExecutorStatus(executor);
-    const statusBadgeClass = getExecutorStatusBadgeClass(executor);
-    const actionButtons = getExecutorActionButtons(executor);
+  const q = executorView.query.trim().toLowerCase();
+  const items = executorsState.items.filter(e => !q ||
+    [e.executor_name, e.executor_email, e.relationship].some(v => String(v || '').toLowerCase().includes(q)));
 
-    return `
-      <article class="asset-card">
-        <div class="asset-card-header">
-          <div>
-            <h4>${escapeHtml(executor.executor_name)}</h4>
-            <p class="asset-type">${escapeHtml(executor.executor_email)}</p>
-          </div>
-          <span class="executor-status-badge ${statusBadgeClass}">${escapeHtml(executorStatus)}</span>
-        </div>
-        <p class="executor-meta">${executor.executor_phone ? `Phone: ${escapeHtml(executor.executor_phone)}` : 'Phone: Not provided'}</p>
-        <p class="executor-meta">${executor.relationship ? `Relationship: ${escapeHtml(executor.relationship)}` : 'Relationship: Not provided'}</p>
-        ${actionButtons}
-        <p class="asset-date">Added ${formatAssetDate(executor.created_at)}</p>
-      </article>
-    `;
-  }).join('');
+  executorsList.innerHTML = `
+    <div class="board" style="--cols:3">
+      ${EXECUTOR_COLUMNS.map(col => {
+        const colItems = items.filter(e => getExecutorStatus(e) === col.key);
+        return `
+          <section class="column" aria-label="${col.title}">
+            <div class="column-head"><span class="dot" style="--dot:${col.dot}"></span><h2>${col.title}</h2><span class="col-count">${colItems.length}</span></div>
+            <p class="column-hint">${col.hint}</p>
+            <div class="column-body">
+              ${colItems.length ? colItems.map(executorCard).join('') : `<div class="column-empty">${q ? 'Nobody matches here.' : 'Nobody here yet.'}</div>`}
+            </div>
+            ${col.key === 'Invited' ? '<button type="button" class="column-add" onclick="openExecutorDrawer()"><i class="fas fa-plus"></i>Invite executor</button>' : ''}
+          </section>`;
+      }).join('')}
+    </div>`;
 
   // Bind action buttons
   bindExecutorButtons();
+}
+
+// Sidebar "Executors" list, like the members list in a project tool
+function renderPanelPeople() {
+  const list = document.getElementById('panelPeople');
+  if (!list) return;
+  const people = executorsState.items;
+  if (!people.length) {
+    list.innerHTML = '<li class="people-empty">No executors yet. <a href="#executors" data-page="executors">Invite one</a>.</li>';
+    return;
+  }
+  list.innerHTML = people.slice(0, 4).map(executor => {
+    const status = getExecutorStatus(executor);
+    const role = executor.relationship ? `${executor.relationship} · ${status === 'Active' ? 'has access' : status.toLowerCase()}` : (status === 'Active' ? 'Has access' : status);
+    return `
+      <li class="person">
+        <span class="avatar" data-tone="${avatarTone(executor.executor_name)}">${getInitials(executor.executor_name)}<span class="presence ${status === 'Active' ? 'on' : status === 'Invited' ? 'pending' : ''}"></span></span>
+        <div style="min-width:0">
+          <div class="person-name">${escapeHtml(executor.executor_name)}</div>
+          <div class="person-role">${escapeHtml(role)}</div>
+        </div>
+      </li>`;
+  }).join('') + (people.length > 4 ? `<li class="people-empty">+${people.length - 4} more</li>` : '');
 }
 
 function getExecutorStatus(executor) {
@@ -1115,38 +1349,30 @@ function getExecutorStatusBadgeClass(executor) {
 }
 
 function getExecutorActionButtons(executor) {
-  // Only show buttons if executor is verified
   if (executor.verification_status !== 'verified') {
-    return `
-      <div class="executor-actions">
-        <p class="executor-meta"><em>Waiting for verification...</em></p>
-        <button class="delete-btn" data-delete-id="${executor.executor_id}">Remove</button>
-      </div>
-    `;
+    return '<p class="bcard-quote"><i class="far fa-envelope"></i>Verification email sent. Waiting for them to confirm.</p>';
   }
 
-  // Ensure access_granted is treated as boolean
   const accessGranted = executor.access_granted === true || executor.access_granted === 'true';
-  
   if (accessGranted) {
-    return `
-      <div class="executor-actions">
-        <button class="success-btn" disabled>✓ Access Granted</button>
-        <button class="revoke-btn" data-revoke-id="${executor.executor_id}">Revoke Access</button>
-        <button class="delete-btn" data-delete-id="${executor.executor_id}">Remove</button>
-      </div>
-    `;
+    return '';
   }
 
   return `
-    <div class="executor-actions">
-      <button class="access-btn" data-grant-id="${executor.executor_id}">Grant Access</button>
-      <button class="delete-btn" data-delete-id="${executor.executor_id}">Remove</button>
-    </div>
-  `;
+    <div class="bcard-actions">
+      <button type="button" class="btn-forest" data-grant-id="${executor.executor_id}"><i class="fas fa-key"></i>Grant access</button>
+    </div>`;
 }
 
 async function executorClickHandler(e) {
+  const moreButton = e.target.closest('[data-more]');
+  if (moreButton) {
+    e.stopPropagation();
+    toggleMoreMenu(moreButton);
+    return;
+  }
+  if (e.target.closest('.more-menu')) closeMoreMenus();
+
   const grantButton = e.target.closest('[data-grant-id]');
   if (grantButton) {
     await handleGrantAccess(grantButton);
@@ -1201,7 +1427,7 @@ async function handleGrantAccess(button) {
   } catch (error) {
     console.error('[Dashboard] Grant access error:', error);
     button.disabled = false;
-    button.textContent = 'Grant Access';
+    button.innerHTML = '<i class="fas fa-key"></i>Grant access';
     showNotification(error.message || 'Failed to grant access', 'error');
   }
 }
@@ -1265,6 +1491,7 @@ async function handleDeleteExecutor(button) {
 
 function updateExecutorCount() {
   document.getElementById('executorCount').textContent = String(executorsState.items.length);
+  setText('navCountExecutors', String(executorsState.items.length));
 }
 
 function formatAssetType(type) {
@@ -1342,12 +1569,21 @@ async function loadSwitchData() {
     // Update switch status
     if (statusRes && statusRes.success) {
       const data = statusRes.data;
-      document.getElementById('dmsStatus').textContent = data.status === 'active' ? 'Active' : 'Triggered';
-      document.getElementById('dmsStatus').className = `badge ${data.status === 'active' ? 'bg-success' : 'bg-danger'}`;
-      document.getElementById('dmsInterval').textContent = data.check_interval_days;
-      document.getElementById('alertDays').textContent = data.check_interval_days;
-      document.getElementById('dmsDaysUntil').textContent = data.daysUntilTrigger;
-      document.getElementById('intervalDays').value = data.check_interval_days;
+      const active = data.status === 'active';
+      const interval = Number(data.check_interval_days) || 30;
+      const daysLeft = Math.max(0, Number(data.daysUntilTrigger) || 0);
+      const pct = Math.round((daysLeft / interval) * 100);
+      const dmsStatus = document.getElementById('dmsStatus');
+      dmsStatus.innerHTML = active ? '<i class="fas fa-circle-check"></i>On, watching for check-ins' : '<i class="fas fa-bell"></i>Triggered';
+      dmsStatus.className = `tag ${active ? 'tag-pass' : 'tag-danger'}`;
+      document.getElementById('dmsInterval').textContent = interval;
+      document.getElementById('alertDays').textContent = interval;
+      document.getElementById('dmsDaysUntil').textContent = daysLeft;
+      document.getElementById('dmsDaysLeftPct').textContent = `${daysLeft} of ${interval} days`;
+      document.getElementById('dmsMeter').style.width = `${pct}%`;
+      document.getElementById('intervalDays').value = interval;
+      updatePromo(data);
+      setText('navCountSwitch', active ? `${daysLeft}d` : '!');
       
       // Format last check-in date
       const lastCheckinDate = new Date(data.last_checkin);
@@ -1372,16 +1608,13 @@ async function loadSwitchData() {
       } else {
         noExecutors.style.display = 'none';
         executorList.innerHTML = executors.map(executor => `
-          <div class="executor-notification-item mb-3 pb-3 border-bottom">
-            <div class="d-flex justify-content-between align-items-start mb-1">
-              <h6 class="mb-0">${escapeHtml(executor.full_name)}</h6>
-              <span class="badge ${executor.access_granted ? 'bg-danger' : 'bg-secondary'}">
-                ${executor.access_granted ? 'Access Granted' : 'Waiting'}
-              </span>
+          <li class="person">
+            <span class="avatar" data-tone="${avatarTone(executor.full_name)}">${getInitials(executor.full_name)}<span class="presence ${executor.access_granted ? 'on' : ''}"></span></span>
+            <div style="min-width:0">
+              <div class="person-name">${escapeHtml(executor.full_name)}</div>
+              <div class="person-role">${escapeHtml(executor.executor_email)} · ${executor.access_granted ? 'has access' : 'waiting'}</div>
             </div>
-            <p class="text-muted small mb-1">${escapeHtml(executor.executor_email)}</p>
-            <p class="text-muted small mb-0">Added ${formatAssetDate(executor.created_at)}</p>
-          </div>
+          </li>
         `).join('');
       }
 
@@ -1397,28 +1630,28 @@ async function loadSwitchData() {
 }
 
 // Manual check-in function
-async function manualCheckIn() {
-  const checkInBtn = document.getElementById('checkInBtn');
+// Used by the switch page button and the sidebar check-in card
+async function manualCheckIn(button) {
+  const checkInBtn = button || document.getElementById('checkInBtn');
   checkInBtn.disabled = true;
-  const originalText = checkInBtn.textContent;
-  checkInBtn.textContent = 'Checking in...';
+  const originalHtml = checkInBtn.innerHTML;
+  checkInBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking in…';
 
   try {
     const response = await apiCall('/dead-mans-switch/check-in', 'POST');
 
     if (response.success) {
-      showNotification('✓ Check-in successful! Your timer has been reset.', 'success');
-      // Reload the data
+      showNotification('Checked in. Your timer has been reset.', 'success');
       await loadSwitchData();
     } else {
       throw new Error(response.message || 'Check-in failed');
     }
   } catch (error) {
     console.error('Check-in error:', error);
-    showNotification(error.message || 'Failed to check in', 'error');
+    showNotification(error.message || 'Could not check in. Please try again.', 'error');
   } finally {
     checkInBtn.disabled = false;
-    checkInBtn.textContent = originalText;
+    checkInBtn.innerHTML = originalHtml;
   }
 }
 
@@ -1445,7 +1678,7 @@ async function updateCheckInterval(event) {
     });
 
     if (response.success) {
-      showNotification('✓ Check interval updated successfully!', 'success');
+      showNotification(`Check-in interval set to ${interval} days.`, 'success');
       // Reload the data
       await loadSwitchData();
     } else {

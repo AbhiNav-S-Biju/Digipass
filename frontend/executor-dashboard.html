@@ -3,2622 +3,531 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executor Dashboard - DIGIPASS</title>
+    <title>Executor Portal - DIGIPASS</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231b3a2d'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='%23fdf6ec'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        * {
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        h1, h2, h3, h4, h5, h6, .navbar-brand {
-            font-family: 'DM Serif Display', serif;
-        }
-
-        :root {
-            --cream: #f5ead8;
-            --cream-light: #fdf6ec;
-            --forest-deep: #1b3a2d;
-            --forest-mid: #2d5a42;
-            --forest-light: #3d7a5a;
-            --sand: #e8d9c0;
-            --sand-deep: #d4c4a0;
-            --text-dark: #1a2e22;
-            --text-muted: #5a7260;
-            --accent-green: #3d7a5a;
-            --accent-light: #d4ead8;
-        }
-
-        body {
-            background-color: var(--cream);
-            color: var(--text-dark);
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: -200px;
-            left: -200px;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, var(--forest-mid) 0%, transparent 70%);
-            opacity: 0.06;
-            border-radius: 50%;
-            z-index: 0;
-            animation: orbDrift 18s ease-in-out infinite;
-            pointer-events: none;
-            will-change: transform;
-        }
-
-        body::after {
-            content: '';
-            position: fixed;
-            bottom: -100px;
-            right: -150px;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, var(--forest-light) 0%, transparent 70%);
-            opacity: 0.05;
-            border-radius: 50%;
-            z-index: 0;
-            animation: orbDrift 22s ease-in-out infinite reverse;
-            pointer-events: none;
-            will-change: transform;
-        }
-
-        @keyframes orbDrift {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -40px) scale(1.05); }
-            66% { transform: translate(-20px, 25px) scale(0.95); }
-        }
-
-        /* Navbar */
-        .navbar {
-            background-color: var(--forest-deep) !important;
-            height: 58px;
-            padding: 0 2rem;
-            box-shadow: none;
-            border-bottom: none;
-            position: relative;
-            z-index: 100;
-        }
-
-        .navbar-brand {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--cream-light) !important;
-            letter-spacing: 0.04em;
-        }
-
-        .navbar-collapse {
-            justify-content: flex-end;
-        }
-
-        .portal-tag {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: rgba(245, 234, 216, 0.7);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.07em;
-            border-radius: 12px;
-            padding: 4px 10px;
-            margin-right: 12px;
-            display: inline-block;
-            font-weight: 500;
-        }
-
-        .btn-logout {
-            background-color: rgba(255, 255, 255, 0.1) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            color: var(--cream-light) !important;
-            font-weight: 500;
-            padding: 7px 18px;
-            border-radius: 6px;
-            font-size: 13.5px;
-        }
-
-        .btn-logout:hover {
-            background-color: rgba(255, 255, 255, 0.15) !important;
-        }
-
-        /* Profile Banner */
-        .profile-banner {
-            background: linear-gradient(135deg, var(--forest-deep) 0%, #1a4035 60%, var(--forest-mid) 100%);
-            padding: 28px 2rem 32px;
-            margin-bottom: 32px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .profile-banner::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(140, 191, 156, 0.3), transparent);
-        }
-
-        .profile-banner-inner {
-            max-width: 1040px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .profile-left {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .profile-avatar {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background-color: var(--forest-light);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--cream-light);
-            font-size: 22px;
-            font-weight: 700;
-            font-family: 'DM Serif Display', serif;
-            box-shadow: 0 0 0 3px rgba(140, 191, 156, 0.2);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .profile-avatar:hover {
-            transform: scale(1.08);
-            box-shadow: 0 0 0 4px rgba(140, 191, 156, 0.35);
-        }
-
-        .profile-name {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .profile-name-text {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--cream-light);
-            font-family: 'DM Serif Display', serif;
-            margin: 0;
-        }
-
-        .profile-meta {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: rgba(245, 234, 216, 0.6);
-        }
-
-        .estate-badge {
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: rgba(245, 234, 216, 0.8);
-            font-size: 11px;
-            padding: 3px 10px;
-            border-radius: 10px;
-            white-space: nowrap;
-        }
-
-        .profile-stats {
-            display: flex;
-            gap: 0;
-        }
-
-        .profile-stat {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0 20px;
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .profile-stat:first-child {
-            border-left: none;
-            padding-left: 0;
-        }
-
-        .profile-stat-number {
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--cream-light);
-            font-family: 'DM Serif Display', serif;
-            transition: transform 0.2s ease;
-        }
-
-        .profile-stat:hover .profile-stat-number {
-            transform: scale(1.08);
-        }
-
-        .profile-stat-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.07em;
-            color: rgba(245, 234, 216, 0.6);
-            margin-top: 2px;
-            font-weight: 600;
-        }
-
-        /* Page Content */
-        .page-content {
-            max-width: 1040px;
-            margin: 0 auto;
-            padding: 32px 2rem 3rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .page-header h1 {
-            font-size: 34px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 4px;
-        }
-
-        .page-header p {
-            font-size: 13.5px;
-            color: var(--text-muted);
-            margin-bottom: 28px;
-        }
-
-        /* Asset Cards Grid */
-        .assets-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 18px;
-            margin-bottom: 2rem;
-        }
-
-        .asset-card {
-            background-color: var(--cream-light);
-            border: 1px solid var(--sand-deep);
-            border-radius: 14px;
-            overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 2px 8px rgba(27, 58, 45, 0.06);
-            position: relative;
-        }
-
-        .asset-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--forest-deep), var(--forest-light), var(--accent-green));
-            opacity: 0.7;
-        }
-
-        .asset-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 40px rgba(27, 58, 45, 0.12), 0 0 0 1px rgba(61, 122, 90, 0.1);
-        }
-
-        .asset-card-top {
-            padding: 20px 20px 0;
-        }
-
-        .asset-card-header {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 14px;
-        }
-
-        .asset-card-icon {
-            width: 40px;
-            height: 40px;
-            min-width: 40px;
-            background-color: var(--sand);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.25s ease;
-        }
-
-        .asset-card:hover .asset-card-icon {
-            transform: scale(1.1) rotate(-3deg);
-        }
-
-        .asset-card-icon svg {
-            width: 22px;
-            height: 22px;
-            stroke: var(--text-muted);
-            fill: none;
-            stroke-width: 1.5;
-        }
-
-        .asset-card-icon i {
-            font-size: 20px;
-            color: var(--text-muted);
-        }
-
-        .asset-card-details h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin: 0 0 1px 0;
-        }
-
-        .asset-card-details p {
-            font-size: 12.5px;
-            color: var(--text-muted);
-            margin: 0;
-        }
-
-        .asset-card-category {
-            display: inline-block;
-            font-size: 10.5px;
-            font-weight: 600;
-            padding: 3px 10px;
-            border-radius: 10px;
-            letter-spacing: 0.04em;
-            text-transform: capitalize;
-            margin-top: 8px;
-        }
-
-        .category-social { background-color: #ddeaf5; color: #1a4a6e; }
-        .category-finance { background-color: var(--accent-light); color: var(--forest-mid); }
-        .category-storage { background-color: #f0e6d4; color: #7a4f1a; }
-        .category-email { background-color: #ede8f5; color: #4a3080; }
-        .category-entertainment { background-color: var(--sand); color: var(--text-muted); }
-        .category-other { background-color: var(--sand); color: var(--text-muted); }
-
-        .asset-card-message {
-            margin: 0 20px 16px;
-            background-color: var(--sand);
-            border-radius: 10px;
-            padding: 14px 16px;
-        }
-
-        .asset-card-message-label {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.07em;
-            margin-bottom: 6px;
-        }
-
-        .asset-card-message-label svg {
-            width: 12px;
-            height: 12px;
-            stroke: var(--text-muted);
-        }
-
-        .asset-card-message-text {
-            font-size: 13.5px;
-            color: var(--text-dark);
-            line-height: 1.55;
-            font-style: italic;
-        }
-
-        .asset-card-message-text::before,
-        .asset-card-message-text::after {
-            content: '"';
-        }
-
-        .asset-card-status {
-            padding: 10px 20px 14px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .asset-card-status-dot {
-            width: 7px;
-            height: 7px;
-            background-color: #8cbf9c;
-            border-radius: 50%;
-        }
-
-        .asset-card-footer {
-            border-top: 1px solid var(--sand-deep);
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .asset-card-date {
-            font-size: 11.5px;
-            color: var(--text-muted);
-        }
-
-        .btn-view-instructions {
-            background-color: var(--forest-deep) !important;
-            color: var(--cream-light) !important;
-            font-size: 12px;
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 7px;
-            border: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-view-instructions::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent 60%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .btn-view-instructions:hover::after {
-            opacity: 1;
-        }
-
-        .btn-view-instructions:hover {
-            background-color: var(--forest-mid) !important;
-            transform: translateY(-1px);
-        }
-
-        .btn-view-instructions svg {
-            width: 13px;
-            height: 13px;
-            stroke: var(--cream-light);
-            fill: none;
-            stroke-width: 1.5;
-        }
-
-        /* Download Will Button */
-        #downloadWillBtn {
-            background-color: var(--forest-deep) !important;
-            border-color: var(--forest-deep) !important;
-            color: var(--cream-light) !important;
-            font-weight: 600;
-            border-radius: 7px;
-            padding: 0.5rem 1.25rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        #downloadWillBtn:hover {
-            background-color: var(--forest-mid) !important;
-            border-color: var(--forest-mid) !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(27, 58, 45, 0.3);
-        }
-
-        #downloadWillBtn:active {
-            transform: translateY(0);
-        }
-
-        #downloadWillBtn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Empty state */
-        .alert-info {
-            background-color: var(--cream-light);
-            border: 1px solid var(--sand-deep);
-            color: var(--text-dark);
-            border-radius: 14px;
-            padding: 20px;
-            text-align: center;
-            backdrop-filter: blur(8px);
-        }
-
-        /* Modal */
-        .modal-content {
-            background-color: var(--cream-light);
-            border: 1px solid var(--sand-deep);
-            border-radius: 14px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-        }
-
-        .modal-header {
-            background-color: transparent;
-            border-bottom: 1px solid var(--sand-deep);
-            padding: 20px;
-        }
-
-        .modal-header h5 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin: 0 0 4px 0;
-        }
-
-        .modal-header p {
-            margin: 0;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .modal-header .btn-close {
-            background-color: transparent;
-            border: none;
-            opacity: 0.7;
-            width: 24px;
-            height: 24px;
-        }
-
-        .modal-header .btn-close:hover {
-            opacity: 1;
-        }
-
-        .modal-body {
-            padding: 20px;
-            color: var(--text-dark);
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .modal-body h6 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-top: 16px;
-            margin-bottom: 8px;
-        }
-
-        .modal-body h6:first-child {
-            margin-top: 0;
-        }
-
-        .modal-body .card {
-            background-color: transparent;
-            border: 1px solid var(--sand-deep);
-            border-radius: 10px;
-            margin-bottom: 16px;
-        }
-
-        .modal-body .card-header {
-            background-color: rgba(227, 217, 192, 0.3);
-            border-bottom: 1px solid var(--sand-deep);
-            padding: 12px 16px;
-        }
-
-        .modal-body .card-header h6 {
-            font-size: 14px;
-            margin: 0;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            color: var(--text-dark);
-        }
-
-        .modal-body .card-body {
-            padding: 16px;
-        }
-
-        .modal-body .input-group {
-            margin-bottom: 12px;
-        }
-
-        .modal-body .form-control {
-            border: 1px solid var(--sand-deep);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 13px;
-            background-color: var(--cream);
-        }
-
-        .modal-body .form-control:focus {
-            border-color: var(--forest-deep);
-            box-shadow: 0 0 0 3px rgba(61, 122, 90, 0.1);
-            background-color: white;
-        }
-
-        .modal-body .btn {
-            font-size: 12px;
-            padding: 7px 14px;
-            border-radius: 7px;
-            font-weight: 500;
-        }
-
-        .modal-footer {
-            background-color: transparent;
-            border-top: 1px solid var(--sand-deep);
-            padding: 16px 20px;
-        }
-
-        .modal-footer .btn {
-            font-size: 13px;
-            padding: 8px 16px;
-            border-radius: 7px;
-            font-weight: 500;
-        }
-
-        .modal-footer .btn-secondary {
-            background-color: transparent;
-            color: var(--forest-deep);
-            border: 1px solid var(--sand-deep);
-        }
-
-        .modal-footer .btn-secondary:hover {
-            background-color: var(--sand);
-            border-color: var(--sand-deep);
-        }
-
-        .modal-footer .btn-primary {
-            background-color: var(--forest-deep);
-            color: var(--cream-light);
-            border: none;
-        }
-
-        .modal-footer .btn-primary:hover {
-            background-color: var(--forest-mid);
-        }
-
-        .modal-body .alert-warning {
-            background-color: rgba(232, 217, 192, 0.4);
-            border: 1px solid var(--sand-deep);
-            color: var(--text-dark);
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-size: 12px;
-        }
-
-        .modal-body .text-muted {
-            color: var(--text-muted);
-        }
-
-        .modal-body a {
-            color: var(--forest-deep);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .modal-body a:hover {
-            text-decoration: underline;
-        }
-
-        /* Modal backdrop */
-        .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-body .spinner-border {
-            color: var(--forest-deep);
-        }
-
-        /* Responsive */
-        @media (max-width: 860px) {
-            .profile-banner {
-                padding: 20px 1rem 24px;
-            }
-
-            .profile-banner-inner {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .profile-stats {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .page-content {
-                padding: 28px 1rem 3rem;
-            }
-
-            .page-header h1 {
-                font-size: 28px;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .navbar {
-                padding: 0 1rem;
-            }
-
-            .navbar-brand {
-                font-size: 18px;
-            }
-
-            .portal-tag {
-                display: none;
-            }
-
-            .profile-banner {
-                padding: 20px 1rem 24px;
-            }
-
-            .profile-banner-inner {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .profile-avatar {
-                width: 44px;
-                height: 44px;
-                font-size: 18px;
-            }
-
-            .profile-name-text {
-                font-size: 20px;
-            }
-
-            .profile-stats {
-                width: 100%;
-                gap: 0;
-            }
-
-            .profile-stat {
-                flex: 1;
-                padding: 0 12px;
-                border-left: 1px solid rgba(255, 255, 255, 0.1);
-            }
-
-            .profile-stat:first-child {
-                padding-left: 0;
-                border-left: none;
-            }
-
-            .profile-stat-number {
-                font-size: 20px;
-            }
-
-            .page-content {
-                padding: 24px 1rem 2rem;
-            }
-
-            .page-header h1 {
-                font-size: 24px;
-            }
-
-            .page-header p {
-                font-size: 12px;
-                margin-bottom: 20px;
-            }
-
-            .assets-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-
-            .asset-card {
-                border-radius: 12px;
-            }
-
-            .asset-card-top {
-                padding: 16px 16px 0;
-            }
-
-            .asset-card-message {
-                margin: 0 16px 12px;
-            }
-
-            .asset-card-footer {
-                padding: 12px 16px;
-            }
-
-            .btn-view-instructions {
-                font-size: 11px;
-                padding: 6px 12px;
-            }
-        }
-
-        /* ============================================
-           WORKFLOW PANEL STYLES
-           ============================================ */
-
-        .workflow-panel {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: grid;
-            grid-template-columns: 360px 1fr;
-            background: var(--cream);
-            z-index: 2000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .workflow-panel-visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .workflow-panel-hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Left Panel: Steps */
-        .workflow-steps-panel {
-            background: var(--forest-deep);
-            color: var(--cream-light);
-            padding: 20px;
-            overflow-y: auto;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .steps-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .steps-header h3 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--cream-light);
-            margin: 0;
-        }
-
-        .workflow-close-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: var(--cream-light);
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 16px;
-        }
-
-        .workflow-close-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: scale(1.05);
-        }
-
-        .steps-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .step-item {
-            display: flex;
-            gap: 12px;
-            padding: 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: transparent;
-            border: 1px solid transparent;
-            align-items: flex-start;
-        }
-
-        .step-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .step-item-active {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: var(--sand);
-            border-left: 4px solid var(--sand);
-            padding-left: 10px;
-        }
-
-        .step-item-completed {
-            opacity: 0.75;
-        }
-
-        .step-item-number {
-            width: 28px;
-            height: 28px;
-            min-width: 28px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-
-        .step-item-completed .step-item-number {
-            background: #8cbf9c;
-            color: var(--forest-deep);
-        }
-
-        .step-item-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .step-item-content h5 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--cream-light);
-            margin: 0 0 2px 0;
-        }
-
-        .step-item-content p {
-            font-size: 11px;
-            color: rgba(245, 234, 216, 0.65);
-            margin: 0;
-            line-height: 1.4;
-            word-break: break-word;
-        }
-
-        .steps-footer {
-            margin-top: auto;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--sand), #8cbf9c);
-            width: 0%;
-            transition: width 0.4s ease;
-            border-radius: 2px;
-        }
-
-        .progress-text {
-            font-size: 11px;
-            color: rgba(245, 234, 216, 0.6);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            font-weight: 600;
-        }
-
-        /* Workflow Navigation Buttons */
-        .workflow-nav-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: var(--cream-light);
-            padding: 10px 14px;
-            border-radius: 7px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-
-        .workflow-nav-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.25);
-            transform: translateY(-1px);
-        }
-
-        .workflow-nav-btn:active {
-            transform: translateY(0);
-        }
-
-        .workflow-nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Right Panel: Preview */
-        .workflow-preview-panel {
-            background: var(--cream-light);
-            padding: 32px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-y: auto;
-        }
-
-        #previewContent {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .step-preview-container {
-            width: 100%;
-            max-width: 700px;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-
-        .step-preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--sand-deep);
-            flex-shrink: 0;
-        }
-
-        .step-preview-header h3 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin: 0;
-        }
-
-        .step-description {
-            font-size: 14px;
-            color: var(--text-muted);
-            line-height: 1.6;
-            margin-bottom: 16px;
-        }
-
-        .step-badge {
-            background: var(--sand);
-            color: var(--text-dark);
-            font-size: 11px;
-            font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .video-container {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            border-radius: 14px;
-            overflow: hidden;
-            background: var(--sand);
-            margin-bottom: 24px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        }
-
-        .video-container video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .youtube-video {
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 8px;
-        }
-
-        .image-container {
-            width: 100%;
-            height: 360px;
-            background: var(--sand);
-            margin-bottom: 24px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-            border-radius: 8px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .video-fallback {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            background: linear-gradient(135deg, var(--sand) 0%, var(--cream-light) 100%);
-            color: var(--text-muted);
-        }
-
-        .video-fallback i {
-            font-size: 48px;
-            color: var(--forest-deep);
-            opacity: 0.6;
-        }
-
-        .video-fallback p {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin: 0;
-        }
-
-        .video-fallback small {
-            font-size: 12px;
-            color: var(--text-muted);
-            text-align: center;
-            max-width: 200px;
-            line-height: 1.5;
-        }
-
-        .step-details {
-            flex: 1;
-            overflow-y: auto;
-            min-height: 0;
-        }
-
-        .step-details h4 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin: 0 0 12px 0;
-        }
-
-        .step-action {
-            font-size: 14px;
-            color: var(--text-dark);
-            line-height: 1.6;
-            margin: 0 0 20px 0;
-            padding: 14px 16px;
-            background: var(--sand);
-            border-radius: 10px;
-            border-left: 4px solid var(--forest-deep);
-        }
-
-        /* Step Content */
-        .step-content {
-            width: 100%;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid var(--sand-deep);
-        }
-
-        .step-content h4 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin: 0 0 12px 0;
-        }
-
-        .step-content p {
-            font-size: 14px;
-            color: var(--text-dark);
-            line-height: 1.6;
-            margin: 8px 0;
-        }
-
-        .step-content p:first-of-type {
-            margin-top: 0;
-        }
-
-        .step-content p:last-of-type {
-            margin-bottom: 0;
-        }
-
-        /* Credentials Section */
-        .credentials-section {
-            margin-bottom: 20px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .credentials-header {
-            background: var(--sand);
-            padding: 12px 16px;
-            font-weight: 600;
-            color: var(--text-dark);
-            font-size: 13px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .credentials-header i {
-            font-size: 14px;
-        }
-
-        .credentials-body {
-            background: white;
-            padding: 16px;
-            border-top: 1px solid var(--sand-deep);
-        }
-
-        .credential-item {
-            margin-bottom: 14px;
-        }
-
-        .credential-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .credential-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 6px;
-        }
-
-        .credential-value-wrapper {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .credential-value {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid var(--sand-deep);
-            border-radius: 8px;
-            font-size: 13px;
-            font-family: 'Courier New', monospace;
-            background: var(--cream);
-            color: var(--text-dark);
-            cursor: text;
-            transition: all 0.2s ease;
-        }
-
-        .credential-value:focus {
-            outline: none;
-            border-color: var(--forest-deep);
-            box-shadow: 0 0 0 3px rgba(27, 58, 45, 0.1);
-        }
-
-        .credential-toggle-btn,
-        .credential-copy-btn {
-            width: 36px;
-            height: 36px;
-            border: 1px solid var(--sand-deep);
-            background: var(--cream);
-            border-radius: 8px;
-            cursor: pointer;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-        }
-
-        .credential-toggle-btn:hover,
-        .credential-copy-btn:hover {
-            background: var(--sand);
-            color: var(--forest-deep);
-            border-color: var(--forest-deep);
-        }
-
-        /* Copy and Toggle Buttons for Workflow */
-        .copy-credential-btn,
-        .toggle-password-btn {
-            padding: 6px 10px;
-            border: 1px solid var(--sand-deep);
-            background: var(--cream-light);
-            border-radius: 6px;
-            cursor: pointer;
-            color: var(--forest-deep);
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .copy-credential-btn:hover,
-        .toggle-password-btn:hover {
-            background: var(--sand);
-            border-color: var(--forest-deep);
-            transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(27, 58, 45, 0.15);
-        }
-
-        .copy-credential-btn:active,
-        .toggle-password-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Farewell Message Box */
-        .farewell-message-box {
-            margin-bottom: 20px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border-left: 4px solid #E50914;
-            background: white;
-        }
-
-        .farewell-message-header {
-            background: #ffe0e6;
-            padding: 12px 16px;
-            font-weight: 600;
-            color: #c41e3a;
-            font-size: 13px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .farewell-message-header i {
-            font-size: 14px;
-        }
-
-        .farewell-message-body {
-            background: white;
-            padding: 16px;
-            border-top: 1px solid #f0d5dd;
-        }
-
-        .farewell-message-body p {
-            margin: 0 0 12px 0;
-            font-size: 14px;
-            line-height: 1.6;
-            color: var(--text-dark);
-            word-break: break-word;
-            white-space: pre-wrap;
-        }
-
-        .farewell-message-body .credential-copy-btn {
-            margin-top: 8px;
-            background: #ffe0e6;
-            border-color: #f0d5dd;
-            color: #c41e3a;
-        }
-
-        .farewell-message-body .credential-copy-btn:hover {
-            background: #ffc5d2;
-            border-color: #c41e3a;
-        }
-
-        .credential-toggle-btn:hover,
-        .credential-copy-btn:hover {
-            background: var(--sand);
-            color: var(--text-dark);
-        }
-
-        /* Tips Section */
-        .step-tips {
-            background: rgba(140, 191, 156, 0.1);
-            border: 1px solid #8cbf9c;
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 20px;
-        }
-
-        .step-tips h6 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--forest-deep);
-            margin: 0 0 10px 0;
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .step-tips ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        .step-tips li {
-            font-size: 12px;
-            color: var(--forest-mid);
-            margin-bottom: 6px;
-            line-height: 1.5;
-        }
-
-        .step-tips li:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Navigation */
-        .step-navigation {
-            display: flex;
-            gap: 12px;
-            justify-content: space-between;
-            margin-top: auto;
-            padding: 16px;
-            border-top: 1px solid var(--sand-deep);
-            background: white;
-            flex-shrink: 0;
-        }
-
-        .workflow-btn {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid var(--sand-deep);
-            background: white;
-            color: var(--text-dark);
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-
-        .workflow-btn:hover:not(:disabled) {
-            background: var(--sand);
-            border-color: var(--sand-deep);
-        }
-
-        .workflow-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        /* Action Selector Modal */
-        .action-selector-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .action-selector-content {
-            background: var(--cream-light);
-            border-radius: 12px;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            animation: slideUp 0.3s ease;
-        }
-
-        .action-selector-header {
-            background: linear-gradient(135deg, var(--forest-deep), var(--forest-mid));
-            color: var(--cream-light);
-            padding: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .action-selector-header h3 {
-            margin: 0;
-            font-size: 1.3rem;
-            font-family: 'DM Serif Display', serif;
-        }
-
-        .action-selector-close {
-            background: transparent;
-            border: none;
-            color: var(--cream-light);
-            font-size: 28px;
-            cursor: pointer;
-            opacity: 0.8;
-            transition: opacity 0.2s ease;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .action-selector-close:hover {
-            opacity: 1;
-        }
-
-        .action-selector-body {
-            padding: 24px;
-        }
-
-        .action-selector-body p {
-            color: var(--text-muted);
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-        }
-
-        .action-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .action-btn {
-            padding: 14px 20px;
-            background: white;
-            border: 2px solid var(--sand);
-            border-radius: 8px;
-            color: var(--text-dark);
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-        }
-
-        .action-btn:hover {
-            background: var(--sand);
-            border-color: var(--forest-mid);
-            transform: translateX(4px);
-        }
-
-        .action-btn:active {
-            transform: translateX(4px) scale(0.98);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .workflow-btn-complete {
-            background: var(--forest-deep);
-            color: var(--cream-light);
-            border-color: var(--forest-deep);
-        }
-
-        .workflow-btn-complete:hover:not(:disabled) {
-            background: var(--forest-mid);
-            border-color: var(--forest-mid);
-        }
-
-        /* Toast Notification */
-        .workflow-toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--forest-deep);
-            color: var(--cream-light);
-            padding: 12px 18px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            box-shadow: 0 4px 16px rgba(27, 58, 45, 0.2);
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-            z-index: 3000;
-        }
-
-        .workflow-toast-show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .workflow-panel {
-                grid-template-columns: 280px 1fr;
-            }
-
-            .workflow-steps-panel {
-                padding: 16px;
-            }
-
-            .workflow-preview-panel {
-                padding: 24px;
-            }
-
-            .step-preview-container {
-                max-width: 600px;
-            }
-        }
-
-        @media (max-width: 860px) {
-            .workflow-panel {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr;
-            }
-
-            .workflow-steps-panel {
-                max-height: 200px;
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                padding: 12px;
-            }
-
-            .steps-list {
-                flex-direction: row;
-                gap: 8px;
-                overflow-x: auto;
-            }
-
-            .step-item {
-                flex-shrink: 0;
-                width: 90px;
-                flex-direction: column;
-                gap: 6px;
-                padding: 10px 8px;
-            }
-
-            .step-item-content h5,
-            .step-item-content p {
-                display: none;
-            }
-
-            .workflow-preview-panel {
-                padding: 20px;
-            }
-
-            .step-preview-header {
-                margin-bottom: 16px;
-            }
-
-            .video-container {
-                margin-bottom: 16px;
-            }
-
-            .step-navigation {
-                flex-direction: column;
-            }
-
-            .workflow-btn {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .workflow-close-btn {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
-            }
-
-            .steps-header h3 {
-                font-size: 16px;
-            }
-
-            .step-preview-header h3 {
-                font-size: 18px;
-            }
-
-            .step-details h4 {
-                font-size: 16px;
-            }
-
-            .workflow-preview-panel {
-                padding: 16px;
-            }
-
-            .video-container {
-                aspect-ratio: 4 / 3;
-            }
-
-            .step-navigation {
-                gap: 8px;
-            }
-
-            .workflow-btn {
-                padding: 8px 10px;
-                font-size: 11px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/board.css?v=2">
     <script src="js/config.js"></script>
 </head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container-fluid px-3 px-md-4" style="max-width: 100%; padding: 0 2rem;">
-            <a class="navbar-brand" href="#"><svg width="160" height="40" viewBox="0 0 200 54" xmlns="http://www.w3.org/2000/svg" style="display: block; height: 40px; width: auto;"><rect x="0" y="6" width="40" height="40" rx="10" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.18)" stroke-width="1"/><rect x="9" y="14" width="22" height="17" rx="3.5" fill="none" stroke="#fdf6ec" stroke-width="1.8"/><path d="M9 21 L31 21" stroke="#fdf6ec" stroke-width="1.4" fill="none"/><rect x="12" y="24" width="5" height="4" rx="1" fill="#8cbf9c"/><rect x="19" y="24" width="5" height="4" rx="1" fill="#8cbf9c" opacity=".45"/><path d="M27 10 L27 15" stroke="#fdf6ec" stroke-width="1.8" stroke-linecap="round"/><circle cx="27" cy="9" r="3" fill="#fdf6ec"/><text x="49" y="29" font-family="'DM Serif Display', serif" font-size="22" fill="#fdf6ec">Digipass</text><text x="50" y="41" font-family="'DM Sans', sans-serif" font-size="8.5" fill="rgba(245,234,216,0.5)" letter-spacing="2.8">DIGITAL ESTATE</text></svg></a>
-            <div class="ms-auto d-flex align-items-center gap-3">
-                <div class="portal-tag">Executor Portal</div>
-                <button id="logoutBtn" class="btn btn-logout">Logout</button>
+<body class="board-body">
+    <div class="app">
+        <!-- Icon rail -->
+        <nav class="rail" aria-label="Primary">
+            <div class="rail-logo" aria-hidden="true">
+                <svg viewBox="0 0 40 40"><rect x="7" y="10" width="22" height="17" rx="3.5" fill="none" stroke="#fdf6ec" stroke-width="2"/><path d="M7 17 L29 17" stroke="#fdf6ec" stroke-width="1.6"/><rect x="10" y="20" width="5" height="4" rx="1" fill="#b7d8bf"/><rect x="17" y="20" width="5" height="4" rx="1" fill="#b7d8bf" opacity=".5"/><path d="M25 6 L25 11" stroke="#fdf6ec" stroke-width="2" stroke-linecap="round"/><circle cx="25" cy="5" r="2.6" fill="#fdf6ec"/></svg>
             </div>
-        </div>
-    </nav>
+            <div class="rail-group">
+                <button type="button" class="rail-btn active" aria-label="Accounts" aria-current="page"><i class="fas fa-table-columns"></i><span class="rail-tip">Accounts</span></button>
+                <button type="button" class="rail-btn" aria-label="Download digital will" onclick="document.getElementById('downloadWillBtn').click()"><i class="fas fa-file-arrow-down"></i><span class="rail-tip">Download will</span></button>
+            </div>
+            <div class="rail-spacer"></div>
+            <div class="rail-group">
+                <button type="button" class="rail-btn" id="logoutBtn" aria-label="Log out"><i class="fas fa-arrow-right-from-bracket"></i><span class="rail-tip">Log out</span></button>
+                <span class="rail-avatar" id="executorAvatar" aria-hidden="true">E</span>
+            </div>
+        </nav>
 
-    <!-- Profile Banner -->
-    <div class="profile-banner">
-        <div class="profile-banner-inner">
-            <div class="profile-left">
-                <div class="profile-avatar" id="executorAvatar">E</div>
-                <div class="profile-name">
-                    <p class="profile-name-text" id="executorName">Executor Name</p>
-                    <div class="profile-meta">
-                        <div class="estate-badge" id="inheritanceName">Estate: Loading...</div>
-                        <span>·</span>
-                        <span>Executor access granted</span>
+        <!-- Secondary panel -->
+        <aside class="panel" id="sidePanel" aria-label="Estate">
+            <div class="panel-heading"><h2 id="estateHeading">Estate</h2></div>
+            <p class="panel-sub">You are helping carry out these wishes.</p>
+            <ul class="panel-nav" id="progressNav">
+                <li><button type="button" class="active" data-progress-filter=""><i class="fas fa-layer-group"></i>All accounts<span class="count tnum" id="assetCount">0</span></button></li>
+                <li><button type="button" data-progress-filter="todo"><i class="far fa-circle"></i>Not started<span class="count tnum" id="countTodo">0</span></button></li>
+                <li><button type="button" data-progress-filter="doing"><i class="fas fa-circle-half-stroke"></i>In progress<span class="count tnum" id="countDoing">0</span></button></li>
+                <li><button type="button" data-progress-filter="done"><i class="fas fa-circle-check"></i>Taken care of<span class="count tnum" id="countDone">0</span></button></li>
+            </ul>
+
+            <div class="panel-heading"><h2>People</h2></div>
+            <ul class="people">
+                <li class="person">
+                    <span class="avatar" data-tone="2" id="ownerAvatar">–</span>
+                    <div style="min-width:0">
+                        <div class="person-name" id="ownerName">Estate owner</div>
+                        <div class="person-role">Their wishes</div>
                     </div>
-                </div>
-            </div>
-            <div class="profile-stats">
-                <div class="profile-stat">
-                    <div class="profile-stat-number" id="assetCount">0</div>
-                    <div class="profile-stat-label">Assets</div>
-                </div>
-                <div class="profile-stat">
-                    <div class="profile-stat-number" id="estateName">–</div>
-                    <div class="profile-stat-label">Estate</div>
-                </div>
-                <div class="profile-stat">
-                    <div class="profile-stat-number">✓</div>
-                    <div class="profile-stat-label">Status</div>
-                </div>
-            </div>
-        </div>
-    </div>
+                </li>
+                <li class="person">
+                    <span class="avatar" data-tone="1" id="executorAvatarSm">E</span>
+                    <div style="min-width:0">
+                        <div class="person-name" id="executorName">You</div>
+                        <div class="person-role" id="executorEmail">Executor</div>
+                    </div>
+                </li>
+            </ul>
 
-    <!-- Main Content -->
-    <main class="page-content">
-
-        <!-- Page Header -->
-        <div class="page-header">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <div>
-                    <h1>Digital Assets</h1>
-                    <p>Assets you're authorized to manage</p>
-                </div>
-                <button id="downloadWillBtn" class="btn btn-primary" style="height: fit-content;">
-                    <i class="fas fa-download"></i> Download Digital Will
+            <div class="promo">
+                <h3>Their digital will</h3>
+                <p>The signed record of every account and what should happen to it.</p>
+                <button type="button" class="promo-btn" id="downloadWillBtn">
+                    <span>Download PDF</span><span class="chev"><i class="fas fa-arrow-down"></i></span>
                 </button>
             </div>
-        </div>
+        </aside>
+        <div class="panel-scrim" id="panelScrim" onclick="togglePanel(false)"></div>
 
-        <!-- Assets List -->
-        <div class="assets-grid" id="assetsList">
-            <p class="text-muted text-center py-5">Loading assets...</p>
-        </div>
+        <main class="main">
+            <section class="page active" aria-labelledby="pageTitle">
+                <header class="topbar">
+                    <button type="button" class="pill menu-toggle" onclick="togglePanel(true)" aria-label="Open estate menu"><i class="fas fa-bars"></i></button>
+                    <div class="topbar-title">
+                        <h1 id="pageTitle">Accounts</h1>
+                        <p>Take each one at your own pace. Your progress is saved on this device.</p>
+                    </div>
+                    <div class="view-tabs" role="tablist" aria-label="View">
+                        <button type="button" class="view-tab" role="tab" aria-selected="true" data-view="board"><i class="fas fa-table-columns"></i>Board</button>
+                        <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="list"><i class="fas fa-list"></i>List</button>
+                    </div>
+                </header>
 
-        <!-- Empty State -->
-        <div id="emptyState" class="alert alert-info d-none text-center">
-            <p class="mb-0">No digital assets have been assigned to you yet. Check back soon.</p>
-        </div>
+                <div class="toolbar">
+                    <label class="search-pill">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <span class="visually-hidden">Search accounts</span>
+                        <input type="search" id="assetSearch" placeholder="Search accounts…" autocomplete="off">
+                    </label>
+                    <div class="pill-row" role="group" aria-label="Filter by their wish">
+                        <button type="button" class="pill" data-action-filter="" aria-pressed="true">All</button>
+                        <button type="button" class="pill" data-action-filter="pass" aria-pressed="false"><i class="fas fa-hand-holding-heart"></i>Pass on</button>
+                        <button type="button" class="pill" data-action-filter="delete" aria-pressed="false"><i class="fas fa-trash-can"></i>Delete</button>
+                        <button type="button" class="pill" data-action-filter="last_message" aria-pressed="false"><i class="fas fa-feather"></i>Last message</button>
+                    </div>
+                </div>
 
-        <!-- Asset Instructions Modal -->
-        <div class="modal fade" id="instructionsModal" tabindex="-1" aria-labelledby="instructionsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <div>
-                            <h5 class="modal-title" id="instructionsModalLabel">Asset Instructions</h5>
-                            <p class="text-muted small mb-0" id="instructionsSubtitle"></p>
+                <div class="board-scroll">
+                    <div id="assetsList" aria-live="polite">
+                        <div class="board" style="--cols:3">
+                            <div class="column"><div class="skeleton"></div></div>
+                            <div class="column"><div class="skeleton"></div></div>
+                            <div class="column"><div class="skeleton"></div></div>
                         </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body" id="instructionsContent">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
+        </main>
+    </div>
 
-        <!-- Workflow Panel - Dynamic Step-by-Step Guide -->
-        <div id="workflowPanel" class="workflow-panel workflow-panel-hidden">
-            <!-- Left Panel: Steps Navigation -->
-            <div class="workflow-steps-panel">
-                <div class="steps-header">
-                    <h3 id="appName">App Name</h3>
-                    <button class="workflow-close-btn" title="Close workflow">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="steps-list" id="stepsList">
-                    <!-- Steps dynamically generated -->
-                </div>
-                <div class="steps-footer">
-                    <div class="progress-bar">
-                        <div id="progressBar" class="progress-fill"></div>
-                    </div>
-                    <p id="progressText" class="progress-text">Step 1 of 5</p>
-                    <div style="display: flex; gap: 8px; margin-top: 12px;">
-                        <button class="workflow-nav-btn" id="prevStepBtn" onclick="previousStep()" title="Previous step" style="flex: 1;">
-                            <i class="fas fa-chevron-left"></i> Previous
-                        </button>
-                        <button class="workflow-nav-btn" id="nextStepBtn" onclick="nextStep()" title="Next step" style="flex: 1;">
-                            Next <i class="fas fa-chevron-right"></i>
-                        </button>
-                        <button class="workflow-nav-btn" id="doneBtn" onclick="markAsDone()" title="Mark as done" style="flex: 1; background: #10b981; border-color: #10b981;">
-                            <i class="fas fa-check"></i> Done
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Panel: Preview & Instructions -->
-            <div class="workflow-preview-panel">
-                <div id="previewContent">
-                    <!-- Preview content dynamically generated -->
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/workflow-steps-detailed.js"></script>
     <script>
         const API_URL = (window.DIGIPASS_API_ORIGIN || '');
 
         const PLATFORM_ICONS = {
-            'Instagram': 'fab fa-instagram',
-            'Facebook': 'fab fa-facebook',
-            'Twitter': 'fab fa-twitter',
-            'LinkedIn': 'fab fa-linkedin',
-            'Gmail': 'fas fa-envelope',
-            'Outlook': 'fas fa-envelope',
-            'PayPal': 'fab fa-paypal',
-            'Google Pay': 'fab fa-google',
-            'Google Drive': 'fab fa-google-drive',
-            'Netflix': 'fas fa-tv',
-            'Disney+': 'fas fa-play-circle',
-            'Snapchat': 'fab fa-snapchat',
-            'TikTok': 'fab fa-tiktok',
-            'Apple Mail': 'fab fa-apple',
-            'Dropbox': 'fab fa-dropbox',
-            'Spotify': 'fab fa-spotify',
-            'Square': 'fas fa-square'
+            'Instagram': 'fab fa-instagram', 'Facebook': 'fab fa-facebook', 'Twitter': 'fab fa-twitter', 'LinkedIn': 'fab fa-linkedin',
+            'Gmail': 'fas fa-envelope', 'Outlook': 'fas fa-envelope', 'PayPal': 'fab fa-paypal', 'Google Pay': 'fab fa-google',
+            'Google Drive': 'fab fa-google-drive', 'Netflix': 'fas fa-tv', 'Disney+': 'fas fa-play-circle', 'Snapchat': 'fab fa-snapchat',
+            'TikTok': 'fab fa-tiktok', 'Apple Mail': 'fab fa-apple', 'Dropbox': 'fab fa-dropbox', 'Spotify': 'fab fa-spotify', 'Square': 'fas fa-square'
         };
+        const ACTION_META = {
+            pass: { label: 'Pass on', icon: 'fa-hand-holding-heart', tagClass: 'tag-pass' },
+            delete: { label: 'Delete', icon: 'fa-trash-can', tagClass: 'tag-delete' },
+            last_message: { label: 'Last message', icon: 'fa-feather', tagClass: 'tag-message' }
+        };
+        const COLUMNS = [
+            { key: 'todo', title: 'Not started', hint: 'Open the steps whenever you are ready.', dot: 'var(--sand-deep)' },
+            { key: 'doing', title: 'In progress', hint: 'Pick up where you left off.', dot: 'var(--forest-light)' },
+            { key: 'done', title: 'Taken care of', hint: 'Handled the way they asked.', dot: 'var(--forest-deep)' }
+        ];
+        const CATEGORY_LABELS = { social: 'Social', email: 'Email', finance: 'Finance', storage: 'Storage', entertainment: 'Entertainment', other: 'Other' };
+
+        const state = { assets: [], view: 'board', query: '', action: '', progress: '', lastColumn: {} };
 
         function getPlatformIcon(platformName) {
             return PLATFORM_ICONS[platformName] || 'fas fa-lock';
         }
 
-        // Check if executor is logged in
-        const token = localStorage.getItem('executorToken');
-        console.log('[Dashboard] Token from sessionStorage:', token ? 'Present (' + token.substring(0, 20) + '...)' : 'MISSING');
-        
-        if (!token) {
-            console.log('[Dashboard] No token found, redirecting to login');
-            location.href = 'executor-login.html';
+        function escapeHtml(text) {
+            return String(text ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
         }
-
-        const executor = JSON.parse(localStorage.getItem('executor') || '{}');
 
         function getInitials(name) {
-            return String(name || 'Executor')
-                .trim()
-                .split(/\s+/)
-                .filter(Boolean)
-                .map(part => part[0])
-                .join('')
-                .substring(0, 2)
-                .toUpperCase() || 'E';
+            return String(name || '?').trim().split(/\s+/).filter(Boolean).map(p => p[0]).join('').substring(0, 2).toUpperCase() || '?';
         }
 
-        function updateProfileBanner(executorData = {}, ownerData = {}) {
+        function togglePanel(open) {
+            document.getElementById('sidePanel').classList.toggle('open', open);
+            document.getElementById('panelScrim').classList.toggle('open', open);
+        }
+
+        // ---------- Session ----------
+        const token = localStorage.getItem('executorToken');
+        if (!token) {
+            location.href = 'executor-login.html';
+        }
+        const executor = JSON.parse(localStorage.getItem('executor') || '{}');
+
+        function updateProfile(executorData = {}, ownerData = {}) {
             const executorName = executorData.executor_name || executor.executor_name || 'Executor';
             const executorEmail = executorData.executor_email || executor.executor_email || '';
-            const ownerName = ownerData.full_name || executor.ownerName || 'Estate Owner';
+            const ownerName = ownerData.full_name || executor.ownerName || 'Estate owner';
+            const ownerFirst = ownerName.split(' ')[0];
 
-            document.getElementById('executorName').textContent = executorEmail
-                ? `${executorName} (${executorEmail})`
-                : executorName;
-            document.getElementById('inheritanceName').textContent = `Estate: ${ownerName}`;
-            document.getElementById('estateName').textContent = ownerName.split(' ')[0] || 'Estate';
+            document.getElementById('executorName').textContent = `${executorName} (you)`;
+            document.getElementById('executorEmail').textContent = executorEmail || 'Executor';
             document.getElementById('executorAvatar').textContent = getInitials(executorName);
+            document.getElementById('executorAvatarSm').textContent = getInitials(executorName);
+            document.getElementById('ownerName').textContent = ownerName;
+            document.getElementById('ownerAvatar').textContent = getInitials(ownerName);
+            document.getElementById('estateHeading').textContent = `Estate of ${ownerFirst}`;
+            document.getElementById('pageTitle').textContent = ownerData.full_name || executor.ownerName ? `${ownerFirst}'s accounts` : 'Accounts';
         }
+        updateProfile();
 
-        updateProfileBanner();
-
-        // Logout functionality
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('executorToken');
             localStorage.removeItem('executor');
             location.href = 'executor-login.html';
         });
 
-        // Load assets
+        // ---------- Progress (written by workflow-window.html, same browser) ----------
+        function progressKey(assetId) { return `digipass-progress-${assetId}`; }
+
+        function readProgress(assetId) {
+            try { return JSON.parse(localStorage.getItem(progressKey(assetId)) || 'null'); }
+            catch (e) { return null; }
+        }
+
+        function writeProgress(assetId, value) {
+            if (value === null) localStorage.removeItem(progressKey(assetId));
+            else localStorage.setItem(progressKey(assetId), JSON.stringify({ ...value, updatedAt: Date.now() }));
+        }
+
+        function columnFor(asset) {
+            const p = readProgress(asset.asset_id);
+            if (!p) return 'todo';
+            return p.done ? 'done' : 'doing';
+        }
+
+        // ---------- Rendering ----------
+        function filtered() {
+            const q = state.query.trim().toLowerCase();
+            return state.assets.filter(a => {
+                if (state.action && a.action_type !== state.action) return false;
+                if (state.progress && columnFor(a) !== state.progress) return false;
+                if (!q) return true;
+                return [a.platform_name, a.account_identifier, a.category].some(v => String(v || '').toLowerCase().includes(q));
+            });
+        }
+
+        function progressBlock(asset) {
+            const p = readProgress(asset.asset_id);
+            if (!p) {
+                return `<div class="meter-row"><span>Steps</span><span>Not started</span></div><div class="meter"><span style="width:0%"></span></div>`;
+            }
+            if (p.done) {
+                return `<div class="meter-row"><span>Steps</span><span>All done</span></div><div class="meter"><span style="width:100%"></span></div>`;
+            }
+            if (!Number(p.total)) {
+                return `<div class="meter-row"><span>Steps</span><span>Opened</span></div><div class="meter"><span style="width:4%"></span></div>`;
+            }
+            const total = Math.max(1, Number(p.total) || 1);
+            const step = Math.min(total, Math.max(1, Number(p.step) || 1));
+            return `<div class="meter-row"><span>Step ${step} of ${total}</span><span>${Math.round((step / total) * 100)}%</span></div><div class="meter"><span style="width:${(step / total) * 100}%"></span></div>`;
+        }
+
+        function cardMenu(asset, column) {
+            return `
+                <div class="more">
+                    <button type="button" class="more-btn" data-more aria-haspopup="true" aria-expanded="false" aria-label="Options for ${escapeHtml(asset.platform_name)}"><i class="fas fa-ellipsis"></i></button>
+                    <div class="more-menu" role="menu">
+                        ${column !== 'done' ? `<button type="button" role="menuitem" data-mark-done="${asset.asset_id}"><i class="fas fa-circle-check"></i>Mark as taken care of</button>` : ''}
+                        ${column !== 'todo' ? `<button type="button" role="menuitem" data-reset="${asset.asset_id}"><i class="fas fa-rotate-left"></i>Start over</button>` : ''}
+                    </div>
+                </div>`;
+        }
+
+        function assetCard(asset, column) {
+            const action = ACTION_META[asset.action_type] || ACTION_META.pass;
+            const category = asset.category || 'other';
+            const settle = state.lastColumn[asset.asset_id] && state.lastColumn[asset.asset_id] !== column ? ' settle' : '';
+            const openLabel = column === 'todo' ? 'Open steps' : column === 'doing' ? 'Continue' : 'Review steps';
+            return `
+                <article class="bcard${settle}" data-asset-id="${asset.asset_id}">
+                    <div class="bcard-top">
+                        <div class="tags">
+                            <span class="tag ${action.tagClass}"><i class="fas ${action.icon}"></i>${action.label}</span>
+                            <span class="tag tag-neutral">${CATEGORY_LABELS[category] || escapeHtml(category)}</span>
+                        </div>
+                        ${cardMenu(asset, column)}
+                    </div>
+                    <div class="bcard-title"><span class="plat"><i class="${getPlatformIcon(asset.platform_name)}"></i></span>${escapeHtml(asset.platform_name)}</div>
+                    <p class="bcard-desc">${escapeHtml(asset.account_identifier || '')}</p>
+                    ${asset.last_message ? `<p class="bcard-quote"><i class="fas fa-quote-left"></i>${escapeHtml(asset.last_message.substring(0, 110))}${asset.last_message.length > 110 ? '…' : ''}</p>` : ''}
+                    ${progressBlock(asset)}
+                    <div class="bcard-foot">
+                        <span class="meta"><i class="fas fa-key"></i>${asset.account_password ? 'Sign-in provided' : 'No password given'}</span>
+                        <span class="push"><button type="button" class="${column === 'done' ? 'btn-ghost' : 'btn-forest'}" data-open="${asset.asset_id}">${openLabel}<i class="fas fa-arrow-up-right-from-square"></i></button></span>
+                    </div>
+                </article>`;
+        }
+
+        function updateCounts() {
+            const counts = { todo: 0, doing: 0, done: 0 };
+            state.assets.forEach(a => counts[columnFor(a)]++);
+            document.getElementById('assetCount').textContent = state.assets.length;
+            document.getElementById('countTodo').textContent = counts.todo;
+            document.getElementById('countDoing').textContent = counts.doing;
+            document.getElementById('countDone').textContent = counts.done;
+        }
+
+        function render() {
+            const list = document.getElementById('assetsList');
+            updateCounts();
+
+            if (!state.assets.length) {
+                list.innerHTML = statePanel('fa-box-open', 'No accounts yet', 'Nothing has been shared with you so far. Check back later.');
+                return;
+            }
+
+            const items = filtered();
+
+            if (state.view === 'list') {
+                list.innerHTML = items.length ? `
+                    <div class="list" role="table" aria-label="Accounts">
+                        <div class="list-row list-head" role="row"><span>Account</span><span class="hide-sm">Sign-in</span><span class="hide-sm">Their wish</span><span class="hide-sm">Progress</span><span></span></div>
+                        ${items.map(asset => {
+                            const action = ACTION_META[asset.action_type] || ACTION_META.pass;
+                            const col = columnFor(asset);
+                            return `
+                                <div class="list-row" role="row">
+                                    <span class="bcard-title"><span class="plat"><i class="${getPlatformIcon(asset.platform_name)}"></i></span>${escapeHtml(asset.platform_name)}</span>
+                                    <span class="cell-muted hide-sm">${escapeHtml(asset.account_identifier || '')}</span>
+                                    <span class="hide-sm"><span class="tag ${action.tagClass}"><i class="fas ${action.icon}"></i>${action.label}</span></span>
+                                    <span class="cell-muted hide-sm">${COLUMNS.find(c => c.key === col).title}</span>
+                                    <button type="button" class="${col === 'done' ? 'btn-ghost' : 'btn-forest'}" data-open="${asset.asset_id}">${col === 'done' ? 'Review' : 'Open'}</button>
+                                </div>`;
+                        }).join('')}
+                    </div>` : statePanel('fa-magnifying-glass', 'No matching accounts', 'Try a different search or filter.');
+            } else {
+                const cols = state.progress ? COLUMNS.filter(c => c.key === state.progress) : COLUMNS;
+                list.innerHTML = `
+                    <div class="board${cols.length === 1 ? ' stack' : ''}" style="--cols:${cols.length}">
+                        ${cols.map(col => {
+                            const colItems = items.filter(a => columnFor(a) === col.key);
+                            return `
+                                <section class="column" aria-label="${col.title}">
+                                    <div class="column-head"><span class="dot" style="--dot:${col.dot}"></span><h2>${col.title}</h2><span class="col-count">${colItems.length}</span></div>
+                                    <p class="column-hint">${col.hint}</p>
+                                    <div class="column-body">
+                                        ${colItems.length ? colItems.map(a => assetCard(a, col.key)).join('') : `<div class="column-empty">${col.key === 'done' ? 'Accounts you finish will rest here.' : 'Nothing here right now.'}</div>`}
+                                    </div>
+                                </section>`;
+                        }).join('')}
+                    </div>`;
+            }
+
+            state.assets.forEach(a => { state.lastColumn[a.asset_id] = columnFor(a); });
+        }
+
+        function statePanel(icon, title, body, tone) {
+            return `<div class="state-panel"><div class="state-icon"${tone ? ` style="background:var(--${tone}-soft);color:var(--${tone})"` : ''}><i class="fas ${icon}"></i></div><h2>${title}</h2><p>${body}</p></div>`;
+        }
+
+        // ---------- Loading ----------
         async function loadAssets() {
+            const list = document.getElementById('assetsList');
             try {
-                console.log('[Dashboard] Loading assets with token:', token ? 'Present' : 'MISSING');
                 const response = await fetch(`${API_URL}/api/executor/assets`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
+                const data = await response.json().catch(() => ({}));
 
-                console.log('[Dashboard] Assets response status:', response.status);
-                const data = await response.json();
-                console.log('[Dashboard] Assets response data:', data);
-
-                // Handle authentication errors
                 if (response.status === 401) {
-                    console.warn('Unauthorized - redirecting to login');
                     location.href = 'executor-login.html';
                     return;
                 }
-
-                // Handle access denied
                 if (response.status === 403) {
-                    console.warn('Access denied - executor does not have access yet');
-                    document.getElementById('assetsList').innerHTML = '';
-                    document.getElementById('assetCount').textContent = '0';
-                    const emptyState = document.getElementById('emptyState');
-                    if (emptyState) {
-                        emptyState.innerHTML = '<div class="alert alert-warning"><strong>Access Pending</strong><br>Your administrator has not granted you access to the assets yet. Please contact them to grant access.</div>';
-                        emptyState.classList.remove('d-none');
-                    }
+                    list.innerHTML = statePanel('fa-hourglass-half', 'Access is not open yet',
+                        'The estate owner has not granted you access to their accounts. You will be able to see them here once they do.', 'warn');
+                    updateCounts();
                     return;
                 }
-
-                // Handle other errors
                 if (!response.ok || !data.success) {
-                    console.error('Failed to load assets:', data.message);
-                    document.getElementById('assetsList').innerHTML = '';
-                    document.getElementById('assetCount').textContent = '0';
-                    const emptyState = document.getElementById('emptyState');
-                    if (emptyState) {
-                        emptyState.innerHTML = `<div class="alert alert-danger"><strong>Error</strong><br>${escapeHtml(data.message || 'Failed to load assets')}</div>`;
-                        emptyState.classList.remove('d-none');
-                    }
+                    list.innerHTML = statePanel('fa-plug-circle-exclamation', 'Accounts could not be loaded',
+                        escapeHtml(data.message || 'Please refresh the page in a moment.'), 'danger');
                     return;
                 }
 
-                const owner = data.data && data.data.owner ? data.data.owner : {};
-                const executorData = data.data && data.data.executor ? data.data.executor : {};
-                updateProfileBanner(executorData, owner);
+                const owner = (data.data && data.data.owner) || {};
+                const executorData = (data.data && data.data.executor) || {};
+                updateProfile(executorData, owner);
 
                 if (executorData.executor_id) {
                     localStorage.setItem('executor', JSON.stringify({
                         ...executor,
                         ...executorData,
-                        ownerName: owner.full_name || executor.ownerName || 'Estate Owner',
+                        ownerName: owner.full_name || executor.ownerName || 'Estate owner',
                         ownerEmail: owner.email || executor.ownerEmail || '',
                         userId: owner.user_id
                     }));
                 }
 
-                // Get assets from response
-                const assets = data.data && data.data.assets ? data.data.assets : [];
-
-                if (assets && assets.length > 0) {
-                    const assetsList = document.getElementById('assetsList');
-                    assetsList.innerHTML = assets.map(asset => {
-                        const categoryClass = `category-${asset.category || 'other'}`;
-                        const assetDate = new Date(asset.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                        
-                        return `
-                            <div class="asset-card">
-                                <div class="asset-card-top">
-                                    <div class="asset-card-header">
-                                        <div class="asset-card-icon">
-                                            <i class="${getPlatformIcon(asset.platform_name)}"></i>
-                                        </div>
-                                        <div class="asset-card-details">
-                                            <h3>${escapeHtml(asset.platform_name)}</h3>
-                                            <p>${escapeHtml(asset.account_identifier || 'N/A')}</p>
-                                            <div class="asset-card-category ${categoryClass}">${asset.category || 'other'}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                ${asset.last_message ? `
-                                <div class="asset-card-message">
-                                    <div class="asset-card-message-label">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                                        </svg>
-                                        Final Message
-                                    </div>
-                                    <div class="asset-card-message-text">${escapeHtml(asset.last_message.substring(0, 100))}${asset.last_message.length > 100 ? '...' : ''}</div>
-                                </div>
-                                ` : ''}
-                                <div class="asset-card-status">
-                                    <div class="asset-card-status-dot"></div>
-                                    <span>Ready to access</span>
-                                </div>
-                                <div class="asset-card-footer">
-                                    <span class="asset-card-date">Added ${assetDate}</span>
-                                    <button class="btn-view-instructions" data-asset-id="${asset.asset_id}" data-platform="${asset.platform_name}" data-account="${asset.account_identifier || asset.asset_id}" data-action="${asset.action_type}" data-password="${asset.account_password ? asset.account_password.replace(/"/g, '&quot;') : ''}" data-message="${asset.last_message ? asset.last_message.replace(/"/g, '&quot;') : ''}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                            <polyline points="14 2 14 8 20 8"></polyline>
-                                            <line x1="12" y1="19" x2="12" y2="5"></line>
-                                            <line x1="9" y1="14" x2="15" y2="14"></line>
-                                        </svg>
-                                        View Instructions
-                                    </button>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                    
-                    // Add event listener for view instructions buttons
-                    const assetListContainer = document.getElementById('assetsList');
-                    assetListContainer.addEventListener('click', (e) => {
-                        const btn = e.target.closest('.btn-view-instructions');
-                        if (btn) {
-                            const assetId = btn.dataset.assetId;
-                            const platform = btn.dataset.platform;
-                            const account = btn.dataset.account;
-                            const action = btn.dataset.action;
-                            const message = btn.dataset.message || null;
-                            const password = btn.dataset.password || null;
-                            
-                            openWorkflowDirect(parseInt(assetId), platform, account, action, message || null, password || null);
-                        }
-                    });
-                    
-                    // Close workflow panel button
-                    const closeWorkflowBtn = document.querySelector('.workflow-close-btn');
-                    if (closeWorkflowBtn) {
-                        closeWorkflowBtn.addEventListener('click', closeWorkflow);
-                    }
-                    
-                    // Update asset count in profile stats
-                    document.getElementById('assetCount').textContent = assets.length;
-                    
-                    const emptyState = document.getElementById('emptyState');
-                    if (emptyState) {
-                        emptyState.classList.add('d-none');
-                    }
-                } else {
-                    document.getElementById('assetsList').innerHTML = '';
-                    document.getElementById('assetCount').textContent = '0';
-                    const emptyState = document.getElementById('emptyState');
-                    if (emptyState) {
-                        emptyState.classList.remove('d-none');
-                    }
-                }
+                state.assets = (data.data && data.data.assets) || [];
+                state.assets.forEach(a => { state.lastColumn[a.asset_id] = columnFor(a); });
+                render();
             } catch (error) {
                 console.error('Asset loading error:', error);
-                document.getElementById('assetsList').innerHTML = '';
-                document.getElementById('assetCount').textContent = '0';
-                const emptyState = document.getElementById('emptyState');
-                if (emptyState) {
-                    emptyState.innerHTML = '<div class="alert alert-danger"><strong>Error</strong><br>Failed to load assets. Please refresh the page or contact support.</div>';
-                    emptyState.classList.remove('d-none');
-                }
+                list.innerHTML = statePanel('fa-plug-circle-exclamation', 'Accounts could not be loaded',
+                    'Check your connection and refresh the page.', 'danger');
             }
         }
 
-        // Workflow Panel Functions
+        // Hand the asset to the step-by-step window (sessionStorage is copied to the new tab)
         function openWorkflowDirect(assetId, platform, account, action, message, password) {
             sessionStorage.setItem('digipass_asset_id', assetId);
             sessionStorage.setItem('digipass_platform_name', platform);
             sessionStorage.setItem('digipass_account', account || '');
             sessionStorage.setItem('digipass_action', action || '');
-            if (message) {
-                sessionStorage.setItem('digipass_message', message);
-            } else {
-                sessionStorage.removeItem('digipass_message');
-            }
-            if (password) {
-                sessionStorage.setItem('digipass_password', password);
-            } else {
-                sessionStorage.removeItem('digipass_password');
-            }
-            
+            if (message) sessionStorage.setItem('digipass_message', message);
+            else sessionStorage.removeItem('digipass_message');
+            if (password) sessionStorage.setItem('digipass_password', password);
+            else sessionStorage.removeItem('digipass_password');
+
             window.open('workflow-window.html', '_blank');
         }
 
-
-        function renderStepPreview(step, platform, account, action, password, message) {
-            const previewContent = document.getElementById('previewContent');
-            
-            let html = `
-                <div class="step-preview-container">
-                    <div class="step-preview-header">
-                        <h3>${step.title}</h3>
-                        <span class="step-badge">Step ${step.stepNumber || 1}</span>
-                    </div>
-                    
-                    <div class="step-details">
-                        <p class="step-description">${step.description || ''}</p>
-                        
-                        <div class="step-action">
-                            <strong>Action:</strong><br>
-                            ${step.action}
-                        </div>
-            `;
-            
-            // Add account/username section at the top for first step
-            if (step.stepNumber === 1) {
-                html += `
-                    <div class="credentials-section" style="margin-bottom: 20px;">
-                        <div class="credentials-header">
-                            <i class="fas fa-user"></i> Account Information
-                        </div>
-                        <div class="credentials-body">
-                            <div class="credential-item">
-                                <div class="credential-label">USERNAME / ACCOUNT</div>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div class="credential-value" style="flex: 1; font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; word-break: break-all;" id="credUsername">
-                                        ${account || 'Not provided'}
-                                    </div>
-                                    <button class="copy-credential-btn" type="button" onclick="copyUsernameValue('credUsername')" title="Copy username">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Add credentials section if needed
-            if (step.credentials && step.credentials.length > 0) {
-                html += `
-                    <div class="credentials-section">
-                        <div class="credentials-header">
-                            <i class="fas fa-lock"></i> Credentials Required
-                        </div>
-                        <div class="credentials-body">
-                `;
-                
-                step.credentials.forEach((cred, index) => {
-                    if (cred.toLowerCase().includes('password')) {
-                        const uniqueId = `credPassword_${Date.now()}_${index}`;
-                        const toggleId = `togglePassword_${Date.now()}_${index}`;
-                        html += `
-                            <div class="credential-item">
-                                <div class="credential-label">PASSWORD</div>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div class="credential-value" style="flex: 1; font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; word-break: break-all;" id="${uniqueId}" data-actual="${password || ''}">
-                                        ${password ? password.replace(/./g, '•') : 'Not provided'}
-                                    </div>
-                                    <button class="copy-credential-btn" type="button" onclick="copyPasswordValue('${uniqueId}')" title="Copy password">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                    <button class="toggle-password-btn" type="button" onclick="togglePasswordDisplay('${uniqueId}')" title="Show/Hide password">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    } else if (cred.toLowerCase().includes('email') || cred.toLowerCase().includes('username') || cred.toLowerCase().includes('account')) {
-                        const uniqueId = `credUsername_${Date.now()}_${index}`;
-                        html += `
-                            <div class="credential-item">
-                                <div class="credential-label">${cred.toUpperCase()}</div>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div class="credential-value" style="flex: 1; font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px; word-break: break-all;" id="${uniqueId}">
-                                        ${account || 'Not provided'}
-                                    </div>
-                                    <button class="copy-credential-btn" type="button" onclick="copyUsernameValue('${uniqueId}')" title="Copy username">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        html += `
-                            <div class="credential-item">
-                                <div class="credential-label">${cred.toUpperCase()}</div>
-                                <div class="credential-value">Required - Provide your own</div>
-                            </div>
-                        `;
-                    }
-                });
-                
-                html += `
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Add tips section
-            if (step.tips && step.tips.length > 0) {
-                html += `
-                    <div style="margin-top: 20px; padding: 14px 16px; background: #fffbeb; border-radius: 10px; border-left: 4px solid #f59e0b;">
-                        <strong style="color: #92400e;">💡 Tips:</strong>
-                        <ul style="margin: 8px 0 0 0; padding-left: 20px;">
-                `;
-                
-                step.tips.forEach(tip => {
-                    html += `<li style="color: #92400e; margin-bottom: 6px; font-size: 13px;">${tip}</li>`;
-                });
-                
-                html += `
-                        </ul>
-                    </div>
-                `;
-            }
-            
-            // Add farewell message section if applicable
-            if (step.showFarewellMessage && message) {
-                const messageId = `farewell_${Date.now()}`;
-                html += `
-                    <div style="margin-top: 20px; padding: 14px 16px; background: #dbeafe; border-radius: 10px; border-left: 4px solid #0369a1;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <strong style="color: #0369a1;">📧 Your Message:</strong>
-                            <button class="copy-credential-btn" type="button" onclick="copyMessageValue('${messageId}')" title="Copy message">
-                                <i class="fas fa-copy"></i> Copy
-                            </button>
-                        </div>
-                        <div style="margin-top: 8px; padding: 10px; background: white; border-radius: 6px; font-style: italic; color: #1f2937; word-break: break-word; white-space: pre-wrap;" id="${messageId}">
-                            ${message}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            html += `
-                    </div>
-                </div>
-            `;
-            
-            previewContent.innerHTML = html;
-        }
-
-        function copyCredential(elementId, message) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-            
-            const text = element.textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                showCopyFeedback(message);
-            }).catch(err => {
-                console.error('Copy failed:', err);
+        // ---------- Interaction ----------
+        function closeMenus(except) {
+            document.querySelectorAll('.more-menu.open').forEach(m => {
+                if (m === except) return;
+                m.classList.remove('open');
+                const b = m.parentElement.querySelector('[data-more]');
+                if (b) b.setAttribute('aria-expanded', 'false');
             });
         }
 
-        function copyUsernameValue(elementId) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-            
-            const text = element.textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                showCopyFeedback('Username copied!');
-            }).catch(err => {
-                console.error('Copy failed:', err);
-            });
-        }
-
-        function copyPasswordValue(elementId) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-            
-            const actualPassword = element.getAttribute('data-actual') || '';
-            navigator.clipboard.writeText(actualPassword).then(() => {
-                showCopyFeedback('Password copied!');
-            }).catch(err => {
-                console.error('Copy failed:', err);
-            });
-        }
-
-        function copyMessageValue(elementId) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-            
-            const text = element.textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                showCopyFeedback('Message copied!');
-            }).catch(err => {
-                console.error('Copy failed:', err);
-            });
-        }
-
-        function togglePasswordDisplay(elementId) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-            
-            const actualPassword = element.getAttribute('data-actual') || '';
-            const isHidden = element.textContent.includes('•');
-            element.textContent = isHidden ? actualPassword : actualPassword.replace(/./g, '•');
-        }
-
-        function showCopyFeedback(message) {
-            // Create a temporary notification
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #10b981;
-                color: white;
-                padding: 12px 16px;
-                border-radius: 6px;
-                font-size: 13px;
-                z-index: 3000;
-                animation: slideIn 0.3s ease-out;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 2000);
-        }
-
-        function updateProgress(currentStep, totalSteps) {
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressText');
-            const percentage = ((currentStep + 1) / totalSteps) * 100;
-            
-            progressBar.style.width = percentage + '%';
-            progressText.textContent = `Step ${currentStep + 1} of ${totalSteps}`;
-        }
-
-        function closeWorkflow() {
-            const workflowPanel = document.getElementById('workflowPanel');
-            workflowPanel.classList.remove('workflow-panel-visible');
-            workflowPanel.classList.add('workflow-panel-hidden');
-        }
-
-        function nextStep() {
-            const activeStep = document.querySelector('.step-item-active');
-            if (!activeStep) return;
-            
-            const nextStepEl = activeStep.nextElementSibling;
-            if (nextStepEl && nextStepEl.classList.contains('step-item')) {
-                nextStepEl.click();
+        document.getElementById('assetsList').addEventListener('click', (e) => {
+            const more = e.target.closest('[data-more]');
+            if (more) {
+                e.stopPropagation();
+                const menu = more.parentElement.querySelector('.more-menu');
+                const open = !menu.classList.contains('open');
+                closeMenus(menu);
+                menu.classList.toggle('open', open);
+                more.setAttribute('aria-expanded', String(open));
+                return;
             }
-        }
 
-        function previousStep() {
-            const activeStep = document.querySelector('.step-item-active');
-            if (!activeStep) return;
-            
-            const prevStepEl = activeStep.previousElementSibling;
-            if (prevStepEl && prevStepEl.classList.contains('step-item')) {
-                prevStepEl.click();
-            }
-        }
-
-        function markAsDone() {
-            closeWorkflow();
-            showCopyFeedback('Workflow completed! ✓');
-        }
-
-        // Copy text to clipboard (for final messages)
-        function copyToClipboard(elementId) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-            
-            const text = element.value || element.textContent;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = event?.target.closest('button');
-                if (btn) {
-                    const originalText = btn.innerHTML;
-                    btn.innerHTML = '📋 Copied!';
-                    setTimeout(() => {
-                        btn.innerHTML = originalText;
-                    }, 2000);
+            const openBtn = e.target.closest('[data-open]');
+            if (openBtn) {
+                const asset = state.assets.find(a => String(a.asset_id) === openBtn.dataset.open);
+                if (!asset) return;
+                if (!readProgress(asset.asset_id)) {
+                    writeProgress(asset.asset_id, { step: 1, total: 0, done: false });
+                    render();
                 }
-            }).catch((err) => {
-                console.error('Copy failed:', err);
-                try {
-                    element.select();
-                    document.execCommand('copy');
-                    const btn = event?.target.closest('button');
-                    if (btn) {
-                        const originalText = btn.innerHTML;
-                        btn.innerHTML = '📋 Copied!';
-                        setTimeout(() => {
-                            btn.innerHTML = originalText;
-                        }, 2000);
-                    }
-                } catch (e) {
-                    alert('Could not copy. Please try manually selecting the text.');
-                }
-            });
-        }
-
-        // Save asset progress to localStorage
-        function saveAssetProgress(assetId) {
-            const checkboxes = document.querySelectorAll(`input[data-asset="${assetId}"]`);
-            const progress = [];
-            checkboxes.forEach((checkbox, index) => {
-                progress.push(checkbox.checked);
-            });
-            localStorage.setItem(`assetProgress-${assetId}`, JSON.stringify(progress));
-        }
-
-        // Load asset progress from localStorage
-        function loadAssetProgress(assetId) {
-            const saved = localStorage.getItem(`assetProgress-${assetId}`);
-            if (saved) {
-                const progress = JSON.parse(saved);
-                const checkboxes = document.querySelectorAll(`input[data-asset="${assetId}"]`);
-                checkboxes.forEach((checkbox, index) => {
-                    checkbox.checked = progress[index] || false;
-                });
+                openWorkflowDirect(asset.asset_id, asset.platform_name, asset.account_identifier || String(asset.asset_id),
+                    asset.action_type, asset.last_message || null, asset.account_password || null);
+                return;
             }
-        }
 
-        // Helper: Escape HTML for safe display
-        function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.replace(/[&<>"']/g, m => map[m]);
-        }
-
-        // Toggle password visibility
-        function togglePasswordVisibility(fieldId) {
-            const element = document.getElementById(fieldId);
-            if (!element) return;
-            
-            if (element.type === 'password') {
-                element.type = 'text';
-            } else {
-                element.type = 'password';
+            const doneBtn = e.target.closest('[data-mark-done]');
+            if (doneBtn) {
+                const prev = readProgress(doneBtn.dataset.markDone) || {};
+                writeProgress(doneBtn.dataset.markDone, { ...prev, done: true });
+                closeMenus();
+                render();
+                return;
             }
-        }
 
-        // Copy credential to clipboard
-        function copyCredential(fieldId) {
-            const element = document.getElementById(fieldId);
-            if (!element) return;
-            
-            const text = element.value || element.textContent;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                // Show success toast
-                const btn = event?.target.closest('button');
-                if (btn) {
-                    const originalText = btn.textContent || btn.innerHTML;
-                    btn.textContent = '✓ Copied!';
-                    btn.innerHTML = '✓ Copied!';
-                    setTimeout(() => {
-                        btn.textContent = originalText;
-                        btn.innerHTML = originalText;
-                    }, 2000);
-                }
-            }).catch((err) => {
-                console.error('Copy failed:', err);
-                // Fallback: try selecting and copying
-                try {
-                    element.select?.();
-                    document.execCommand('copy');
-                    const btn = event?.target.closest('button');
-                    if (btn) {
-                        const originalText = btn.textContent || btn.innerHTML;
-                        btn.textContent = '✓ Copied!';
-                        btn.innerHTML = '✓ Copied!';
-                        setTimeout(() => {
-                            btn.textContent = originalText;
-                            btn.innerHTML = originalText;
-                        }, 2000);
-                    }
-                } catch (e) {
-                    console.warn('Fallback copy failed:', e);
-                }
+            const resetBtn = e.target.closest('[data-reset]');
+            if (resetBtn) {
+                if (!confirm('Start this account over? Its saved progress on this device will be cleared.')) return;
+                writeProgress(resetBtn.dataset.reset, null);
+                closeMenus();
+                render();
+            }
+        });
+
+        document.addEventListener('click', (e) => { if (!e.target.closest('.more')) closeMenus(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeMenus(); togglePanel(false); } });
+
+        // The workflow window writes progress in another tab; move cards as it happens.
+        window.addEventListener('storage', (e) => {
+            if (e.key && e.key.startsWith('digipass-progress-')) render();
+        });
+
+        document.getElementById('assetSearch').addEventListener('input', (e) => {
+            state.query = e.target.value;
+            render();
+        });
+
+        document.querySelectorAll('[data-action-filter]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                state.action = btn.dataset.actionFilter;
+                document.querySelectorAll('[data-action-filter]').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+                render();
             });
-        }
+        });
 
-        // Download Digital Will
+        document.querySelectorAll('[data-view]').forEach(tab => {
+            tab.addEventListener('click', () => {
+                state.view = tab.dataset.view;
+                document.querySelectorAll('[data-view]').forEach(t => t.setAttribute('aria-selected', String(t === tab)));
+                render();
+            });
+        });
+
+        document.querySelectorAll('[data-progress-filter]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                state.progress = btn.dataset.progressFilter;
+                document.querySelectorAll('[data-progress-filter]').forEach(b => b.classList.toggle('active', b === btn));
+                togglePanel(false);
+                render();
+            });
+        });
+
+        // ---------- Will download ----------
         document.getElementById('downloadWillBtn').addEventListener('click', async () => {
             const btn = document.getElementById('downloadWillBtn');
-            const originalText = btn.innerHTML;
+            const label = btn.innerHTML;
+            const restore = (html, delay) => setTimeout(() => { btn.innerHTML = label; btn.disabled = false; }, delay || 0);
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
+            btn.innerHTML = '<span>Preparing…</span><span class="chev"><i class="fas fa-spinner fa-spin"></i></span>';
 
             try {
                 const executorData = JSON.parse(localStorage.getItem('executor') || '{}');
                 const userId = executorData.userId;
-                const token = sessionStorage.getItem('executorToken') || localStorage.getItem('executorToken');
-                
-                if (!userId) {
-                    alert('Error: Unable to determine user ID. Please refresh and try again.');
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
+                const authToken = sessionStorage.getItem('executorToken') || localStorage.getItem('executorToken');
+
+                if (!userId || !authToken) {
+                    alert('We could not identify this estate. Please refresh the page and try again.');
+                    restore();
                     return;
                 }
-                
-                if (!token) {
-                    alert('Error: Authentication required. Please refresh and log in again.');
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                    return;
-                }
-                
-                const response = await fetch(`${window.DIGIPASS_API_ORIGIN || ''}/api/executor/will/download/${userId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+
+                const response = await fetch(`${API_URL}/api/executor/will/download/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
                 });
 
                 if (!response.ok) {
-                    try {
-                        const error = await response.json();
-                        console.error('[Download] Server error response:', error);
-                        let errorMsg = error.message || `Failed to download will (${response.status})`;
-                        if (error.error) {
-                            errorMsg += ` - ${error.error}`;
-                        }
-                        alert('Error: ' + errorMsg);
-                    } catch (e) {
-                        console.error('[Download] Failed to parse error response:', e);
-                        alert('Error: Failed to download will (HTTP ' + response.status + ')');
-                    }
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
+                    const err = await response.json().catch(() => ({}));
+                    alert('The will could not be downloaded: ' + (err.message || `error ${response.status}`));
+                    restore();
                     return;
                 }
 
-                // Create blob from response
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                const dateStr = new Date().toISOString().split('T')[0];
-                a.download = `Digital_Will_${userId}_${dateStr}.pdf`;
+                a.download = `Digital_Will_${userId}_${new Date().toISOString().split('T')[0]}.pdf`;
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
 
-                btn.innerHTML = '<i class="fas fa-check"></i> Downloaded!';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }, 2000);
+                btn.innerHTML = '<span>Downloaded</span><span class="chev"><i class="fas fa-check"></i></span>';
+                restore(null, 2000);
             } catch (error) {
                 console.error('Download error:', error);
-                alert('Failed to download will. Please try again.');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                alert('The will could not be downloaded. Please try again.');
+                restore();
             }
         });
 
         loadAssets();
     </script>
-
 </body>
 </html>

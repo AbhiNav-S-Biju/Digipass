@@ -868,6 +868,23 @@
         const API_URL = (window.DIGIPASS_API_ORIGIN || '') + '/api';
         let allSteps = [];
         let current = 0;
+        // Progress is shared with the executor dashboard (same browser) so its
+        // board can show each account as not started / in progress / taken care of.
+        let progressAssetId = null;
+
+        function readSavedProgress() {
+            if (!progressAssetId) return null;
+            try { return JSON.parse(localStorage.getItem(`digipass-progress-${progressAssetId}`) || 'null'); }
+            catch (e) { return null; }
+        }
+
+        function saveProgress(step, total, done) {
+            if (!progressAssetId) return;
+            try {
+                localStorage.setItem(`digipass-progress-${progressAssetId}`,
+                    JSON.stringify({ step, total, done, updatedAt: Date.now() }));
+            } catch (e) { /* storage unavailable: board just won't update */ }
+        }
         let assetInfo = null;
         let platformName = 'Platform';
 
@@ -1114,10 +1131,16 @@
             const nextBtn = document.getElementById('nextBtn');
             prevBtn.disabled = idx === 0;
 
+            const saved = readSavedProgress();
+            saveProgress(idx + 1, total, Boolean(saved && saved.done));
+
             if (idx === total - 1) {
                 nextBtn.className = 'nav-btn btn-done';
                 nextBtn.innerHTML = '<i class="fas fa-check"></i> Done';
-                nextBtn.onclick = () => window.close();
+                nextBtn.onclick = () => {
+                    saveProgress(total, total, true);
+                    window.close();
+                };
             } else {
                 nextBtn.className = 'nav-btn btn-solid';
                 nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
@@ -1206,11 +1229,14 @@
         }
 
         function bootstrap() {
-            current = 0;
+            // Resume where the executor left off, unless the account is already finished
+            const saved = readSavedProgress();
+            const resumeAt = saved && !saved.done && saved.step >= 1 && saved.step <= allSteps.length ? saved.step - 1 : 0;
+            current = resumeAt;
             buildSidebar();
             syncSidebar();
             document.getElementById('navFooter').style.display = 'flex';
-            renderStep(0);
+            renderStep(resumeAt);
         }
 
         async function loadInstructions() {
@@ -1228,6 +1254,7 @@
                     showError('Missing asset. Please open this workflow from the executor dashboard.');
                     return;
                 }
+                progressAssetId = assetId;
 
                 // Get workflow data for this platform and action
                 let steps = [];

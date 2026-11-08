@@ -5,2043 +5,559 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - DIGIPASS</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231b3a2d'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='%23fdf6ec'/%3E%3C/svg%3E">
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-    <!-- Bootstrap 5 CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            /* Design System Colors */
-            --cream: #f5ead8;
-            --cream-light: #fdf6ec;
-            --forest-deep: #1b3a2d;
-            --forest-mid: #2d5a42;
-            --forest-light: #3d7a5a;
-            --sand: #e8d9c0;
-            --sand-deep: #d4c4a0;
-            --text-dark: #1a2e22;
-            --text-muted: #5a7260;
-        }
-
-        * {
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        h1, h2, h3, h4, h5, h6, .navbar-brand {
-            font-family: 'DM Serif Display', serif;
-        }
-
-        body {
-            background-color: var(--cream);
-            color: var(--text-dark);
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: -200px;
-            left: -200px;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, var(--forest-mid) 0%, transparent 70%);
-            opacity: 0.06;
-            border-radius: 50%;
-            z-index: 0;
-            animation: orbDrift 18s ease-in-out infinite;
-            pointer-events: none;
-            will-change: transform;
-        }
-
-        body::after {
-            content: '';
-            position: fixed;
-            bottom: -100px;
-            right: -150px;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, var(--forest-light) 0%, transparent 70%);
-            opacity: 0.05;
-            border-radius: 50%;
-            z-index: 0;
-            animation: orbDrift 22s ease-in-out infinite reverse;
-            pointer-events: none;
-            will-change: transform;
-        }
-
-        @keyframes orbDrift {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -40px) scale(1.05); }
-            66% { transform: translate(-20px, 25px) scale(0.95); }
-        }
-
-        /* Navbar */
-        .navbar {
-            background-color: var(--forest-deep) !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-            padding: 1rem 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            z-index: 100;
-        }
-
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--cream-light) !important;
-            letter-spacing: 0.5px;
-        }
-
-        .nav-link {
-            color: var(--cream-light) !important;
-            font-weight: 500;
-            font-size: 0.95rem;
-            padding: 0.5rem 1rem !important;
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: var(--sand) !important;
-        }
-
-        .nav-link.active {
-            color: #8cbf9c !important;
-            border-bottom: 2px solid #8cbf9c;
-        }
-
-        .mr-auto {
-            margin-right: auto !important;
-        }
-
-        .navbar-toggler {
-            border-color: var(--cream-light);
-        }
-
-        .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23fdf6ec' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-        }
-
-        .btn-logout {
-            background-color: var(--sand-deep) !important;
-            color: var(--text-dark) !important;
-            font-weight: 600;
-            border-radius: 7px;
-            border: none !important;
-            padding: 0.5rem 1rem !important;
-            transition: all 0.3s ease;
-        }
-
-        .btn-logout:hover {
-            background-color: var(--sand) !important;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(212, 196, 160, 0.3);
-        }
-
-        /* Profile Trigger (Dropdown) */
-        #profileTrigger {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            position: relative;
-            transition: background-color 0.15s ease;
-            margin-left: 8px;
-        }
-
-        #profileTrigger:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-        }
-
-        .profile-avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background-color: var(--forest-light);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'DM Serif Display', serif;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--cream-light);
-            flex-shrink: 0;
-        }
-
-        .profile-username {
-            font-size: 13px;
-            color: var(--cream-light);
-            font-weight: 500;
-        }
-
-        .profile-chevron {
-            width: 14px;
-            height: 14px;
-            stroke: rgba(245, 234, 216, 0.7);
-            stroke-width: 2.5;
-            fill: none;
-            transition: transform 0.25s ease;
-        }
-
-        #profileTrigger.open .profile-chevron {
-            transform: rotate(180deg);
-        }
-
-        /* Dropdown Menu */
-        #profileDropdown {
-            position: absolute;
-            top: calc(100% + 8px);
-            right: 0;
-            width: 220px;
-            background: var(--cream-light);
-            border: 1px solid var(--sand-deep);
-            border-radius: 12px;
-            overflow: hidden;
-            z-index: 1000;
-            display: none;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
-
-        #profileDropdown.open {
-            display: block;
-        }
-
-        .dd-header {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--sand-deep);
-        }
-
-        .dd-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .dd-email {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .dd-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 11px 16px;
-            font-size: 13.5px;
-            color: var(--text-dark);
-            cursor: pointer;
-            transition: background-color 0.15s ease;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-        }
-
-        .dd-item:hover {
-            background-color: var(--sand);
-        }
-
-        .dd-item svg {
-            width: 16px;
-            height: 16px;
-            stroke: currentColor;
-            stroke-width: 1.5;
-            fill: none;
-            flex-shrink: 0;
-        }
-
-        .dd-divider {
-            height: 1px;
-            background-color: var(--sand-deep);
-        }
-
-        .dd-item.logout {
-            color: #a32d2d;
-        }
-
-        .dd-item.logout:hover {
-            background-color: #fcebeb;
-        }
-
-        .dd-item.logout svg {
-            stroke: #a32d2d;
-        }
-
-        /* Main Content */
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        main.container-fluid {
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Page Header */
-        .page-header h2 {
-            color: var(--forest-deep);
-            font-weight: 700;
-            font-size: clamp(1.75rem, 6vw, 2.25rem);
-            margin-bottom: 0.5rem;
-        }
-
-        .page-header p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            font-weight: 400;
-        }
-
-        /* Cards */
-        .card {
-            border: 1px solid var(--sand-deep);
-            border-radius: 14px;
-            background-color: var(--cream-light);
-            box-shadow: 0 2px 8px rgba(27, 58, 45, 0.06), 0 0 0 1px rgba(212, 196, 160, 0.2);
-            transition: all 0.3s ease;
-            overflow: hidden;
-            border-top: 3px solid transparent;
-            border-image: linear-gradient(90deg, var(--forest-deep), var(--forest-light)) 1;
-            backdrop-filter: blur(8px);
-        }
-
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(27, 58, 45, 0.12), 0 0 0 1px rgba(61, 122, 90, 0.15);
-        }
-
-        .card h3 {
-            color: var(--forest-deep);
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .card-header {
-            background-color: transparent;
-            border-bottom: 1px solid var(--sand-deep);
-            padding: 1.25rem;
-        }
-
-        .card-body {
-            padding: 1.25rem;
-        }
-
-        /* Stat Cards */
-        .stat-card {
-            background-color: var(--cream-light);
-            border: 1px solid var(--sand-deep);
-            border-radius: 14px;
-            padding: 1.75rem 1.25rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            border-top: 3px solid transparent;
-            border-image: linear-gradient(90deg, var(--forest-deep), var(--forest-light)) 1;
-            box-shadow: 0 2px 8px rgba(27, 58, 45, 0.06);
-            backdrop-filter: blur(8px);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(27, 58, 45, 0.12);
-        }
-
-        .stat-card h3 {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-
-        .stat-number,
-        .stat-status {
-            font-size: clamp(1.75rem, 8vw, 2.5rem);
-            font-weight: 700;
-            color: var(--forest-deep);
-            margin-bottom: 1rem;
-        }
-
-        /* Buttons */
-        .btn-primary {
-            background-color: var(--forest-deep) !important;
-            border-color: var(--forest-deep) !important;
-            color: var(--cream-light) !important;
-            font-weight: 600;
-            border-radius: 7px;
-            padding: 0.5rem 1.25rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--forest-mid) !important;
-            border-color: var(--forest-mid) !important;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(27, 58, 45, 0.25);
-        }
-
-        .btn-secondary {
-            background-color: var(--cream-light) !important;
-            color: var(--forest-deep) !important;
-            border: 1px solid var(--sand-deep) !important;
-            font-weight: 600;
-            border-radius: 7px;
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--forest-deep) !important;
-            background-color: var(--sand) !important;
-        }
-
-        .btn-danger {
-            background-color: #f8d7da !important;
-            color: #842029 !important;
-            font-weight: 600;
-            border-radius: 7px;
-            border: none !important;
-        }
-
-        /* Action Button Styling - Asset Actions (Pass, Delete, Last Message) */
-        .btn-group .btn-check:checked + .btn-outline-primary {
-            background-color: var(--forest-deep) !important;
-            border-color: var(--forest-deep) !important;
-            color: var(--cream-light) !important;
-            font-weight: 600;
-        }
-
-        .btn-group .btn-outline-primary {
-            border: 2px solid var(--sand-deep) !important;
-            color: var(--text-dark) !important;
-            font-weight: 500;
-            background-color: var(--cream-light) !important;
-            transition: all 0.3s ease;
-        }
-
-        .btn-group .btn-outline-primary:hover {
-            border-color: var(--forest-mid) !important;
-            background-color: var(--sand) !important;
-            color: var(--forest-deep) !important;
-        }
-
-        /* Forms */
-        .form-label {
-            font-weight: 600;
-            color: var(--text-dark);
-            font-size: 0.9rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .form-control,
-        .form-select {
-            border: 1px solid var(--sand-deep);
-            border-radius: 7px;
-            font-size: 0.95rem;
-            padding: 0.75rem;
-            background-color: var(--cream-light);
-            color: var(--text-dark);
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: var(--forest-deep);
-            background-color: white;
-            box-shadow: 0 0 0 3px rgba(27, 58, 45, 0.1);
-        }
-
-        /* Platform Select Dropdown Styling */
-        .platform-select {
-            background: linear-gradient(135deg, var(--cream-light) 0%, var(--cream) 100%);
-            border: 2px solid var(--sand-deep);
-            font-weight: 500;
-            padding: 0.85rem 2.5rem 0.85rem 0.85rem;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231b3a2d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 16px 12px;
-            padding-right: 2.5rem;
-            appearance: none;
-        }
-
-        .platform-select:hover {
-            border-color: var(--forest-mid);
-            background: linear-gradient(135deg, var(--sand) 0%, var(--cream-light) 100%);
-        }
-
-        .platform-select:focus {
-            border-color: var(--forest-deep);
-            background: white;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231b3a2d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 16px 12px;
-            box-shadow: 0 0 0 3px rgba(45, 90, 66, 0.15);
-        }
-
-        .platform-select option {
-            padding: 0.5rem;
-            color: var(--text-dark);
-            background: var(--cream-light);
-        }
-
-        .platform-select option:hover {
-            background: var(--sand);
-        }
-
-        .platform-select optgroup {
-            color: var(--forest-deep);
-            font-weight: 600;
-            background: var(--sand);
-        }
-
-        /* Custom Platform Dropdown */
-        .custom-platform-dropdown {
-            position: relative;
-            width: 100%;
-        }
-
-        .platform-dropdown-trigger {
-            width: 100%;
-            padding: 0.85rem;
-            background: linear-gradient(135deg, var(--cream-light) 0%, var(--cream) 100%);
-            border: 2px solid var(--sand-deep);
-            border-radius: 7px;
-            color: var(--text-dark);
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            transition: all 0.3s ease;
-            position: relative;
-            text-align: left;
-        }
-
-        .platform-dropdown-trigger:hover {
-            border-color: var(--forest-mid);
-            background: linear-gradient(135deg, var(--sand) 0%, var(--cream-light) 100%);
-        }
-
-        .platform-dropdown-trigger:focus {
-            outline: none;
-            border-color: var(--forest-deep);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(45, 90, 66, 0.15);
-        }
-
-        .platform-icon-display {
-            font-size: 1.2rem;
-            color: var(--forest-deep);
-            min-width: 24px;
-            text-align: center;
-        }
-
-        .platform-text-display {
-            flex: 1;
-            color: var(--text-dark);
-        }
-
-        .platform-dropdown-trigger:focus .dropdown-arrow {
-            color: var(--forest-deep);
-        }
-
-        .dropdown-arrow {
-            margin-left: auto;
-            color: var(--sand-deep);
-            font-size: 0.8rem;
-            transition: transform 0.3s ease;
-        }
-
-        .platform-dropdown-trigger[aria-expanded="true"] .dropdown-arrow {
-            transform: rotate(180deg);
-        }
-
-        .platform-dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--cream-light);
-            border: 2px solid var(--forest-deep);
-            border-radius: 7px;
-            margin-top: 0.5rem;
-            max-height: 400px;
-            overflow-y: auto;
-            z-index: 1000;
-            display: none;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            animation: slideDown 0.3s ease;
-        }
-
-        .platform-dropdown-menu.show {
-            display: block;
-        }
-
-        .dropdown-section {
-            padding: 0.5rem 0;
-        }
-
-        .dropdown-section-title {
-            padding: 0.75rem 1rem;
-            color: var(--forest-deep);
-            font-weight: 700;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            background: linear-gradient(90deg, var(--sand) 0%, transparent 100%);
-            border-bottom: 1px solid var(--sand-deep);
-        }
-
-        .platform-option {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: transparent;
-            border: none;
-            color: var(--text-dark);
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            text-align: left;
-            transition: all 0.2s ease;
-            font-size: 0.95rem;
-        }
-
-        .platform-option:hover {
-            background: var(--sand);
-            padding-left: 1.25rem;
-        }
-
-        .platform-option:active {
-            background: var(--sand-deep);
-        }
-
-        .platform-option i {
-            font-size: 1.1rem;
-            color: var(--forest-deep);
-            min-width: 24px;
-            text-align: center;
-        }
-
-        .platform-option span {
-            flex: 1;
-        }
-
-        .platform-dropdown-menu::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .platform-dropdown-menu::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .platform-dropdown-menu::-webkit-scrollbar-thumb {
-            background: var(--sand-deep);
-            border-radius: 3px;
-        }
-
-        .platform-dropdown-menu::-webkit-scrollbar-thumb:hover {
-            background: var(--forest-mid);
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Asset Cards */
-        .asset-card {
-            background-color: var(--cream-light);
-            border: 1px solid var(--sand-deep);
-            border-radius: 14px;
-            padding: 1.25rem;
-            transition: all 0.3s ease;
-            border-top: 3px solid var(--forest-deep);
-        }
-
-        .asset-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
-
-        .asset-card-icon {
-            width: 40px;
-            height: 40px;
-            min-width: 40px;
-            background-color: var(--sand);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.25s ease;
-        }
-
-        .asset-card:hover .asset-card-icon {
-            transform: scale(1.1) rotate(-3deg);
-        }
-
-        .asset-card-icon i {
-            font-size: 20px;
-            color: var(--text-muted);
-        }
-
-        .asset-card h4 {
-            color: var(--forest-deep);
-            font-weight: 600;
-            font-size: 1.05rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .asset-type {
-            display: inline-block;
-            background-color: var(--sand);
-            color: var(--forest-deep);
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: capitalize;
-            margin-bottom: 1rem;
-        }
-
-        .executor-actions {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-            margin-top: 1rem;
-        }
-
-        .executor-actions button {
-            border: 1px solid transparent;
-            border-radius: 8px;
-            padding: 0.6rem 0.9rem;
-            font-size: 0.86rem;
-            font-weight: 700;
-            line-height: 1;
-            min-height: 38px;
-            transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
-        }
-
-        .executor-actions button:not(:disabled):hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 18px rgba(27, 58, 45, 0.14);
-        }
-
-        .executor-actions button:disabled {
-            cursor: default;
-            opacity: 0.9;
-        }
-
-        .access-btn {
-            background-color: var(--forest-deep);
-            border-color: var(--forest-deep);
-            color: var(--cream-light);
-        }
-
-        .access-btn:hover:not(:disabled) {
-            background-color: var(--forest-mid);
-            border-color: var(--forest-mid);
-        }
-
-        .revoke-btn {
-            background-color: #fff7ed;
-            border-color: #fed7aa;
-            color: #9a3412;
-        }
-
-        .revoke-btn:hover:not(:disabled) {
-            background-color: #ffedd5;
-            border-color: #fdba74;
-        }
-
-        .executor-actions .delete-btn {
-            background-color: #fef2f2;
-            border-color: #fecaca;
-            color: #991b1b;
-        }
-
-        .executor-actions .delete-btn:hover:not(:disabled) {
-            background-color: #fee2e2;
-            border-color: #fca5a5;
-        }
-
-        .success-btn {
-            background-color: #dcfce7;
-            border-color: #bbf7d0;
-            color: #166534;
-        }
-
-        /* Status Pills */
-        .status-pill {
-            display: inline-block;
-            padding: 0.4rem 0.8rem;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: capitalize;
-        }
-
-        .status-pending {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-success {
-            background-color: #dcfce7;
-            color: #166534;
-        }
-
-        .status-error {
-            background-color: #fee2e2;
-            color: #842029;
-        }
-
-        /* Summary Items */
-        .summary-item {
-            background-color: var(--cream-light);
-            border: 1px solid var(--sand-deep);
-            border-radius: 14px;
-            padding: 2rem 1.25rem;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            min-height: 160px;
-            transition: all 0.3s ease;
-            border-top: 3px solid transparent;
-            border-image: linear-gradient(90deg, var(--forest-deep), var(--forest-light)) 1;
-        }
-
-        .summary-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
-
-        .summary-item h4 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-        }
-
-        .summary-count {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--forest-deep);
-            margin: 0;
-        }
-
-        /* Will status bar */
-        .will-status-bar {
-            display: none;
-            width: 100%;
-            height: 6px;
-            background: var(--sand);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-
-        .will-status-bar.active {
-            display: block;
-        }
-
-        .will-status-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-green), var(--forest-light));
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 3px;
-        }
-
-        .will-status-text {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 6px;
-            text-align: center;
-        }
-
-        /* Modal */
-        .modal-content {
-            border-radius: 14px;
-            border: 1px solid var(--sand-deep);
-            background-color: var(--cream-light);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal-header {
-            border-bottom: 1px solid var(--sand-deep);
-            background-color: transparent;
-            padding: 1.5rem;
-        }
-
-        .modal-header h2 {
-            color: var(--forest-deep);
-            font-weight: 700;
-            font-size: 1.5rem;
-        }
-
-        .btn-close {
-            filter: invert(0.3);
-        }
-
-        /* QR Display */
-        .qr-display {
-            background-color: white;
-            border: 1px solid var(--sand-deep);
-            border-radius: 14px;
-            padding: 2rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 350px;
-        }
-
-        .qr-display img {
-            max-width: 100%;
-            height: auto;
-            image-rendering: pixelated;
-        }
-
-        /* Health Score Card */
-        .health-score-container {
-            text-align: center;
-            padding: 2rem 1.25rem;
-        }
-
-        .health-score-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-weight: 700;
-            font-size: 2.5rem;
-            color: white;
-            position: relative;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .health-score-circle:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
-        }
-
-        .health-score-circle.score-high {
-            background: linear-gradient(135deg, #86c157 0%, #5da936 100%);
-        }
-
-        .health-score-circle.score-medium {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        }
-
-        .health-score-circle.score-low {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        }
-
-        .health-score-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-        }
-
-        .health-score-breakdown {
-            display: flex;
-            gap: 1rem;
-            justify-content: space-around;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--sand-deep);
-        }
-
-        .health-score-item {
-            flex: 1;
-            text-align: center;
-        }
-
-        .health-score-item-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .health-score-item-value {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--forest-deep);
-        }
-
-        /* Checklist Widget */
-        .checklist-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-            padding: 1rem;
-            border-bottom: 1px solid var(--sand-deep);
-            transition: background-color 0.2s ease;
-        }
-
-        .checklist-item:last-child {
-            border-bottom: none;
-        }
-
-        .checklist-item:hover {
-            background-color: var(--sand);
-        }
-
-        .checklist-checkbox {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--sand-deep);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            margin-top: 2px;
-            background-color: transparent;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .checklist-checkbox.completed {
-            background-color: #86c157;
-            border-color: #86c157;
-            color: white;
-        }
-
-        .checklist-content {
-            flex: 1;
-        }
-
-        .checklist-title {
-            font-weight: 600;
-            color: var(--text-dark);
-            font-size: 0.95rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .checklist-description {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .checklist-item.completed .checklist-title {
-            color: var(--text-muted);
-            text-decoration: line-through;
-        }
-
-        /* Activity Feed */
-        .activity-item {
-            display: flex;
-            gap: 1rem;
-            padding: 1rem;
-            border-bottom: 1px solid var(--sand-deep);
-        }
-
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            font-size: 1.2rem;
-            transition: transform 0.2s ease;
-        }
-
-        .activity-item:hover .activity-icon {
-            transform: scale(1.1);
-        }
-
-        .activity-icon.asset {
-            background-color: rgba(139, 195, 107, 0.2);
-            color: #86c157;
-        }
-
-        .activity-icon.executor {
-            background-color: rgba(61, 122, 90, 0.2);
-            color: var(--forest-light);
-        }
-
-        .activity-icon.will {
-            background-color: rgba(232, 217, 192, 0.5);
-            color: var(--forest-deep);
-        }
-
-        .activity-icon.switch {
-            background-color: rgba(245, 158, 11, 0.2);
-            color: #f59e0b;
-        }
-
-        .activity-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .activity-title {
-            font-weight: 600;
-            color: var(--text-dark);
-            font-size: 0.95rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .activity-meta {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .activity-time {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        /* Tip Box */
-        .tip-box {
-            padding: 1.5rem;
-            border: 1px solid var(--sand-deep);
-            border-radius: 8px;
-            text-align: center;
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, #fafaf8, var(--cream-light));
-            height: 100%;
-            backdrop-filter: blur(6px);
-        }
-
-        .tip-box:hover {
-            border-color: var(--forest-deep);
-            box-shadow: 0 2px 8px rgba(27, 58, 45, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .tip-icon {
-            font-size: 2rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .tip-box h5 {
-            font-weight: 700;
-            color: var(--forest-deep);
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
-        }
-
-        /* Progress Bar */
-        .progress-bar-custom {
-            height: 8px;
-            background-color: var(--sand);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 0.5rem;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #86c157 0%, #5da936 100%);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        /* Responsive: Tablet (560px - 900px) */
-        @media (max-width: 900px) {
-            .navbar {
-                padding: 0.75rem 0;
-            }
-
-            .navbar-brand {
-                font-size: 1.35rem;
-            }
-
-            .nav-link {
-                font-size: 0.9rem;
-                padding: 0.5rem 0.75rem !important;
-            }
-
-            .page-header h2 {
-                font-size: 1.5rem;
-            }
-
-            .stat-card {
-                padding: 1.5rem 1rem;
-            }
-
-            .card {
-                margin-bottom: 1.5rem;
-            }
-        }
-
-        /* Responsive: Mobile (<560px) */
-        @media (max-width: 560px) {
-            .navbar {
-                padding: 0.5rem 0;
-            }
-
-            .navbar-brand {
-                font-size: 1.2rem;
-            }
-
-            .nav-link {
-                font-size: 0.85rem;
-                padding: 0.5rem !important;
-            }
-
-            .btn-logout {
-                font-size: 0.8rem;
-                padding: 0.4rem 0.8rem !important;
-            }
-
-            .page-header h2 {
-                font-size: 1.3rem;
-            }
-
-            .page-header p {
-                font-size: 0.85rem;
-            }
-
-            .stat-card {
-                padding: 1.25rem 1rem;
-                margin-bottom: 0.75rem;
-            }
-
-            .stat-card h3 {
-                font-size: 0.8rem;
-            }
-
-            .stat-number, .stat-status {
-                font-size: 1.5rem;
-            }
-
-            .summary-item {
-                padding: 1.5rem 1rem;
-                min-height: 140px;
-            }
-
-            .summary-count {
-                font-size: 1.8rem;
-            }
-
-            .card-body {
-                padding: 1rem;
-            }
-
-            .card-header {
-                padding: 1rem;
-            }
-
-            .asset-card {
-                padding: 1rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/board.css?v=2">
 </head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid px-3 px-md-4">
-            <a class="navbar-brand" href="#dashboard"><svg width="160" height="40" viewBox="0 0 200 54" xmlns="http://www.w3.org/2000/svg" style="display: block; height: 40px; width: auto;"><rect x="0" y="6" width="40" height="40" rx="10" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.18)" stroke-width="1"/><rect x="9" y="14" width="22" height="17" rx="3.5" fill="none" stroke="#fdf6ec" stroke-width="1.8"/><path d="M9 21 L31 21" stroke="#fdf6ec" stroke-width="1.4" fill="none"/><rect x="12" y="24" width="5" height="4" rx="1" fill="#8cbf9c"/><rect x="19" y="24" width="5" height="4" rx="1" fill="#8cbf9c" opacity=".45"/><path d="M27 10 L27 15" stroke="#fdf6ec" stroke-width="1.8" stroke-linecap="round"/><circle cx="27" cy="9" r="3" fill="#fdf6ec"/><text x="49" y="29" font-family="'DM Serif Display', serif" font-size="22" fill="#fdf6ec">Digipass</text><text x="50" y="41" font-family="'DM Sans', sans-serif" font-size="8.5" fill="rgba(245,234,216,0.5)" letter-spacing="2.8">DIGITAL ESTATE</text></svg></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-page="dashboard" href="#dashboard">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-page="assets" href="#assets">Digital Assets</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-page="executors" href="#executors">Executors</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-page="will" href="#will">Digital Will</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-page="switch" href="#switch">Dead Man's Switch</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <div id="profileTrigger" onclick="toggleDropdown()">
-                            <div class="profile-avatar" id="profileInitial">A</div>
-                            <span class="profile-username" id="profileName">User</span>
-                            <svg class="profile-chevron" viewBox="0 0 24 24">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                            <div id="profileDropdown">
-                                <div class="dd-header">
-                                    <div class="dd-name" id="dropdownName">User Name</div>
-                                    <div class="dd-email" id="dropdownEmail">user@example.com</div>
-                                </div>
-                                <button class="dd-item" onclick="navigateToProfile()">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="12" cy="7" r="4"></circle>
-                                    </svg>
-                                    My Profile
-                                </button>
-                                <button class="dd-item" onclick="navigateToSettings()">
-                                    <svg viewBox="0 0 24 24">
-                                        <circle cx="12" cy="12" r="1"></circle>
-                                        <circle cx="19" cy="12" r="1"></circle>
-                                        <circle cx="5" cy="12" r="1"></circle>
-                                    </svg>
-                                    Settings
-                                </button>
-                                <button class="dd-item" onclick="navigateToActivity()">
-                                    <svg viewBox="0 0 24 24">
-                                        <polyline points="12 6 12 12 16 14"></polyline>
-                                        <circle cx="12" cy="12" r="9"></circle>
-                                    </svg>
-                                    Activity Log
-                                </button>
-                                <div class="dd-divider"></div>
-                                <button class="dd-item logout" onclick="closeDropdownAndLogout()">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M10 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M17 16l4-4m0 0l-4-4m4 4H7"></path>
-                                    </svg>
-                                    Logout
-                                </button>
-                            </div>
+<body class="board-body">
+    <!-- Kept for dashboard.js, which binds logout to this element -->
+    <button id="logoutBtn" type="button" hidden></button>
+
+    <div class="app">
+        <!-- Icon rail -->
+        <nav class="rail" aria-label="Primary">
+            <div class="rail-logo" aria-hidden="true">
+                <svg viewBox="0 0 40 40"><rect x="7" y="10" width="22" height="17" rx="3.5" fill="none" stroke="#fdf6ec" stroke-width="2"/><path d="M7 17 L29 17" stroke="#fdf6ec" stroke-width="1.6"/><rect x="10" y="20" width="5" height="4" rx="1" fill="#b7d8bf"/><rect x="17" y="20" width="5" height="4" rx="1" fill="#b7d8bf" opacity=".5"/><path d="M25 6 L25 11" stroke="#fdf6ec" stroke-width="2" stroke-linecap="round"/><circle cx="25" cy="5" r="2.6" fill="#fdf6ec"/></svg>
+            </div>
+            <div class="rail-group">
+                <a class="rail-btn active" data-page="dashboard" href="#dashboard" aria-label="Overview"><i class="fas fa-house"></i><span class="rail-tip">Overview</span></a>
+                <a class="rail-btn" data-page="assets" href="#assets" aria-label="Digital assets"><i class="fas fa-table-columns"></i><span class="rail-tip">Digital assets</span></a>
+                <a class="rail-btn" data-page="executors" href="#executors" aria-label="Executors"><i class="fas fa-user-group"></i><span class="rail-tip">Executors</span></a>
+                <a class="rail-btn" data-page="will" href="#will" aria-label="Digital will"><i class="fas fa-file-signature"></i><span class="rail-tip">Digital will</span></a>
+                <a class="rail-btn" data-page="switch" href="#switch" aria-label="Dead Man's Switch"><i class="fas fa-heart-pulse"></i><span class="rail-tip">Dead Man's Switch</span></a>
+            </div>
+            <div class="rail-spacer"></div>
+            <div class="rail-group">
+                <a class="rail-btn" href="/profile.html?tab=security" aria-label="Settings"><i class="fas fa-gear"></i><span class="rail-tip">Settings</span></a>
+                <div class="profile-menu">
+                    <button type="button" class="rail-avatar" id="profileTrigger" aria-haspopup="true" aria-expanded="false" aria-label="Account menu"><span id="profileInitial">U</span></button>
+                    <div class="profile-pop" id="profileDropdown" role="menu">
+                        <div class="pp-head">
+                            <div class="pp-name" id="dropdownName">User</div>
+                            <div class="pp-mail" id="dropdownEmail"></div>
                         </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    
-    <!-- Hidden logout button for backward compatibility with dashboard.js -->
-    <button id="logoutBtn" style="display: none;"></button>
-
-    <!-- Main Content -->
-    <main class="container-fluid px-3 px-md-4 py-4" style="padding-top: calc(1rem + 80px); margin-top: 0;">
-        <!-- User Info -->
-        <div id="userInfo" class="alert alert-light border mb-4">
-            <p class="mb-0">Welcome, <strong id="userName">User</strong>!</p>
-        </div>
-
-        <!-- Dashboard Page -->
-        <section id="dashboardPage" class="page active">
-            <div class="page-header mb-4">
-                <h2>Dashboard</h2>
-                <p>Overview of your digital estate</p>
-            </div>
-            <div class="row g-3">
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="stat-card">
-                        <h3>Digital Assets</h3>
-                        <p class="stat-number" id="assetCount">0</p>
-                        <a data-page="assets" href="#assets" class="btn btn-primary btn-sm">Manage Assets</a>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="stat-card">
-                        <h3>Executors</h3>
-                        <p class="stat-number" id="executorCount">0</p>
-                        <a data-page="executors" href="#executors" class="btn btn-primary btn-sm">Manage Executors</a>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="stat-card">
-                        <h3>Digital Will</h3>
-                        <p class="stat-number" id="willCount">0</p>
-                        <a data-page="will" href="#will" class="btn btn-primary btn-sm">Create Will</a>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="stat-card">
-                        <h3>Dead Man's Switch</h3>
-                        <p class="stat-status" id="switchStatus">Inactive</p>
-                        <a data-page="switch" href="#switch" class="btn btn-primary btn-sm">Configure</a>
+                        <a href="/profile.html" role="menuitem"><i class="fas fa-user"></i>My profile</a>
+                        <a href="/profile.html?tab=activity" role="menuitem"><i class="fas fa-clock-rotate-left"></i>Activity log</a>
+                        <button type="button" class="danger" role="menuitem" onclick="document.getElementById('logoutBtn').click()"><i class="fas fa-arrow-right-from-bracket"></i>Log out</button>
                     </div>
                 </div>
             </div>
+        </nav>
 
-            <!-- Health Score Widget -->
-            <div class="row g-4 mt-2">
-                <div class="col-12 col-lg-4">
-                    <div class="card">
-                        <div class="card-body health-score-container">
-                            <div class="health-score-label">Estate Health Score</div>
-                            <div class="health-score-circle score-high" id="healthScoreCircle">72</div>
-                            <p class="text-muted mb-3" id="healthScoreStatus">Good Progress</p>
-                            <div class="health-score-breakdown">
-                                <div class="health-score-item">
-                                    <div class="health-score-item-label">Assets</div>
-                                    <div class="health-score-item-value" id="scoreAssets">4</div>
-                                </div>
-                                <div class="health-score-item">
-                                    <div class="health-score-item-label">Executors</div>
-                                    <div class="health-score-item-value" id="scoreExecutors">1</div>
-                                </div>
-                                <div class="health-score-item">
-                                    <div class="health-score-item-label">Completion</div>
-                                    <div class="health-score-item-value" id="scoreCompletion">60%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Secondary panel -->
+        <aside class="panel" id="sidePanel" aria-label="Estate">
+            <div class="panel-heading"><h2>Your estate</h2></div>
+            <ul class="panel-nav">
+                <li><a data-page="dashboard" href="#dashboard" class="active"><i class="fas fa-seedling"></i>Overview<span class="count tnum" id="navCountReady">0%</span></a></li>
+                <li><a data-page="assets" href="#assets"><i class="fas fa-key"></i>Digital assets<span class="count tnum" id="navCountAssets">0</span></a></li>
+                <li><a data-page="executors" href="#executors"><i class="fas fa-user-shield"></i>Executors<span class="count tnum" id="navCountExecutors">0</span></a></li>
+                <li><a data-page="will" href="#will"><i class="fas fa-scroll"></i>Digital will<span class="count" id="navCountWill">–</span></a></li>
+                <li><a data-page="switch" href="#switch"><i class="fas fa-heart-pulse"></i>Dead Man's Switch<span class="count" id="navCountSwitch">–</span></a></li>
+            </ul>
 
-                <!-- Checklist Widget -->
-                <div class="col-12 col-lg-4">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="mb-0">Setup Checklist</h3>
-                            <span class="badge bg-primary" id="checklistProgress">3/5</span>
-                        </div>
-                        <div class="card-body p-0">
-                            <div id="checklistContainer">
-                                <!-- Will be populated by JavaScript -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity Widget -->
-                <div class="col-12 col-lg-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="mb-0">Recent Activity</h3>
-                        </div>
-                        <div class="card-body p-0">
-                            <div id="activityFeed">
-                                <!-- Will be populated by JavaScript -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tips to Increase Score -->
-            <div class="row g-4 mt-2">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="mb-0">Tips to Increase Your Health Score</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="tip-box">
-                                        <div class="tip-icon"></div>
-                                        <h5>Add More Assets</h5>
-                                        <p class="text-muted small mb-0">Add all your digital accounts (up to 4 assets = 20 points)</p>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="tip-box">
-                                        <div class="tip-icon"></div>
-                                        <h5>Designate an Executor</h5>
-                                        <p class="text-muted small mb-0">Assign a trusted person to manage your estate (20 points)</p>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="tip-box">
-                                        <div class="tip-icon"></div>
-                                        <h5>Generate Your Will</h5>
-                                        <p class="text-muted small mb-0">Create an official digital will PDF (30 points)</p>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="tip-box">
-                                        <div class="tip-icon"></div>
-                                        <h5>Activate Check-ins</h5>
-                                        <p class="text-muted small mb-0">Enable Dead Man's Switch (30 points)</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Assets Page -->
-        <section id="assetsPage" class="page">
-            <div class="page-header mb-4">
-                <h2>Digital Assets</h2>
-                <p>Manage accounts and decide what happens to them after you</p>
-            </div>
-            <div class="row g-4">
-                <!-- Add Asset Form -->
-                <div class="col-12 col-lg-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h3 class="card-title mb-3">Add Digital Asset</h3>
-                            <form id="assetForm">
-                                <!-- Platform Selection -->
-                                <div class="mb-3">
-                                    <label for="platformName" class="form-label">Platform/Service</label>
-                                    <!-- Hidden native select for form submission -->
-                                    <select class="form-select platform-select" id="platformName" name="platformName" required style="display: none;">
-                                        <option value="">Choose a platform...</option>
-                                        <option value="Instagram">Instagram</option>
-                                        <option value="Facebook">Facebook</option>
-                                        <option value="Twitter">Twitter</option>
-                                        <option value="LinkedIn">LinkedIn</option>
-                                        <option value="Gmail">Gmail</option>
-                                        <option value="Outlook">Outlook</option>
-                                        <option value="PayPal">PayPal</option>
-                                        <option value="Google Pay">Google Pay</option>
-                                        <option value="Google Drive">Google Drive</option>
-                                        <option value="Netflix">Netflix</option>
-                                        <option value="Disney+">Disney+</option>
-                                    </select>
-
-                                    <!-- Custom Dropdown -->
-                                    <div class="custom-platform-dropdown">
-                                        <button type="button" class="platform-dropdown-trigger" id="platformDropdownTrigger">
-                                            <span class="platform-icon-display">
-                                                <i class="fas fa-chevron-down"></i>
-                                            </span>
-                                            <span class="platform-text-display">Choose a platform...</span>
-                                            <i class="fas fa-chevron-down dropdown-arrow"></i>
-                                        </button>
-                                        <div class="platform-dropdown-menu" id="platformDropdownMenu">
-                                            <div class="dropdown-section">
-                                                <div class="dropdown-section-title">Social Media</div>
-                                                <button type="button" class="platform-option" data-value="Instagram" data-icon="fab fa-instagram">
-                                                    <i class="fab fa-instagram"></i>
-                                                    <span>Instagram</span>
-                                                </button>
-                                                <button type="button" class="platform-option" data-value="Facebook" data-icon="fab fa-facebook">
-                                                    <i class="fab fa-facebook"></i>
-                                                    <span>Facebook</span>
-                                                </button>
-                                                <button type="button" class="platform-option" data-value="Twitter" data-icon="fab fa-twitter">
-                                                    <i class="fab fa-twitter"></i>
-                                                    <span>Twitter (X)</span>
-                                                </button>
-                                                <button type="button" class="platform-option" data-value="LinkedIn" data-icon="fab fa-linkedin">
-                                                    <i class="fab fa-linkedin"></i>
-                                                    <span>LinkedIn</span>
-                                                </button>
-                                            </div>
-
-                                            <div class="dropdown-section">
-                                                <div class="dropdown-section-title">Email</div>
-                                                <button type="button" class="platform-option" data-value="Gmail" data-icon="fas fa-envelope">
-                                                    <i class="fas fa-envelope"></i>
-                                                    <span>Gmail</span>
-                                                </button>
-                                                <button type="button" class="platform-option" data-value="Outlook" data-icon="fas fa-envelope">
-                                                    <i class="fas fa-envelope"></i>
-                                                    <span>Outlook</span>
-                                                </button>
-                                            </div>
-
-                                            <div class="dropdown-section">
-                                                <div class="dropdown-section-title">Finance</div>
-                                                <button type="button" class="platform-option" data-value="PayPal" data-icon="fab fa-paypal">
-                                                    <i class="fab fa-paypal"></i>
-                                                    <span>PayPal</span>
-                                                </button>
-                                                <button type="button" class="platform-option" data-value="Google Pay" data-icon="fab fa-google">
-                                                    <i class="fab fa-google"></i>
-                                                    <span>Google Pay</span>
-                                                </button>
-                                            </div>
-
-                                            <div class="dropdown-section">
-                                                <div class="dropdown-section-title">Storage</div>
-                                                <button type="button" class="platform-option" data-value="Google Drive" data-icon="fab fa-google-drive">
-                                                    <i class="fab fa-google-drive"></i>
-                                                    <span>Google Drive</span>
-                                                </button>
-                                            </div>
-
-                                            <div class="dropdown-section">
-                                                <div class="dropdown-section-title">Entertainment</div>
-                                                <button type="button" class="platform-option" data-value="Netflix" data-icon="fas fa-tv">
-                                                    <i class="fas fa-tv"></i>
-                                                    <span>Netflix</span>
-                                                </button>
-                                                <button type="button" class="platform-option" data-value="Disney+" data-icon="fas fa-play-circle">
-                                                    <i class="fas fa-play-circle"></i>
-                                                    <span>Disney+</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Account Identifier -->
-                                <div class="mb-3">
-                                    <label for="accountIdentifier" class="form-label">Email or Username</label>
-                                    <input type="text" class="form-control" id="accountIdentifier" name="accountIdentifier" placeholder="your@email.com or username" required>
-                                </div>
-
-                                <!-- Password -->
-                                <div class="mb-3">
-                                    <label for="accountPassword" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="accountPassword" name="accountPassword" placeholder="Enter account password" required>
-                                    <small class="text-muted d-block mt-2">Your executor will need this to access the account. It will be stored securely.</small>
-                                </div>
-
-                                <!-- Action Type Selection -->
-                                <div class="mb-3">
-                                    <label class="form-label">After You: What Should Happen?</label>
-                                    <div class="btn-group w-100" role="group">
-                                        <input type="radio" class="btn-check" name="actionType" id="actionPass" value="pass" required>
-                                        <label class="btn btn-outline-primary" for="actionPass">
-                                            Pass to Executor
-                                        </label>
-
-                                        <input type="radio" class="btn-check" name="actionType" id="actionDelete" value="delete" required>
-                                        <label class="btn btn-outline-primary" for="actionDelete">
-                                            Delete Account
-                                        </label>
-
-                                        <input type="radio" class="btn-check" name="actionType" id="actionMessage" value="last_message" required>
-                                        <label class="btn btn-outline-primary" for="actionMessage">
-                                            Final Message
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- Conditional Message Field -->
-                                <div class="mb-3" id="messageContainer" style="display: none;">
-                                    <label for="lastMessage" class="form-label">Your Final Message (optional)</label>
-                                    <textarea class="form-control" id="lastMessage" name="lastMessage" rows="3" placeholder="Write a final message to your loved ones..."></textarea>
-                                    <small class="text-muted d-block mt-2">This message will be shared with executors or account heirs.</small>
-                                </div>
-
-                                <button type="submit" id="assetSubmitBtn" class="btn btn-primary w-100">Add Asset</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Assets List -->
-                <div class="col-12 col-lg-6">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="mb-0">Your Assets</h3>
-                            <button type="button" id="refreshAssetsBtn" class="btn btn-secondary btn-sm">Refresh</button>
-                        </div>
-                        <div class="card-body">
-                            <p id="assetsStatus" class="text-muted">Loading assets...</p>
-                            <div id="assetsList"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Executors Page -->
-        <section id="executorsPage" class="page">
-            <div class="page-header mb-4">
+            <div class="panel-heading">
                 <h2>Executors</h2>
-                <p>Designate people to manage your digital estate</p>
+                <a data-page="executors" href="#executors">View all</a>
             </div>
-            <div class="row g-4">
-                <!-- Add Executor Form -->
-                <div class="col-12 col-lg-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h3 class="card-title mb-3">Add Executor</h3>
-                            <form id="executorForm">
-                                <div class="mb-3">
-                                    <label for="executorName" class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" id="executorName" name="executorName" placeholder="e.g. Priya Sharma" required>
+            <ul class="people" id="panelPeople">
+                <li class="people-empty">Loading…</li>
+            </ul>
+
+            <div class="promo" id="promoCard">
+                <h3>Check in to stay in control</h3>
+                <p id="promoText">Your executors are only told if you stop checking in.</p>
+                <div class="promo-meter" aria-hidden="true"><span id="promoMeter"></span></div>
+                <button type="button" class="promo-btn" id="promoCheckIn" onclick="manualCheckIn(this)">
+                    <span>Check in now</span><span class="chev"><i class="fas fa-chevron-right"></i></span>
+                </button>
+            </div>
+        </aside>
+        <div class="panel-scrim" id="panelScrim" onclick="togglePanel(false)"></div>
+
+        <main class="main" id="main">
+            <!-- ============ Overview ============ -->
+            <section id="dashboardPage" class="page active" aria-labelledby="overviewTitle">
+                <header class="topbar">
+                    <button type="button" class="pill menu-toggle" onclick="togglePanel(true)" aria-label="Open estate menu"><i class="fas fa-bars"></i></button>
+                    <div class="topbar-title">
+                        <h1 id="overviewTitle">Welcome back, <span id="userName">there</span></h1>
+                        <p>Here is how ready your digital estate is.</p>
+                    </div>
+                    <div class="topbar-end">
+                        <button type="button" class="pill pill-outline" onclick="openExecutorDrawer()"><i class="fas fa-user-plus"></i>Invite executor</button>
+                    </div>
+                </header>
+
+                <div class="strip" aria-live="polite">
+                    <div>
+                        <div class="strip-label">Estate readiness</div>
+                        <div class="strip-value"><span id="healthScoreCircle">0</span>% <span class="strip-label" id="healthScoreStatus">Getting started</span></div>
+                    </div>
+                    <div class="strip-meter"><div class="meter"><span id="healthMeter"></span></div></div>
+                    <div class="strip-facts">
+                        <span class="strip-fact"><strong id="assetCount">0</strong> assets</span>
+                        <span class="strip-fact"><strong id="executorCount">0</strong> executors</span>
+                        <span class="strip-fact">Will <strong id="willCount">0</strong></span>
+                        <span class="strip-fact">Switch <strong id="switchStatus">–</strong></span>
+                    </div>
+                </div>
+
+                <div class="board-scroll">
+                    <div class="board" style="--cols:3">
+                        <div class="column">
+                            <div class="column-head"><span class="dot" style="--dot:var(--sand-deep)"></span><h2>Still to do</h2><span class="col-count" id="todoCount">0</span></div>
+                            <div class="column-body" id="checklistTodo"><div class="skeleton"></div></div>
+                        </div>
+                        <div class="column">
+                            <div class="column-head"><span class="dot" style="--dot:var(--forest-light)"></span><h2>Done</h2><span class="col-count" id="checklistProgress">0/5</span></div>
+                            <div class="column-body" id="checklistDone"><div class="skeleton"></div></div>
+                        </div>
+                        <div class="column">
+                            <div class="column-head"><span class="dot" style="--dot:var(--forest-deep)"></span><h2>Recent activity</h2></div>
+                            <div class="bcard"><ul class="activity" id="activityFeed"><li><div class="skeleton" style="height:40px;width:100%"></div></li></ul></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ Digital assets ============ -->
+            <section id="assetsPage" class="page" aria-labelledby="assetsTitle">
+                <header class="topbar">
+                    <button type="button" class="pill menu-toggle" onclick="togglePanel(true)" aria-label="Open estate menu"><i class="fas fa-bars"></i></button>
+                    <div class="topbar-title">
+                        <h1 id="assetsTitle">Digital assets</h1>
+                        <p>Each account sits in the column of what should happen to it.</p>
+                    </div>
+                    <div class="view-tabs" role="tablist" aria-label="Asset view">
+                        <button type="button" class="view-tab" role="tab" aria-selected="true" data-asset-view="board"><i class="fas fa-table-columns"></i>Board</button>
+                        <button type="button" class="view-tab" role="tab" aria-selected="false" data-asset-view="list"><i class="fas fa-list"></i>List</button>
+                    </div>
+                    <div class="topbar-end">
+                        <button type="button" class="pill pill-outline" onclick="openExecutorDrawer()"><i class="fas fa-user-plus"></i>Invite executor</button>
+                    </div>
+                </header>
+
+                <div class="toolbar">
+                    <label class="search-pill">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <span class="visually-hidden">Search assets</span>
+                        <input type="search" id="assetSearch" placeholder="Search accounts…" autocomplete="off">
+                    </label>
+                    <div class="more">
+                        <button type="button" class="pill" id="assetCategoryBtn" aria-haspopup="true" aria-expanded="false"><i class="fas fa-sliders"></i><span id="assetCategoryLabel">All categories</span></button>
+                        <div class="more-menu" id="assetCategoryMenu" role="menu">
+                            <button type="button" data-category="">All categories</button>
+                            <button type="button" data-category="social"><i class="fas fa-hashtag"></i>Social</button>
+                            <button type="button" data-category="email"><i class="fas fa-envelope"></i>Email</button>
+                            <button type="button" data-category="finance"><i class="fas fa-wallet"></i>Finance</button>
+                            <button type="button" data-category="storage"><i class="fas fa-cloud"></i>Storage</button>
+                            <button type="button" data-category="entertainment"><i class="fas fa-tv"></i>Entertainment</button>
+                            <button type="button" data-category="other"><i class="fas fa-shapes"></i>Other</button>
+                        </div>
+                    </div>
+                    <button type="button" class="pill" id="refreshAssetsBtn"><i class="fas fa-rotate"></i>Refresh</button>
+                    <div class="toolbar-end">
+                        <button type="button" class="pill pill-primary" onclick="openAssetDrawer()"><i class="fas fa-plus"></i>Add asset</button>
+                    </div>
+                </div>
+                <p id="assetsStatus" class="visually-hidden" aria-live="polite">Loading assets…</p>
+
+                <div class="board-scroll">
+                    <div id="assetsList">
+                        <div class="board" style="--cols:3">
+                            <div class="column"><div class="skeleton"></div></div>
+                            <div class="column"><div class="skeleton"></div></div>
+                            <div class="column"><div class="skeleton"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ Executors ============ -->
+            <section id="executorsPage" class="page" aria-labelledby="executorsTitle">
+                <header class="topbar">
+                    <button type="button" class="pill menu-toggle" onclick="togglePanel(true)" aria-label="Open estate menu"><i class="fas fa-bars"></i></button>
+                    <div class="topbar-title">
+                        <h1 id="executorsTitle">Executors</h1>
+                        <p>The people you trust to carry out your wishes.</p>
+                    </div>
+                </header>
+
+                <div class="toolbar">
+                    <label class="search-pill">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <span class="visually-hidden">Search executors</span>
+                        <input type="search" id="executorSearch" placeholder="Search people…" autocomplete="off">
+                    </label>
+                    <button type="button" class="pill" id="refreshExecutorsBtn"><i class="fas fa-rotate"></i>Refresh</button>
+                    <div class="toolbar-end">
+                        <button type="button" class="pill pill-primary" onclick="openExecutorDrawer()"><i class="fas fa-user-plus"></i>Invite executor</button>
+                    </div>
+                </div>
+                <p id="executorsStatus" class="visually-hidden" aria-live="polite">Loading executors…</p>
+
+                <div class="board-scroll">
+                    <div id="executorsList">
+                        <div class="board" style="--cols:3">
+                            <div class="column"><div class="skeleton"></div></div>
+                            <div class="column"><div class="skeleton"></div></div>
+                            <div class="column"><div class="skeleton"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ Digital will ============ -->
+            <section id="willPage" class="page" aria-labelledby="willTitle">
+                <header class="topbar">
+                    <button type="button" class="pill menu-toggle" onclick="togglePanel(true)" aria-label="Open estate menu"><i class="fas fa-bars"></i></button>
+                    <div class="topbar-title">
+                        <h1 id="willTitle">Digital will</h1>
+                        <p>An official PDF record of your accounts and the people who will handle them.</p>
+                    </div>
+                </header>
+
+                <div class="toolbar">
+                    <button type="button" class="pill" id="refreshWillBtn"><i class="fas fa-rotate"></i>Refresh</button>
+                    <button type="button" class="pill" id="editWillBtn" onclick="openEditWillModal()"><i class="fas fa-pen"></i>Edit personal message</button>
+                    <div class="toolbar-end">
+                        <button type="button" class="pill pill-primary" id="generateWillBtn"><i class="fas fa-file-arrow-down"></i>Generate PDF</button>
+                    </div>
+                </div>
+                <p id="willDetails" class="visually-hidden" aria-live="polite">Loading will information…</p>
+
+                <div class="board-scroll">
+                    <div class="board" style="--cols:3">
+                        <div class="column">
+                            <div class="column-head"><span class="dot" style="--dot:var(--forest-light)"></span><h2>Accounts in your will</h2><span class="col-count" id="willAssetCount">0</span></div>
+                            <div class="column-body" id="willAssetsCol"><div class="skeleton"></div></div>
+                        </div>
+                        <div class="column">
+                            <div class="column-head"><span class="dot" style="--dot:var(--sand-deep)"></span><h2>Executors named</h2><span class="col-count" id="willExecutorCount">0</span></div>
+                            <div class="column-body" id="willExecutorsCol"><div class="skeleton"></div></div>
+                        </div>
+                        <div class="column">
+                            <div class="column-head"><span class="dot" style="--dot:var(--forest-deep)"></span><h2>Document</h2></div>
+                            <div class="bcard">
+                                <div class="tags"><span class="tag tag-neutral"><i class="fas fa-file-pdf"></i>PDF</span><span class="tag tag-pass" id="willStatus">Ready to generate</span></div>
+                                <div class="bcard-title">Digital will</div>
+                                <p class="bcard-desc">Generating creates a fresh PDF from everything on this page and downloads it.</p>
+                                <div id="willStatusBar" class="will-progress" hidden>
+                                    <div class="meter-row"><span>Generating</span><span id="willStatusText">0%</span></div>
+                                    <div class="meter"><span id="willStatusFill"></span></div>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="executorEmail" class="form-label">Email Address</label>
-                                    <input type="email" class="form-control" id="executorEmail" name="executorEmail" placeholder="executor@example.com" required>
+                            </div>
+                            <div class="bcard">
+                                <div class="bcard-title" style="font-size:14px">What the PDF includes</div>
+                                <ul class="steps-list">
+                                    <li>Every account and the action you chose for it</li>
+                                    <li>Your executors and whether they have access</li>
+                                    <li>Your personal message, if you wrote one</li>
+                                </ul>
+                            </div>
+                            <div id="willContent" hidden></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ Dead Man's Switch ============ -->
+            <section id="switchPage" class="page" aria-labelledby="switchTitle">
+                <header class="topbar">
+                    <button type="button" class="pill menu-toggle" onclick="togglePanel(true)" aria-label="Open estate menu"><i class="fas fa-bars"></i></button>
+                    <div class="topbar-title">
+                        <h1 id="switchTitle">Dead Man's Switch</h1>
+                        <p>Check in now and then. Your executors are only told if you stop.</p>
+                    </div>
+                </header>
+
+                <div class="board-scroll">
+                    <div class="board" style="--cols:3">
+                        <div class="column">
+                            <div class="column-head"><span class="dot" style="--dot:var(--forest-light)"></span><h2>Status</h2></div>
+                            <div class="bcard">
+                                <div id="switchStatusLoading"><div class="skeleton" style="height:160px"></div></div>
+                                <div id="switchStatusContent" style="display:none">
+                                    <div class="tags"><span id="dmsStatus" class="tag tag-pass">Active</span></div>
+                                    <div class="bcard-title" style="margin-top:6px"><span><span id="dmsDaysUntil" class="tnum">0</span> days left</span></div>
+                                    <div class="meter-row"><span>Before your executors are told</span><span id="dmsDaysLeftPct">–</span></div>
+                                    <div class="meter"><span id="dmsMeter"></span></div>
+                                    <dl class="kv" style="margin-top:8px">
+                                        <dt>Check-in interval</dt><dd><span id="dmsInterval">30</span> days</dd>
+                                        <dt>Last check-in</dt><dd id="dmsLastCheckin">–</dd>
+                                    </dl>
+                                    <div class="note" style="margin-top:6px"><i class="fas fa-circle-info"></i><span>If you don't check in within <span id="alertDays">30</span> days, your executors are notified and given access to your accounts.</span></div>
+                                    <button id="checkInBtn" type="button" class="btn-forest btn-block" style="margin-top:6px" onclick="manualCheckIn(this)"><i class="fas fa-circle-check"></i>Check in now</button>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="executorPhone" class="form-label">Phone Number</label>
-                                    <input type="text" class="form-control" id="executorPhone" name="executorPhone" placeholder="+91 98765 43210">
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="column-head"><span class="dot" style="--dot:var(--sand-deep)"></span><h2>Check-in interval</h2></div>
+                            <form class="bcard" id="intervalForm" onsubmit="updateCheckInterval(event)">
+                                <label for="intervalDays" class="form-label">Check in at least every</label>
+                                <div style="display:flex;align-items:center;gap:8px">
+                                    <input type="number" id="intervalDays" class="form-control" min="7" max="365" value="30" required style="max-width:120px">
+                                    <span class="bcard-desc">days</span>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="executorRelationship" class="form-label">Relationship</label>
-                                    <input type="text" class="form-control" id="executorRelationship" name="executorRelationship" placeholder="e.g. Sister, Lawyer, Friend">
-                                </div>
-                                <button type="submit" id="executorSubmitBtn" class="btn btn-primary w-100">Save Executor</button>
+                                <p class="form-hint">Anywhere from 7 days (weekly) to 365 days (yearly).</p>
+                                <button type="submit" class="btn-soft btn-block"><i class="fas fa-floppy-disk"></i>Save interval</button>
                             </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Executors List -->
-                <div class="col-12 col-lg-6">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="mb-0">Your Executors</h3>
-                            <button type="button" id="refreshExecutorsBtn" class="btn btn-secondary btn-sm">Refresh</button>
-                        </div>
-                        <div class="card-body">
-                            <p id="executorsStatus" class="text-muted">Loading executors...</p>
-                            <div id="executorsList"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Will Page -->
-        <section id="willPage" class="page">
-            <div class="page-header mb-4">
-                <h2>Digital Will</h2>
-                <p>Create an official record of your digital assets and executors</p>
-            </div>
-            <div class="row g-4">
-                <!-- Will Information -->
-                <div class="col-12 col-lg-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h3 class="card-title mb-3">Will Information</h3>
-                            <p class="text-muted mb-4">
-                                Your digital will is a comprehensive record of all your digital assets and designated executors. 
-                                Generate a PDF to create an official, downloadable document.
-                            </p>
-                            
-                            <div class="row g-3 mb-4">
-                                <div class="col-12 col-sm-6 col-md-4">
-                                    <div class="summary-item">
-                                        <h4>Assets</h4>
-                                        <p class="summary-count" id="willAssetCount">0</p>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6 col-md-4">
-                                    <div class="summary-item">
-                                        <h4>Executors</h4>
-                                        <p class="summary-count" id="willExecutorCount">0</p>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6 col-md-4">
-                                    <div class="summary-item">
-                                        <h4>Status</h4>
-                                        <p class="summary-count" id="willStatus">Ready</p>
-                                        <div class="will-status-bar" id="willStatusBar">
-                                            <div class="will-status-fill" id="willStatusFill"></div>
-                                        </div>
-                                        <div class="will-status-text" id="willStatusText"></div>
-                                    </div>
-                                </div>
+                            <div class="bcard">
+                                <div class="bcard-title" style="font-size:14px">How it works</div>
+                                <ul class="steps-list">
+                                    <li>Choose how often you'll check in</li>
+                                    <li>Check in from here or from the card in the sidebar</li>
+                                    <li>Miss the window and your executors are notified</li>
+                                    <li>They can then follow your instructions for each account</li>
+                                </ul>
                             </div>
-
-                            <button type="button" id="generateWillBtn" class="btn btn-primary w-100">
-                                Generate Digital Will (PDF)
-                            </button>
-                            <button type="button" id="editWillBtn" class="btn btn-secondary w-100 mt-2" data-bs-toggle="modal" data-bs-target="#editWillModal">
-                                Edit Will Content
-                            </button>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Will Details -->
-                <div class="col-12 col-lg-6">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="mb-0">Will Details</h3>
-                            <button type="button" id="refreshWillBtn" class="btn btn-secondary btn-sm">Refresh</button>
-                        </div>
-                        <div class="card-body">
-                            <p id="willDetails" class="text-muted">Loading will information...</p>
-                            <div id="willContent"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Dead Man's Switch Page -->
-        <section id="switchPage" class="page">
-            <div class="page-header mb-4">
-                <h2>Dead Man's Switch</h2>
-                <p>Automated check-ins and executor notifications</p>
-            </div>
-            <div class="row">
-                <div class="col-12 col-lg-8">
-                    <div class="card mb-4">
-                        <div class="card-header bg-light border-bottom">
-                            <h5 class="mb-0">Check-In Status</h5>
-                        </div>
-                        <div class="card-body">
-                            <div id="switchStatusLoading" class="text-center py-4">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                            <div id="switchStatusContent" style="display: none;">
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <p class="text-muted mb-1">Current Status</p>
-                                        <p class="fs-5 fw-bold"><span id="dmsStatus" class="badge bg-success">Active</span></p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p class="text-muted mb-1">Check Interval</p>
-                                        <p class="fs-5 fw-bold"><span id="dmsInterval">30</span> days</p>
-                                    </div>
-                                </div>
-                                <hr class="my-3">
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <p class="text-muted mb-1">Last Check-in</p>
-                                        <p class="fs-6" id="dmsLastCheckin">-</p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p class="text-muted mb-1">Days Until Alert</p>
-                                        <p class="fs-6"><span id="dmsDaysUntil" class="badge bg-warning">0</span> days</p>
-                                    </div>
-                                </div>
-                                <div class="alert alert-info mt-4" role="alert">
-                                    <i class="fas fa-info-circle"></i> If you don't check in within <span id="alertDays">30</span> days, your designated executors will be notified and granted access to your digital assets.
+                        <div class="column">
+                            <div class="column-head"><span class="dot" style="--dot:var(--forest-deep)"></span><h2>Who gets told</h2></div>
+                            <div class="bcard">
+                                <div id="executorListLoading"><div class="skeleton" style="height:80px"></div></div>
+                                <div id="executorListContent" style="display:none">
+                                    <ul class="people" id="executorList" style="margin:0"></ul>
+                                    <p id="noExecutors" class="bcard-desc">No executors yet. <a href="#executors" data-page="executors">Invite someone</a> so the switch has someone to notify.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="card mb-4">
-                        <div class="card-header bg-light border-bottom">
-                            <h5 class="mb-0">Quick Actions</h5>
-                        </div>
-                        <div class="card-body">
-                            <button id="checkInBtn" class="btn btn-primary btn-lg w-100 mb-3" onclick="manualCheckIn()">
-                                <i class="fas fa-check-circle"></i> Check In Now
-                            </button>
-                            <p class="text-muted text-center text-sm">Confirm that you're okay and reset the countdown timer</p>
-                        </div>
-                    </div>
-
-                    <div class="card mb-4">
-                        <div class="card-header bg-light border-bottom">
-                            <h5 class="mb-0">Update Check Interval</h5>
-                        </div>
-                        <div class="card-body">
-                            <form id="intervalForm" onsubmit="updateCheckInterval(event)">
-                                <div class="mb-3">
-                                    <label for="intervalDays" class="form-label">Check-in Required Every (days)</label>
-                                    <input 
-                                        type="number" 
-                                        id="intervalDays" 
-                                        class="form-control form-control-lg" 
-                                        min="7" 
-                                        max="365" 
-                                        value="30"
-                                        required>
-                                    <small class="form-text text-muted d-block mt-2">
-                                        Range: 7 days (weekly) to 365 days (yearly). After this period without checking in, your executors will be notified.
-                                    </small>
-                                </div>
-                                <button type="submit" class="btn btn-outline-primary w-100">
-                                    <i class="fas fa-save"></i> Save New Interval
-                                </button>
-                            </form>
-                        </div>
-                    </div>
                 </div>
+            </section>
+        </main>
+    </div>
 
-                <div class="col-12 col-lg-4">
-                    <div class="card">
-                        <div class="card-header bg-light border-bottom">
-                            <h5 class="mb-0">Designated Executors</h5>
-                        </div>
-                        <div class="card-body">
-                            <div id="executorListLoading" class="text-center py-4">
-                                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                            <div id="executorListContent" style="display: none;">
-                                <div id="executorList"></div>
-                                <p id="noExecutors" class="text-muted text-sm text-center">No executors assigned yet</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card mt-4">
-                        <div class="card-header bg-light border-bottom">
-                            <h5 class="mb-0">How It Works</h5>
-                        </div>
-                        <div class="card-body">
-                            <ol class="small mb-0">
-                                <li class="mb-2">Set your check-in interval (default: 30 days)</li>
-                                <li class="mb-2">Check in regularly to confirm your status</li>
-                                <li class="mb-2">If inactive for the set period, executors are notified</li>
-                                <li class="mb-2">Executors gain access to your digital assets</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
+    <!-- ============ Add asset drawer ============ -->
+    <div class="offcanvas offcanvas-end drawer" tabindex="-1" id="assetDrawer" aria-labelledby="assetDrawerTitle">
+        <div class="offcanvas-header">
+            <div>
+                <h2 class="offcanvas-title" id="assetDrawerTitle">Add an account</h2>
+                <p class="drawer-sub">Record the account and decide what happens to it.</p>
             </div>
-        </section>
-    </main>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <form id="assetForm">
+                <div class="field">
+                    <label for="platformName" class="form-label">Platform</label>
+                    <select class="form-select" id="platformName" name="platformName" required hidden>
+                        <option value="">Choose a platform...</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="Twitter">Twitter</option>
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="Gmail">Gmail</option>
+                        <option value="Outlook">Outlook</option>
+                        <option value="PayPal">PayPal</option>
+                        <option value="Google Pay">Google Pay</option>
+                        <option value="Google Drive">Google Drive</option>
+                        <option value="Netflix">Netflix</option>
+                        <option value="Disney+">Disney+</option>
+                    </select>
+                    <div class="custom-platform-dropdown">
+                        <button type="button" class="platform-dropdown-trigger" id="platformDropdownTrigger" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="platform-icon-display"><i class="fas fa-layer-group"></i></span>
+                            <span class="platform-text-display">Choose a platform…</span>
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        </button>
+                        <div class="platform-dropdown-menu" id="platformDropdownMenu" role="listbox">
+                            <div class="dropdown-section">
+                                <div class="dropdown-section-title">Social</div>
+                                <button type="button" class="platform-option" data-value="Instagram" data-icon="fab fa-instagram"><i class="fab fa-instagram"></i><span>Instagram</span></button>
+                                <button type="button" class="platform-option" data-value="Facebook" data-icon="fab fa-facebook"><i class="fab fa-facebook"></i><span>Facebook</span></button>
+                                <button type="button" class="platform-option" data-value="Twitter" data-icon="fab fa-twitter"><i class="fab fa-twitter"></i><span>Twitter (X)</span></button>
+                                <button type="button" class="platform-option" data-value="LinkedIn" data-icon="fab fa-linkedin"><i class="fab fa-linkedin"></i><span>LinkedIn</span></button>
+                            </div>
+                            <div class="dropdown-section">
+                                <div class="dropdown-section-title">Email</div>
+                                <button type="button" class="platform-option" data-value="Gmail" data-icon="fas fa-envelope"><i class="fas fa-envelope"></i><span>Gmail</span></button>
+                                <button type="button" class="platform-option" data-value="Outlook" data-icon="fas fa-envelope"><i class="fas fa-envelope"></i><span>Outlook</span></button>
+                            </div>
+                            <div class="dropdown-section">
+                                <div class="dropdown-section-title">Finance</div>
+                                <button type="button" class="platform-option" data-value="PayPal" data-icon="fab fa-paypal"><i class="fab fa-paypal"></i><span>PayPal</span></button>
+                                <button type="button" class="platform-option" data-value="Google Pay" data-icon="fab fa-google"><i class="fab fa-google"></i><span>Google Pay</span></button>
+                            </div>
+                            <div class="dropdown-section">
+                                <div class="dropdown-section-title">Storage</div>
+                                <button type="button" class="platform-option" data-value="Google Drive" data-icon="fab fa-google-drive"><i class="fab fa-google-drive"></i><span>Google Drive</span></button>
+                            </div>
+                            <div class="dropdown-section">
+                                <div class="dropdown-section-title">Entertainment</div>
+                                <button type="button" class="platform-option" data-value="Netflix" data-icon="fas fa-tv"><i class="fas fa-tv"></i><span>Netflix</span></button>
+                                <button type="button" class="platform-option" data-value="Disney+" data-icon="fas fa-play-circle"><i class="fas fa-play-circle"></i><span>Disney+</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <!-- Edit Asset Modal -->
-    <div class="modal fade" id="editAssetModal" tabindex="-1">
+                <div class="field">
+                    <label for="accountIdentifier" class="form-label">Email or username</label>
+                    <input type="text" class="form-control" id="accountIdentifier" name="accountIdentifier" placeholder="you@example.com or username" required autocomplete="off">
+                </div>
+
+                <div class="field">
+                    <label for="accountPassword" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="accountPassword" name="accountPassword" placeholder="Account password" required autocomplete="new-password">
+                    <p class="form-hint">Your executor needs this to sign in. It is only shown to them once they have access.</p>
+                </div>
+
+                <div class="field">
+                    <span class="form-label d-block">After you, this account should be…</span>
+                    <div class="choice-group" role="radiogroup" aria-label="After-death action">
+                        <input type="radio" class="btn-check" name="actionType" id="actionPass" value="pass" required>
+                        <label for="actionPass">Passed on<small>Executor takes it over</small></label>
+                        <input type="radio" class="btn-check" name="actionType" id="actionDelete" value="delete" required>
+                        <label for="actionDelete">Deleted<small>Closed for good</small></label>
+                        <input type="radio" class="btn-check" name="actionType" id="actionMessage" value="last_message" required>
+                        <label for="actionMessage">Last message<small>A final post, then closed</small></label>
+                    </div>
+                </div>
+
+                <div class="field" id="messageContainer" style="display:none">
+                    <label for="lastMessage" class="form-label">Your last message</label>
+                    <textarea class="form-control" id="lastMessage" name="lastMessage" rows="4" placeholder="Write the words you'd like posted…"></textarea>
+                    <p class="form-hint">Your executor will post this for you.</p>
+                </div>
+
+                <button type="submit" id="assetSubmitBtn" class="btn-forest btn-block">Add Asset</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============ Invite executor drawer ============ -->
+    <div class="offcanvas offcanvas-end drawer" tabindex="-1" id="executorDrawer" aria-labelledby="executorDrawerTitle">
+        <div class="offcanvas-header">
+            <div>
+                <h2 class="offcanvas-title" id="executorDrawerTitle">Invite an executor</h2>
+                <p class="drawer-sub">They'll get an email to verify. You decide later when they get access.</p>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <form id="executorForm">
+                <div class="field">
+                    <label for="executorName" class="form-label">Full name</label>
+                    <input type="text" class="form-control" id="executorName" name="executorName" placeholder="e.g. Priya Sharma" required>
+                </div>
+                <div class="field">
+                    <label for="executorEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="executorEmail" name="executorEmail" placeholder="name@example.com" required>
+                </div>
+                <div class="field">
+                    <label for="executorPhone" class="form-label">Phone <span class="form-hint">(optional)</span></label>
+                    <input type="tel" class="form-control" id="executorPhone" name="executorPhone" placeholder="+91 98765 43210">
+                </div>
+                <div class="field">
+                    <label for="executorRelationship" class="form-label">Relationship <span class="form-hint">(optional)</span></label>
+                    <input type="text" class="form-control" id="executorRelationship" name="executorRelationship" placeholder="e.g. Sister, Lawyer, Friend">
+                </div>
+                <button type="submit" id="executorSubmitBtn" class="btn-forest btn-block">Save Executor</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============ Edit asset modal ============ -->
+    <div class="modal fade" id="editAssetModal" tabindex="-1" aria-labelledby="editAssetTitle">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="modal-title">Edit Digital Asset</h2>
+                    <h2 class="modal-title" id="editAssetTitle">Edit account</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="editAssetForm">
                         <input type="hidden" id="editAssetId">
-                        <div class="mb-3">
-                            <label for="editPlatformName" class="form-label">Platform/Service <span class="text-danger">*</span></label>
+                        <div class="field mb-3">
+                            <label for="editPlatformName" class="form-label">Platform</label>
                             <select class="form-select" id="editPlatformName" name="editPlatformName" required>
                                 <option value="">Select a platform...</option>
                                 <optgroup label="Social Media">
-                                    <option value="Instagram">Instagram</option>
-                                    <option value="Facebook">Facebook</option>
-                                    <option value="Twitter">Twitter</option>
-                                    <option value="LinkedIn">LinkedIn</option>
-                                    <option value="TikTok">TikTok</option>
-                                    <option value="Snapchat">Snapchat</option>
-                                    <option value="Discord">Discord</option>
+                                    <option value="Instagram">Instagram</option><option value="Facebook">Facebook</option><option value="Twitter">Twitter</option><option value="LinkedIn">LinkedIn</option><option value="TikTok">TikTok</option><option value="Snapchat">Snapchat</option><option value="Discord">Discord</option>
                                 </optgroup>
                                 <optgroup label="Email">
-                                    <option value="Gmail">Gmail</option>
-                                    <option value="Outlook">Outlook</option>
-                                    <option value="Yahoo Mail">Yahoo Mail</option>
-                                    <option value="ProtonMail">ProtonMail</option>
-                                    <option value="Apple Mail">Apple Mail</option>
+                                    <option value="Gmail">Gmail</option><option value="Outlook">Outlook</option><option value="Yahoo Mail">Yahoo Mail</option><option value="ProtonMail">ProtonMail</option><option value="Apple Mail">Apple Mail</option>
                                 </optgroup>
                                 <optgroup label="Finance">
-                                    <option value="PayPal">PayPal</option>
-                                    <option value="Amazon">Amazon</option>
-                                    <option value="Banking App">Banking App</option>
-                                    <option value="Stripe">Stripe</option>
-                                    <option value="Square">Square</option>
+                                    <option value="PayPal">PayPal</option><option value="Amazon">Amazon</option><option value="Banking App">Banking App</option><option value="Stripe">Stripe</option><option value="Square">Square</option>
                                 </optgroup>
                                 <optgroup label="Storage">
-                                    <option value="Google Drive">Google Drive</option>
-                                    <option value="Dropbox">Dropbox</option>
-                                    <option value="OneDrive">OneDrive</option>
-                                    <option value="iCloud">iCloud</option>
+                                    <option value="Google Drive">Google Drive</option><option value="Dropbox">Dropbox</option><option value="OneDrive">OneDrive</option><option value="iCloud">iCloud</option>
                                 </optgroup>
                                 <optgroup label="Entertainment">
-                                    <option value="Netflix">Netflix</option>
-                                    <option value="Spotify">Spotify</option>
-                                    <option value="Disney+">Disney+</option>
-                                    <option value="Hulu">Hulu</option>
+                                    <option value="Netflix">Netflix</option><option value="Spotify">Spotify</option><option value="Disney+">Disney+</option><option value="Hulu">Hulu</option>
                                 </optgroup>
-                                <optgroup label="Other">
-                                    <option value="Other">Other</option>
-                                </optgroup>
+                                <optgroup label="Other"><option value="Other">Other</option></optgroup>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label for="editAccountIdentifier" class="form-label">Email or Username <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="editAccountIdentifier" name="editAccountIdentifier" placeholder="your@email.com or username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editAccountPassword" class="form-label">Password <span class="text-danger">*</span></label>
-                            <input type="password" class="form-control" id="editAccountPassword" name="editAccountPassword" placeholder="Enter account password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label d-block">What should happen to this account? <span class="text-danger">*</span></label>
-                            <div class="action-options">
-                                <div class="form-check">
-                                    <input class="form-check-input edit-action-radio" type="radio" name="editActionType" id="editActionPass" value="pass" required>
-                                    <label class="form-check-label" for="editActionPass">
-                                        <strong>Pass to Executor</strong> - Grant the designated executor full access to this account
-                                    </label>
-                                </div>
-                                <div class="form-check mt-2">
-                                    <input class="form-check-input edit-action-radio" type="radio" name="editActionType" id="editActionDelete" value="delete">
-                                    <label class="form-check-label" for="editActionDelete">
-                                        <strong>Delete Account</strong> - Permanently delete this account (memorials, archived content, etc.)
-                                    </label>
-                                </div>
-                                <div class="form-check mt-2">
-                                    <input class="form-check-input edit-action-radio" type="radio" name="editActionType" id="editActionMessage" value="last_message">
-                                    <label class="form-check-label" for="editActionMessage">
-                                        <strong>Post Final Message</strong> - Post a message to your profile
-                                    </label>
-                                </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
+                                <label for="editAccountIdentifier" class="form-label">Email or username</label>
+                                <input type="text" class="form-control" id="editAccountIdentifier" name="editAccountIdentifier" required autocomplete="off">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="editAccountPassword" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="editAccountPassword" name="editAccountPassword" required autocomplete="new-password">
                             </div>
                         </div>
-                        <div id="editMessageContainer" class="mb-3" style="display: none;">
-                            <label for="editLastMessage" class="form-label">Final Message</label>
-                            <textarea class="form-control" id="editLastMessage" name="editLastMessage" placeholder="e.g. Thank you all for the memories..." rows="3"></textarea>
+                        <div class="mb-3">
+                            <span class="form-label d-block">After you, this account should be…</span>
+                            <div class="choice-group" role="radiogroup" aria-label="After-death action">
+                                <input class="btn-check edit-action-radio" type="radio" name="editActionType" id="editActionPass" value="pass" required>
+                                <label for="editActionPass">Passed on<small>Executor takes it over</small></label>
+                                <input class="btn-check edit-action-radio" type="radio" name="editActionType" id="editActionDelete" value="delete">
+                                <label for="editActionDelete">Deleted<small>Closed for good</small></label>
+                                <input class="btn-check edit-action-radio" type="radio" name="editActionType" id="editActionMessage" value="last_message">
+                                <label for="editActionMessage">Last message<small>A final post, then closed</small></label>
+                            </div>
+                        </div>
+                        <div id="editMessageContainer" class="mb-1" style="display:none">
+                            <label for="editLastMessage" class="form-label">Your last message</label>
+                            <textarea class="form-control" id="editLastMessage" name="editLastMessage" rows="3" placeholder="e.g. Thank you all for the memories…"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="editAssetSubmitBtn">Save Changes</button>
+                    <button type="button" class="btn-ghost" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn-forest" id="editAssetSubmitBtn">Save Changes</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Edit Will Modal -->
-    <div class="modal fade" id="editWillModal" tabindex="-1">
+    <!-- ============ Edit will message modal ============ -->
+    <div class="modal fade" id="editWillModal" tabindex="-1" aria-labelledby="editWillTitle">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="modal-title">Edit Digital Will</h2>
+                    <h2 class="modal-title" id="editWillTitle">Your personal message</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="editWillForm">
-                        <div class="mb-3">
-                            <label for="editWillContent" class="form-label">Will Content <span class="text-danger">*</span></label>
-                            <p class="text-muted small mb-2">Add or edit your custom will content. This will be used in your generated PDF.</p>
-                            <textarea class="form-control" id="editWillContent" name="editWillContent" placeholder="Enter your will content here..." rows="10" required></textarea>
-                            <div class="form-text mt-2">Tip: You can include instructions for your executors, final wishes, or any additional information.</div>
-                        </div>
+                        <label for="editWillContent" class="form-label">Message included in your will</label>
+                        <textarea class="form-control" id="editWillContent" name="editWillContent" rows="10" placeholder="Instructions for your executors, final wishes, anything you want them to know…" required></textarea>
+                        <p class="form-hint">This appears in your generated PDF.</p>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="editWillSubmitBtn">Save Changes</button>
+                    <button type="button" class="btn-ghost" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn-forest" id="editWillSubmitBtn">Save Changes</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/config.js"></script>
     <script src="js/utils.js?v=11"></script>
-    <script src="js/dashboard.js?v=10"></script>
-    
-    <!-- Dashboard Widgets Initialization -->
+    <script src="js/dashboard.js?v=12"></script>
+
+    <!-- Overview widgets -->
     <script>
         // Gather the data every widget needs in ONE round of requests.
         // Assets/executors come from dashboard.js state when already loaded, and
@@ -2066,198 +582,154 @@
             };
         }
 
-        // Initialize Checklist Widget (render only - no requests)
+        // Setup checklist as two board columns (render only - no requests)
         function initializeChecklist(data) {
-            try {
-                const { assets, executors, willExists, switchActive } = data;
+            const { assets, executors, willExists, switchActive } = data;
+            const withAction = assets.filter(a => a.action_type).length;
+            const granted = executors.filter(e => e.access_granted === true || e.access_granted === 'true').length;
 
-                const checklist = [
-                    { id: 1, title: 'Add Digital Assets', description: 'Log your social media and email accounts', completed: assets.length > 0, icon: '' },
-                    { id: 2, title: 'Designate Executors', description: 'Assign at least 1 trusted person', completed: executors.length > 0, icon: '' },
-                    { id: 3, title: 'Set Asset Actions', description: 'Decide what happens to each account', completed: assets.some(a => a.action_type), icon: '' },
-                    { id: 4, title: 'Generate Digital Will', description: 'Create your official PDF document', completed: willExists, icon: '' },
-                    { id: 5, title: 'Activate Dead Man\'s Switch', description: 'Set up automated check-ins', completed: switchActive, icon: '' }
-                ];
+            const items = [
+                { tag: 'Accounts', tagClass: 'tag-pass', icon: 'fa-key', title: 'Record your accounts',
+                  desc: 'Add the email, social and money accounts someone would need to deal with.',
+                  done: assets.length > 0, meter: Math.min(assets.length / 4, 1), meterLabel: `${assets.length} added`, page: 'assets', cta: 'Add an account' },
+                { tag: 'People', tagClass: 'tag-delete', icon: 'fa-user-shield', title: 'Name an executor',
+                  desc: 'Choose at least one person you trust to carry this out.',
+                  done: executors.length > 0, meter: executors.length ? 1 : 0, meterLabel: `${executors.length} invited`, page: 'executors', cta: 'Invite someone' },
+                { tag: 'Accounts', tagClass: 'tag-pass', icon: 'fa-signs-post', title: 'Decide what happens to each',
+                  desc: 'Pass on, delete, or leave a last message for every account.',
+                  done: assets.length > 0 && withAction === assets.length, meter: assets.length ? withAction / assets.length : 0, meterLabel: `${withAction} of ${assets.length}`, page: 'assets', cta: 'Review accounts' },
+                { tag: 'Will', tagClass: 'tag-message', icon: 'fa-file-signature', title: 'Generate your digital will',
+                  desc: 'Create the official PDF record of your wishes.',
+                  done: willExists, page: 'will', cta: 'Open will' },
+                { tag: 'Switch', tagClass: 'tag-neutral', icon: 'fa-heart-pulse', title: 'Turn on the Dead Man\'s Switch',
+                  desc: 'Check-ins tell DIGIPASS you are well; executors are only told if they stop.',
+                  done: switchActive, page: 'switch', cta: 'Set it up' }
+            ];
 
-                const container = document.getElementById('checklistContainer');
-                const completed = checklist.filter(item => item.completed).length;
-                
-                document.getElementById('checklistProgress').textContent = `${completed}/${checklist.length}`;
-                
-                container.innerHTML = checklist.map(item => `
-                    <div class="checklist-item ${item.completed ? 'completed' : ''}">
-                        <div class="checklist-checkbox ${item.completed ? 'completed' : ''}">
-                            ${item.completed ? '✓' : ''}
-                        </div>
-                        <div class="checklist-content">
-                            <div class="checklist-title">${item.title}</div>
-                            <div class="checklist-description">${item.description}</div>
-                        </div>
+            const card = (item) => `
+                <article class="bcard">
+                    <div class="bcard-top">
+                        <div class="tags"><span class="tag ${item.tagClass}">${item.tag}</span>${item.done ? '<span class="tag tag-forest"><i class="fas fa-check"></i>Done</span>' : ''}</div>
                     </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error initializing checklist:', error);
-            }
+                    <div class="bcard-title"><span class="plat"><i class="fas ${item.icon}"></i></span>${item.title}</div>
+                    <p class="bcard-desc">${item.desc}</p>
+                    ${typeof item.meter === 'number' ? `
+                        <div class="meter-row"><span>Progress</span><span>${item.meterLabel}</span></div>
+                        <div class="meter"><span style="width:${Math.round(item.meter * 100)}%"></span></div>` : ''}
+                    ${item.done ? '' : `<div class="bcard-foot"><a class="btn-soft" href="#${item.page}" data-page="${item.page}">${item.cta}<i class="fas fa-arrow-right"></i></a></div>`}
+                </article>`;
+
+            const todo = items.filter(i => !i.done);
+            const done = items.filter(i => i.done);
+
+            // With setup complete, the one recurring task is the next check-in.
+            const sw = window.__switchStatus;
+            const nextCheckIn = sw && sw.status === 'active'
+                ? `<article class="bcard">
+                        <div class="tags"><span class="tag tag-neutral"><i class="fas fa-heart-pulse"></i>Switch</span></div>
+                        <div class="bcard-title"><span class="plat"><i class="fas fa-calendar-check"></i></span>Check in by ${new Date(Date.now() + sw.daysUntilTrigger * 86400000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</div>
+                        <p class="bcard-desc">Setup is complete. The only thing left is the occasional check-in; if you miss it, your executors are notified and given access.</p>
+                   </article>`
+                : '<div class="column-empty">Everything is in place.</div>';
+
+            document.getElementById('checklistTodo').innerHTML = todo.length
+                ? todo.map(card).join('')
+                : nextCheckIn;
+            document.getElementById('checklistDone').innerHTML = done.length
+                ? `<div class="bcard"><ul class="row-list">${done.map(item => `
+                        <li>
+                            <span class="plat"><i class="fas ${item.icon}"></i></span>
+                            <div class="row-main"><div class="row-title">${item.title}</div>${item.meterLabel ? `<div class="row-sub">${item.meterLabel}</div>` : ''}</div>
+                            <span class="row-end" aria-label="Done"><i class="fas fa-circle-check"></i></span>
+                        </li>`).join('')}</ul></div>`
+                : '<div class="column-empty">Finished steps land here.</div>';
+            document.getElementById('todoCount').textContent = todo.length;
+            document.getElementById('checklistProgress').textContent = `${done.length}/${items.length}`;
+            void granted;
         }
 
-        // Initialize Activity Feed
+        // Activity feed column
         async function initializeActivityFeed() {
             try {
-                // Fetch activity from backend
                 const activityRes = await apiCall('/activity?limit=10', 'GET').catch(() => ({ data: [] }));
-                let activities = Array.isArray(activityRes.data) ? activityRes.data : [];
-
+                const activities = Array.isArray(activityRes.data) ? activityRes.data : [];
                 const feed = document.getElementById('activityFeed');
-                
-                // If no activity from API, show empty state
+
                 if (activities.length === 0) {
-                    feed.innerHTML = `
-                        <div style="text-align: center; padding: 2rem 1rem; color: #999;">
-                            <p style="font-size: 0.9rem;">No activity yet. Start by adding digital assets, designating executors, or generating your digital will.</p>
-                        </div>
-                    `;
+                    feed.innerHTML = '<li class="bcard-desc">Nothing yet. Changes to your accounts, executors and will show up here.</li>';
                     return;
                 }
 
-                feed.innerHTML = activities.slice(0, 5).map(activity => {
-                    // Parse API response - from database fields: action_type, description, entity_type, entity_id, created_at
+                feed.innerHTML = activities.slice(0, 6).map(activity => {
                     const actionType = activity.action_type || 'default';
                     const description = activity.description || '';
-                    const createdAt = activity.created_at;
-                    
-                    const timeStr = createdAt ? formatActivityTime(createdAt) : 'Recently';
-                    const title = getActivityTitle(actionType, description);
-                    const displayType = getActivityTypeForIcon(actionType);
-                    const icon = getActivityIcon(actionType);
-                    
                     return `
-                        <div class="activity-item">
-                            <div class="activity-icon ${displayType}">
-                                ${icon}
+                        <li>
+                            <span class="a-icon">${getActivityIcon(actionType)}</span>
+                            <div>
+                                <div class="a-title">${escapeHtml(getActivityTitle(actionType, description))}</div>
+                                <div class="a-meta">${escapeHtml(description)} · ${activity.created_at ? formatActivityTime(activity.created_at) : 'Recently'}</div>
                             </div>
-                            <div class="activity-content">
-                                <div class="activity-title">${title}</div>
-                                <div class="activity-meta">
-                                    <span class="activity-description">${description}</span>
-                                    <span class="activity-time">
-                                        <i class="fas fa-clock" style="font-size: 0.7rem;"></i> ${timeStr}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                        </li>`;
                 }).join('');
             } catch (error) {
                 console.error('Error initializing activity feed:', error);
             }
         }
 
-        // Helper function to format activity time
         function formatActivityTime(dateString) {
             const date = new Date(dateString);
-            const now = new Date();
-            const diffMs = now - date;
+            const diffMs = Date.now() - date.getTime();
             const diffMins = Math.floor(diffMs / 60000);
             const diffHours = Math.floor(diffMs / 3600000);
             const diffDays = Math.floor(diffMs / 86400000);
-
-            if (diffMins < 1) return 'Just now';
+            if (diffMins < 1) return 'just now';
             if (diffMins < 60) return `${diffMins} min ago`;
             if (diffHours < 24) return `${diffHours}h ago`;
             if (diffDays < 7) return `${diffDays}d ago`;
-            
-            return date.toLocaleDateString();
+            return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
         }
 
-        // Helper function to get activity icon
         function getActivityIcon(type) {
             const icons = {
-                'asset': '<i class="fas fa-box"></i>',
-                'executor': '<i class="fas fa-user-shield"></i>',
-                'will': '<i class="fas fa-file-contract"></i>',
-                'switch': '<i class="fas fa-toggle-on"></i>',
-                'asset_created': '<i class="fas fa-plus-circle"></i>',
-                'executor_added': '<i class="fas fa-user-plus"></i>',
-                'will_created': '<i class="fas fa-file-signature"></i>',
-                'switch_checkin': '<i class="fas fa-check-circle"></i>',
-                'switch_interval_updated': '<i class="fas fa-clock"></i>',
-                'default': '<i class="fas fa-info-circle"></i>'
+                asset_created: 'fa-circle-plus', executor_added: 'fa-user-plus', will_created: 'fa-file-signature',
+                switch_checkin: 'fa-circle-check', switch_interval_updated: 'fa-clock'
             };
-            return icons[type] || icons['default'];
+            const key = icons[type] ? type : (type.includes('asset') ? 'asset_created' : type.includes('executor') ? 'executor_added' : type.includes('will') ? 'will_created' : type.includes('switch') ? 'switch_checkin' : null);
+            return `<i class="fas ${key ? icons[key] : 'fa-circle-info'}"></i>`;
         }
 
-        // Helper function to get activity title from action_type
         function getActivityTitle(actionType, description) {
-            if (!actionType) return 'Activity';
             const titleMap = {
-                'asset_created': 'Asset Added',
-                'executor_added': 'Executor Assigned',
-                'will_created': 'Digital Will Generated',
-                'switch_checkin': 'Check-in Complete',
-                'switch_interval_updated': 'Check-in Interval Updated'
+                asset_created: 'Account added', executor_added: 'Executor invited', will_created: 'Digital will generated',
+                switch_checkin: 'Checked in', switch_interval_updated: 'Check-in interval changed'
             };
             return titleMap[actionType] || description || 'Activity';
         }
 
-        // Helper function to get activity type for icon categorization
-        function getActivityTypeForIcon(actionType) {
-            if (!actionType) return 'default';
-            if (actionType.includes('asset')) return 'asset';
-            if (actionType.includes('executor')) return 'executor';
-            if (actionType.includes('will')) return 'will';
-            if (actionType.includes('switch')) return 'switch';
-            return 'default';
-        }
-
-        // Initialize Health Score (render only - no requests)
+        // Readiness strip (render only - no requests)
         function initializeHealthScore(data) {
-            try {
-                const { assets, executors, willExists, switchActive } = data;
+            const { assets, executors, willExists, switchActive } = data;
+            let score = 0;
+            score += Math.min(assets.length * 5, 20);
+            score += executors.length > 0 ? 20 : 0;
+            score += willExists ? 30 : 0;
+            score += switchActive ? 30 : 0;
+            score = Math.min(score, 100);
 
-                // Score calculation: Assets (20) + Executors (20) + Will (30) + Switch (30)
-                let score = 0;
-                score += Math.min(assets.length * 5, 20); // max 20
-                score += (executors.length > 0 ? 20 : 0); // 20 if at least 1
-                score += (willExists ? 30 : 0); // 30 if generated
-                score += (switchActive ? 30 : 0); // 30 if active
-
-                const healthScoreCircle = document.getElementById('healthScoreCircle');
-                const healthScoreStatus = document.getElementById('healthScoreStatus');
-                
-                healthScoreCircle.textContent = Math.min(score, 100);
-                
-                // Remove previous score class and add new one
-                healthScoreCircle.classList.remove('score-high', 'score-medium', 'score-low');
-                
-                if (score >= 70) {
-                    healthScoreCircle.classList.add('score-high');
-                    healthScoreStatus.textContent = 'Good Progress';
-                } else if (score >= 40) {
-                    healthScoreCircle.classList.add('score-medium');
-                    healthScoreStatus.textContent = 'In Progress';
-                } else {
-                    healthScoreCircle.classList.add('score-low');
-                    healthScoreStatus.textContent = 'Getting Started';
-                }
-
-                // Update breakdown
-                document.getElementById('scoreAssets').textContent = assets.length;
-                document.getElementById('scoreExecutors').textContent = executors.length;
-                const completionPercent = Math.round((score / 100) * 100);
-                document.getElementById('scoreCompletion').textContent = completionPercent + '%';
-            } catch (error) {
-                console.error('Error initializing health score:', error);
-            }
+            document.getElementById('healthScoreCircle').textContent = score;
+            document.getElementById('healthMeter').style.width = score + '%';
+            document.getElementById('navCountReady').textContent = score + '%';
+            document.getElementById('healthScoreStatus').textContent =
+                score >= 100 ? 'All set' : score >= 70 ? 'Nearly there' : score >= 40 ? 'Making progress' : 'Getting started';
         }
 
         // Refresh widgets. Initial render is triggered by loadDashboardData() in
-        // dashboard.js once its data is in, so there is no separate DOMContentLoaded
-        // fetch here.
+        // dashboard.js once its data is in.
         //
         // IMPORTANT: this must never call loadDashboardData(). loadDashboardData()
         // calls this function when it finishes, so calling it back created an
-        // endless request loop (~11 API calls every cycle) that tripped the rate
-        // limiter and left the page unable to load or save anything.
+        // endless request loop that tripped the rate limiter.
         let widgetRefreshTimer = null;
         let widgetRefreshInFlight = false;
         let widgetRefreshQueued = null;
@@ -2269,10 +741,7 @@
             }
             widgetRefreshInFlight = true;
             try {
-                const [data] = await Promise.all([
-                    fetchWidgetData(known),
-                    initializeActivityFeed()
-                ]);
+                const [data] = await Promise.all([fetchWidgetData(known), initializeActivityFeed()]);
                 initializeHealthScore(data);
                 initializeChecklist(data);
             } catch (error) {
@@ -2293,82 +762,58 @@
             widgetRefreshTimer = setTimeout(() => refreshDashboardWidgets(known), 300);
         };
     </script>
-    
-    <!-- Profile Dropdown UI Script -->
+
+    <!-- Shell: panel, drawers, profile menu -->
     <script>
-        // Toggle dropdown visibility
-        function toggleDropdown() {
-            document.getElementById('profileDropdown').classList.toggle('open');
-            document.getElementById('profileTrigger').classList.toggle('open');
+        function togglePanel(open) {
+            document.getElementById('sidePanel').classList.toggle('open', open);
+            document.getElementById('panelScrim').classList.toggle('open', open);
         }
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
+        function openAssetDrawer(action) {
+            if (action) {
+                const radio = document.querySelector(`input[name="actionType"][value="${action}"]`);
+                if (radio && !radio.disabled) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+            bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('assetDrawer')).show();
+        }
+
+        function openExecutorDrawer() {
+            bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('executorDrawer')).show();
+        }
+
+        // Profile menu on the rail avatar
+        (function () {
             const trigger = document.getElementById('profileTrigger');
-            if (trigger && !trigger.contains(e.target)) {
-                document.getElementById('profileDropdown').classList.remove('open');
-                document.getElementById('profileTrigger').classList.remove('open');
-            }
-        });
+            const pop = document.getElementById('profileDropdown');
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const open = !pop.classList.contains('open');
+                pop.classList.toggle('open', open);
+                trigger.setAttribute('aria-expanded', String(open));
+            });
+            document.addEventListener('click', (e) => {
+                if (!pop.contains(e.target)) {
+                    pop.classList.remove('open');
+                    trigger.setAttribute('aria-expanded', 'false');
+                }
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') { pop.classList.remove('open'); togglePanel(false); }
+            });
 
-        // Profile navigation placeholders (UI only - real navigation in main app)
-        function navigateToProfile() {
-            closeDropdown();
-            // Placeholder - actual navigation handled by main app
-            window.location.href = '/profile.html';
-        }
-
-        function navigateToSettings() {
-            closeDropdown();
-            // Placeholder - actual navigation handled by main app
-            window.location.href = '/profile.html?tab=security';
-        }
-
-        function navigateToActivity() {
-            closeDropdown();
-            // Placeholder - actual navigation handled by main app
-            window.location.href = '/profile.html?tab=activity';
-        }
-
-        function closeDropdown() {
-            document.getElementById('profileDropdown').classList.remove('open');
-            document.getElementById('profileTrigger').classList.remove('open');
-        }
-
-        // Logout handler
-        function closeDropdownAndLogout() {
-            closeDropdown();
-            // Trigger existing logout functionality
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.click();
-            } else {
-                // Fallback logout
-                localStorage.removeItem('user');
-                localStorage.removeItem('userToken');
-                window.location.href = '/login.html';
-            }
-        }
-
-        // Initialize profile trigger with user data from localStorage
-        function initializeProfileTrigger() {
             try {
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const userName = user.fullName || user.name || 'User';
-                const userEmail = user.email || 'user@example.com';
-                const initials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
-                
-                document.getElementById('profileInitial').textContent = initials;
-                document.getElementById('profileName').textContent = userName;
-                document.getElementById('dropdownName').textContent = userName;
-                document.getElementById('dropdownEmail').textContent = userEmail;
-            } catch (e) {
-                console.warn('Could not initialize profile trigger:', e);
-            }
-        }
-
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', initializeProfileTrigger);
+                const name = user.fullName || user.name || 'User';
+                document.getElementById('profileInitial').textContent =
+                    name.split(/\s+/).filter(Boolean).map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
+                document.getElementById('dropdownName').textContent = name;
+                document.getElementById('dropdownEmail').textContent = user.email || '';
+            } catch (e) { /* non-critical */ }
+        })();
     </script>
 </body>
 </html>

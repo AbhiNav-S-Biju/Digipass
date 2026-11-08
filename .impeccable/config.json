@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "frontend/*dashboard.html"
+        ],
+        "createdAt": "2026-11-08T06:57:52.342Z",
+        "reason": "user confirmed: asked to preserve the existing DIGIPASS cream/forest palette (PRODUCT.md Brand Commitments)"
+      },
+      {
+        "rule": "nested-cards",
+        "value": "*",
+        "files": [
+          "frontend/*dashboard.html"
+        ],
+        "createdAt": "2026-11-08T07:06:20.179Z",
+        "reason": "user confirmed: user supplied a kanban reference (cards inside board columns) and asked for this layout"
+      }
+    ]
+  }
+}
