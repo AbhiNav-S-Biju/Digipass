@@ -170,6 +170,7 @@ body.board-body {
 .sb-nav { position: relative; }
 .sb-nav .sb-item { z-index: 1; }
 .sb-nav i {
+  flex: none; aspect-ratio: 1;
   width: 34px; height: 34px; margin: 0 -7px; border-radius: 50%;
   display: grid; place-items: center;
   border: 1px solid transparent;
@@ -943,6 +944,7 @@ body.board-body {
     -webkit-tap-highlight-color: transparent;
   }
   .dock-item i {
+    flex: none; aspect-ratio: 1;
     width: 34px; height: 34px; border-radius: 50%;
     display: grid; place-items: center;
     font-size: 17px; color: inherit;
@@ -953,7 +955,7 @@ body.board-body {
   .dock-item span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: color 0.2s; }
   .dock-item.active { color: var(--cream-light); }
   .dock-item.active i {
-    width: 52px; height: 52px;
+    width: 52px; height: 52px; min-height: 52px;
     transform: translateY(-22px);
     font-size: 19px;
     color: var(--cream-light);
