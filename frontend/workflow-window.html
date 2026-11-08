@@ -2,1342 +2,695 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIGIPASS - Workflow Instructions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Step-by-step guide - DIGIPASS</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231b3a2d'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='%23fdf6ec'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/board.css?v=5">
     <style>
-        *, *::before, *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            /* Design System Colors - Matching Dashboard */
-            --cream: #f5ead8;
-            --cream-light: #fdf6ec;
-            --forest-deep: #1b3a2d;
-            --forest-mid: #2d5a42;
-            --forest-light: #3d7a5a;
-            --sand: #e8d9c0;
-            --sand-deep: #d4c4a0;
-            --text-dark: #1a2e22;
-            --text-muted: #5a7260;
-            
-            /* Legacy aliases for compatibility */
-            --bg: var(--cream);
-            --bg-deep: var(--sand);
-            --bg-card: #ffffff;
-            --ink: var(--forest-deep);
-            --ink-mid: var(--forest-mid);
-            --ink-soft: var(--text-muted);
-            --border: rgba(27, 58, 45, 0.11);
-            --border-md: rgba(27, 58, 45, 0.2);
-            --action-bg: var(--cream-light);
-            --tip-bg: #fffcf4;
-            --tip-bdr: #c9a961;
-            --msg-bg: #eef5f2;
-            --radius: 10px;
-            --radius-sm: 6px;
-        }
-
-        html,
-        body {
-            height: 100%;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--ink);
-            font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            overflow: hidden;
-        }
-
-        .shell {
-            display: flex;
-            height: 100vh;
-        }
-
-        .sidebar {
-            width: 272px;
-            min-width: 272px;
-            background: var(--ink);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .sb-head {
-            padding: 18px 16px 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-            flex-shrink: 0;
-        }
-
-        .sb-platform-row {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-        }
-
-        .sb-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 8px;
-            background: rgba(253, 246, 236, 0.13);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--cream-light);
-            font-size: 1rem;
-            flex-shrink: 0;
-        }
-
-        .sb-name {
-            flex: 1;
-            min-width: 0;
-            color: var(--cream-light);
-            font-size: 0.95rem;
-            font-weight: 600;
-            letter-spacing: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .sb-close {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: rgba(253, 246, 236, 0.08);
-            border: 1px solid rgba(253, 246, 236, 0.14);
-            color: rgba(253, 246, 236, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 0.72rem;
-            transition: all 0.15s;
-            flex-shrink: 0;
-        }
-
-        .sb-close:hover {
-            background: rgba(253, 246, 236, 0.18);
-            color: var(--cream-light);
-        }
-
-        .sb-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            margin-top: 8px;
-            background: rgba(253, 246, 236, 0.09);
-            color: rgba(253, 246, 236, 0.58);
-            font-size: 0.68rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.07em;
-            padding: 3px 9px 3px 7px;
-            border-radius: 20px;
-        }
-
-        .sb-badge i {
-            font-size: 0.65rem;
-        }
-
-        .sb-steps {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px 10px;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
-        }
-
-        .sb-steps::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        .sb-steps::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 3px;
-        }
-
-        .sb-step {
-            display: flex;
-            align-items: flex-start;
-            gap: 9px;
-            padding: 9px;
-            border-radius: 7px;
-            cursor: pointer;
-            transition: background 0.12s;
-        }
-
-        .sb-step:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .sb-step.active {
-            background: rgba(253, 246, 236, 0.11);
-        }
-
-        .sb-num {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 1.5px solid rgba(255, 255, 255, 0.16);
-            background: rgba(255, 255, 255, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(253, 246, 236, 0.5);
-            font-size: 0.68rem;
-            font-weight: 700;
-            flex-shrink: 0;
-            margin-top: 1px;
-            transition: all 0.15s;
-        }
-
-        .sb-step.active .sb-num {
-            background: var(--cream-light);
-            border-color: var(--cream-light);
-            color: var(--ink);
-        }
-
-        .sb-step.done .sb-num {
-            background: rgba(253, 246, 236, 0.15);
-            border-color: rgba(253, 246, 236, 0.35);
-            color: var(--cream-light);
-        }
-
-        .sb-step-text {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .sb-step-title {
-            color: rgba(253, 246, 236, 0.76);
-            font-size: 0.8rem;
-            font-weight: 600;
-            line-height: 1.3;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .sb-step.active .sb-step-title {
-            color: var(--cream-light);
-        }
-
-        .sb-step-sub {
-            color: rgba(253, 246, 236, 0.34);
-            font-size: 0.68rem;
-            margin-top: 1px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .sb-connector {
-            height: 10px;
-            width: 1px;
-            background: rgba(255, 255, 255, 0.08);
-            margin-left: 20px;
-        }
-
-        .sb-footer {
-            padding: 10px 14px;
-            border-top: 1px solid rgba(255, 255, 255, 0.07);
-            color: rgba(245, 230, 206, 0.28);
-            font-size: 0.66rem;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .main-topbar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 26px;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg);
-            flex-shrink: 0;
-        }
-
-        .step-pill {
-            flex-shrink: 0;
-            color: var(--ink-soft);
-            background: var(--bg-deep);
-            border: 1px solid var(--border-md);
-            border-radius: 20px;
-            padding: 3px 10px;
-            font-size: 0.67rem;
-            font-weight: 700;
-            letter-spacing: 0.09em;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-
-        .topbar-title {
-            color: var(--ink-mid);
-            font-size: 0.82rem;
-            font-weight: 600;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .main-scroll {
-            flex: 1;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
-        }
-
-        .main-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .main-scroll::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-
-        .main-body {
-            max-width: 800px;
-            padding: 26px 28px 24px;
-        }
-
-        .step-eyebrow {
-            color: var(--ink-soft);
-            font-size: 0.67rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .step-h1 {
-            color: var(--ink);
-            font-size: 1.5rem;
-            font-weight: 700;
-            line-height: 1.2;
-            letter-spacing: 0;
-        }
-
-        .divider {
-            height: 1px;
-            background: var(--border);
-            margin: 18px 0;
-        }
-
-        .cred-box {
-            background: var(--bg-card);
-            border: 1.5px solid var(--ink);
-            border-radius: var(--radius);
-            padding: 14px 16px;
-            margin-bottom: 20px;
-        }
-
-        .cred-header {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            color: var(--ink-soft);
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-
-        .cred-grid {
+        /* ---------- Workflow guide (uses board.css tokens) ---------- */
+        body.wf { overflow: hidden; }
+        .wf-app {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
+            grid-template-columns: 300px minmax(0, 1fr);
+            gap: 16px;
+            height: 100vh; height: 100dvh;
+            padding: 12px;
         }
 
-        .cred-field label {
-            display: block;
-            color: var(--ink-soft);
-            font-size: 0.67rem;
-            font-weight: 700;
-            letter-spacing: 0.07em;
-            text-transform: uppercase;
-            margin-bottom: 4px;
+        /* Steps rail: same deep-forest glass as the dashboards */
+        .wf-rail { border-radius: var(--r-xl); padding: 16px 12px; display: flex; flex-direction: column; min-height: 0; }
+        .wf-brand { display: flex; align-items: center; gap: 12px; padding: 4px 6px 14px; }
+        .wf-plat {
+            width: 44px; height: 44px; flex: none; border-radius: 14px;
+            display: grid; place-items: center; font-size: 20px;
+            background: rgba(253, 246, 236, 0.10); border: 1px solid rgba(253, 246, 236, 0.16);
         }
-
-        .cred-val {
-            background: var(--action-bg);
-            border: 1px solid var(--border-md);
-            border-radius: var(--radius-sm);
-            color: var(--ink);
-            font-family: "DM Mono", monospace;
-            font-size: 0.8rem;
-            padding: 7px 10px;
-            word-break: break-all;
+        .wf-brand h1 { font-size: 18px; font-weight: 700; color: var(--cream-light); letter-spacing: -0.01em; }
+        .wf-brand .wf-action { font-size: 12.5px; color: rgba(253, 246, 236, 0.72); display: flex; align-items: center; gap: 6px; }
+        .wf-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; scrollbar-width: none; }
+        .wf-steps::-webkit-scrollbar { display: none; }
+        .wf-step {
+            width: 100%; display: flex; gap: 12px; align-items: flex-start; text-align: left;
+            padding: 10px; border-radius: 14px; border: 1px solid transparent; background: transparent;
+            color: rgba(253, 246, 236, 0.78); cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
         }
-
-        .action-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            margin-bottom: 18px;
-            box-shadow: 0 1px 4px rgba(16, 44, 38, 0.06);
+        @media (hover: hover) { .wf-step:hover { background: rgba(253, 246, 236, 0.06); } }
+        .wf-num {
+            flex: none; width: 30px; height: 30px; aspect-ratio: 1; border-radius: 50%;
+            display: grid; place-items: center; font-size: 12.5px; font-weight: 700;
+            border: 1px solid rgba(253, 246, 236, 0.25); color: rgba(253, 246, 236, 0.85);
         }
-
-        .action-card-head {
-            background: var(--ink);
-            color: var(--cream-light);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 16px;
-            font-size: 0.68rem;
-            font-weight: 700;
-            letter-spacing: 0.09em;
-            text-transform: uppercase;
+        .wf-step-title { font-size: 13.5px; font-weight: 600; line-height: 1.3; color: var(--cream-light); }
+        .wf-step-sub { font-size: 12px; color: rgba(253, 246, 236, 0.62); line-height: 1.35; margin-top: 2px; }
+        .wf-step.done .wf-num { background: rgba(140, 191, 156, 0.25); border-color: transparent; color: var(--sage); }
+        .wf-step.active {
+            background: linear-gradient(135deg, rgba(212, 234, 216, 0.22), rgba(212, 234, 216, 0.08));
+            border-color: rgba(212, 234, 216, 0.30);
+            box-shadow: 0 1px 0 rgba(253, 246, 236, 0.18) inset, 0 10px 24px -12px rgba(140, 191, 156, 0.75);
         }
-
-        .action-card-head i {
-            opacity: 0.65;
-            font-size: 0.75rem;
+        .wf-step.active .wf-num {
+            border-color: rgba(253, 246, 236, 0.35); color: var(--cream-light);
+            background: radial-gradient(circle at 35% 30%, #8cbf9c 0%, var(--forest-light) 55%, var(--forest-mid) 100%);
+            box-shadow: 0 0 0 4px rgba(140, 191, 156, 0.16), 0 8px 18px -6px rgba(61, 122, 90, 0.9);
+            animation: sbPop 0.55s var(--spring);
         }
+        .wf-rail-foot { padding: 12px 6px 2px; border-top: 1px solid rgba(253, 246, 236, 0.10); margin-top: 10px; }
+        .wf-rail-foot .meter-row { color: rgba(253, 246, 236, 0.8); }
+        .wf-rail-foot .meter-row span:last-child { color: rgba(253, 246, 236, 0.7); }
+        .wf-rail-foot .meter { background: rgba(253, 246, 236, 0.15); }
+        .wf-rail-foot .meter > span { background: var(--sage); }
 
-        .pipe-row {
-            display: flex;
-            align-items: stretch;
-            padding: 0 16px 0 14px;
-            border-bottom: 1px solid var(--border);
-            transition: background 0.1s;
-        }
+        /* Main column */
+        .wf-main { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+        .wf-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 4px 2px 14px; }
+        .wf-top .wf-crumb { font-size: 13px; color: var(--ink-muted); }
+        .wf-top-end { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+        .wf-icon-btn { width: 40px; height: 40px; padding: 0; justify-content: center; }
 
-        .pipe-row:last-child {
-            border-bottom: none;
-        }
-
-        .pipe-row:hover {
-            background: #faf8f4;
-        }
-
-        .pipe-icon-col {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 32px;
-            flex-shrink: 0;
-            margin-right: 13px;
-            padding: 13px 0;
-        }
-
-        .pipe-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: var(--action-bg);
-            border: 1px solid var(--border-md);
-            color: var(--ink);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.82rem;
-            flex-shrink: 0;
-        }
-
-        .pipe-line {
-            width: 1.5px;
-            flex: 1;
-            min-height: 10px;
-            background: var(--border);
-            margin: 4px auto 0;
-        }
-
-        .pipe-content {
-            flex: 1;
-            min-width: 0;
-            padding: 13px 0;
-        }
-
-        .pipe-label {
-            color: var(--ink-soft);
-            font-size: 0.63rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            margin-bottom: 3px;
-        }
-
-        .pipe-text {
-            color: var(--ink);
-            font-size: 0.86rem;
-            font-weight: 500;
-            line-height: 1.45;
-        }
-
-        .tips-card {
-            background: var(--tip-bg);
-            border: 1px solid var(--tip-bdr);
-            border-radius: var(--radius);
-            padding: 14px 16px;
-            margin-bottom: 18px;
-        }
-
-        .tips-head {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            color: #7a5c1e;
-            font-size: 0.68rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-
-        .tips-head i {
-            color: #c49a3c;
-            font-size: 0.78rem;
-        }
-
-        .tips-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 7px;
-        }
-
-        .tip-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 9px;
-            color: #5a4510;
-            font-size: 0.83rem;
-            line-height: 1.45;
-        }
-
-        .tip-dot {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: rgba(196, 154, 60, 0.16);
-            color: #b8891c;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.5rem;
-            flex-shrink: 0;
-            margin-top: 3px;
-        }
-
-        .msg-card {
-            background: var(--msg-bg);
-            border: 1.5px solid var(--ink);
-            border-radius: var(--radius);
-            overflow: hidden;
-            margin-bottom: 18px;
-        }
-
-        .msg-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 9px 14px;
-            border-bottom: 1px solid rgba(27, 58, 45, 0.12);
-        }
-
-        .msg-label {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            color: var(--ink);
-            font-size: 0.68rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        .copy-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--ink);
-            color: var(--cream-light);
-            border: none;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.72rem;
-            font-weight: 600;
-            padding: 5px 11px;
-            transition: opacity 0.15s, background 0.15s;
-            white-space: nowrap;
-        }
-
-        .copy-btn:hover {
-            opacity: 0.82;
-        }
-
-        .copy-btn.copied {
-            background: #1a7a55;
-        }
-
-        .icon-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-md);
-            color: var(--ink-soft);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .icon-btn:hover {
-            background: var(--bg-deep);
-            color: var(--ink);
-        }
-
-        .icon-btn.copied {
-            background: #1a7a55;
-            color: #ffffff;
-            border-color: #1a7a55;
-        }
-
-        .msg-body {
-            color: var(--ink);
-            font-size: 0.9rem;
-            font-style: italic;
-            line-height: 1.65;
-            min-height: 64px;
-            padding: 16px;
-            white-space: pre-wrap;
-        }
-
-        .nav-footer {
-            display: none;
-            align-items: center;
-            gap: 12px;
-            border-top: 1px solid var(--border);
-            background: var(--bg);
-            padding: 12px 26px;
-            flex-shrink: 0;
-        }
-
-        .progress-wrap {
-            flex: 1;
-        }
-
-        .progress-label {
-            color: var(--ink-soft);
-            font-size: 0.67rem;
-            font-weight: 700;
-            letter-spacing: 0.07em;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .progress-track {
-            height: 3px;
-            background: var(--border);
-            border-radius: 10px;
+        /* Guide card: the part that also floats in Picture-in-Picture */
+        .wf-card {
+            flex: 1; min-height: 0;
+            display: flex; flex-direction: column;
+            background: var(--card); border-radius: var(--r-xl); box-shadow: var(--shadow-card);
             overflow: hidden;
         }
+        .wf-card-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 22px 26px; }
+        .wf-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+        .wf-title { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin: 4px 0 6px; color: var(--ink); }
+        .wf-desc { font-size: 14px; color: var(--ink-muted); margin: 0 0 18px; max-width: 70ch; }
 
-        .progress-fill {
-            height: 100%;
-            width: 0;
-            background: var(--ink);
-            border-radius: 10px;
-            transition: width 0.35s ease;
+        .wf-section { margin-top: 16px; }
+        .wf-section-head { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 8px; }
+        .wf-do { list-style: none; margin: 0; padding: 0; counter-reset: d; display: flex; flex-direction: column; gap: 8px; }
+        .wf-do li { display: flex; gap: 12px; align-items: flex-start; background: var(--cream-light); border-radius: var(--r-md); padding: 12px 14px; font-size: 14.5px; line-height: 1.45; }
+        .wf-do .do-ico { flex: none; width: 32px; height: 32px; aspect-ratio: 1; border-radius: 10px; display: grid; place-items: center; background: #fff; color: var(--forest-deep); box-shadow: var(--shadow-card); font-size: 13px; }
+        .wf-do .do-kind { display: block; font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-muted); }
+
+        .wf-tips { list-style: none; margin: 0; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--warn-soft); border-radius: var(--r-md); font-size: 13.5px; }
+        .wf-tips li { display: flex; gap: 8px; }
+        .wf-tips li::before { content: ''; flex: none; width: 6px; height: 6px; border-radius: 50%; margin-top: 8px; background: var(--warn); }
+
+        .wf-msg { background: var(--sage); border-radius: var(--r-md); padding: 14px; }
+        .wf-msg p { margin: 0 0 10px; font-size: 14.5px; white-space: pre-wrap; color: var(--forest-deep); }
+
+        /* Sign-in details (collapsible on every step) */
+        .wf-creds { border: 1px solid var(--line-strong); border-radius: var(--r-md); margin-bottom: 16px; background: #fff; }
+        .wf-creds summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 13.5px; font-weight: 600; }
+        .wf-creds summary::-webkit-details-marker { display: none; }
+        .wf-creds summary .chev { margin-left: auto; color: var(--ink-muted); transition: transform 0.2s; }
+        .wf-creds[open] summary .chev { transform: rotate(180deg); }
+        .wf-creds-body { padding: 0 14px 14px; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .wf-field label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-muted); margin-bottom: 4px; }
+        .wf-field .row { display: flex; gap: 6px; }
+        .wf-field .val { flex: 1; min-width: 0; background: var(--cream-light); border-radius: 10px; padding: 9px 12px; font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace; font-size: 13.5px; overflow-wrap: anywhere; }
+        .wf-field .btn-ghost { padding: 8px 11px; }
+
+        /* Card footer: navigation (works inside the floating window too) */
+        .wf-nav { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-top: 1px solid var(--line); background: var(--card); }
+        .wf-nav .wf-prog { flex: 1; min-width: 0; }
+        .wf-nav .wf-prog .meter-row { font-size: 12.5px; margin-bottom: 4px; }
+
+        /* "Back from the app?" prompt (phones) */
+        .wf-return {
+            position: fixed; left: 12px; right: 12px; bottom: calc(86px + env(safe-area-inset-bottom)); z-index: 50;
+            border-radius: var(--r-lg); padding: 14px; display: none;
+            animation: toastIn 0.3s var(--ease-out);
         }
+        .wf-return.show { display: block; }
+        .wf-return p { margin: 0 0 10px; font-size: 14px; color: var(--cream-light); }
+        .wf-return .row { display: flex; gap: 8px; }
+        .wf-return .btn-ghost { color: var(--cream-light); border-color: rgba(253, 246, 236, 0.35); }
 
-        .nav-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border: 1.5px solid var(--ink);
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 8px 16px;
-            transition: all 0.15s;
-            white-space: nowrap;
-        }
+        .wf-state { margin: auto; text-align: center; color: var(--ink-muted); padding: 40px 20px; }
 
-        .btn-ghost {
-            background: transparent;
-            color: var(--ink);
-        }
-
-        .btn-ghost:hover:not(:disabled) {
-            background: var(--bg-deep);
-        }
-
-        .btn-ghost:disabled {
-            cursor: default;
-            opacity: 0.28;
-        }
-
-        .btn-solid {
-            background: var(--ink);
-            color: var(--cream-light);
-        }
-
-        .btn-solid:hover {
-            opacity: 0.88;
-        }
-
-        .btn-done {
-            background: #1a7a55;
-            border-color: #1a7a55;
-            color: #ffffff;
-        }
-
-        .btn-done:hover {
-            background: #145e41;
-            border-color: #145e41;
-        }
-
-        .state-loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            color: var(--ink-soft);
-            font-size: 0.88rem;
-            padding: 60px 20px;
-        }
-
-        .spinner {
-            width: 30px;
-            height: 30px;
-            border: 2.5px solid var(--border);
-            border-top-color: var(--ink);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .state-error {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            background: #fef2f2;
-            border: 1px solid #fca5a5;
-            border-radius: var(--radius);
-            color: #7f1d1d;
-            font-size: 0.85rem;
-            margin: 20px;
-            padding: 14px 16px;
-        }
-
-        .step-enter {
-            animation: stepIn 0.2s ease both;
-        }
-
-        @keyframes stepIn {
-            from {
-                opacity: 0;
-                transform: translateY(7px);
+        /* Narrow screens: phones, and the guide when tiled beside the site */
+        .wf-mini, .wf-dots { display: none; }
+        .wf-action { display: flex; align-items: center; gap: 6px; }
+        @media (max-width: 900px) {
+            body.wf { overflow: auto; }
+            .wf-app { display: block; height: auto; min-height: 100dvh; padding: 0 0 calc(84px + env(safe-area-inset-bottom)); }
+            .wf-rail { display: none; }
+            .wf-mini {
+                display: flex; align-items: center; gap: 10px;
+                position: sticky; top: 0; z-index: 20;
+                padding: 12px 14px; color: var(--cream-light);
+                border-radius: 0 0 var(--r-lg) var(--r-lg);
             }
-            to {
-                opacity: 1;
-                transform: none;
-            }
+            .wf-mini .wf-plat { width: 38px; height: 38px; font-size: 17px; border-radius: 12px; }
+            .wf-mini .wf-mini-name { font-size: 15.5px; font-weight: 700; line-height: 1.2; }
+            .wf-mini .wf-action { font-size: 12px; color: rgba(253, 246, 236, 0.72); }
+            .wf-mini .wf-mini-end { margin-left: auto; display: flex; gap: 6px; }
+            .wf-mini .wf-icon-btn { width: 36px; height: 36px; background: rgba(253, 246, 236, 0.10); color: var(--cream-light); border: 1px solid rgba(253, 246, 236, 0.18); }
+            .wf-dots { display: flex; gap: 6px; padding: 12px 16px 4px; }
+            .wf-dots span { flex: 1; height: 5px; border-radius: 4px; background: rgba(27, 58, 45, 0.12); transition: background 0.3s; }
+            .wf-dots span.done { background: var(--forest-light); }
+            .wf-dots span.active { background: var(--forest-deep); }
+            .wf-main { padding: 0 12px; }
+            .wf-top { padding: 10px 2px 10px; }
+            .wf-top .wf-crumb { display: none; }
+            .wf-top-end { margin-left: 0; width: 100%; }
+            .wf-top-end .pill { flex: 1; justify-content: center; }
+            .wf-top-end .wf-close { display: none; }
+            .wf-card { overflow: visible; }
+            .wf-card-scroll { padding: 18px 16px; overflow: visible; }
+            .wf-title { font-size: 22px; }
+            .wf-nav { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 40; border-radius: var(--r-lg); box-shadow: var(--shadow-pop); border-top: 0; padding: 10px 12px; }
         }
 
-        @media (max-width: 720px) {
-            body {
-                overflow: auto;
-            }
-
-            .shell {
-                min-height: 100vh;
-                height: auto;
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                min-width: 0;
-                max-height: 260px;
-            }
-
-            .main {
-                min-height: 640px;
-            }
-
-            .main-body {
-                padding: 22px 18px 24px;
-            }
-
-            .cred-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .nav-footer {
-                align-items: stretch;
-                flex-wrap: wrap;
-                padding: 12px 18px;
-            }
-
-            .progress-wrap {
-                flex-basis: 100%;
-            }
-
-            .nav-btn {
-                flex: 1;
-                justify-content: center;
-            }
-        }
+        /* Inside the floating Picture-in-Picture window */
+        body.wf-pip { margin: 0; background: var(--card); overflow: hidden; }
+        body.wf-pip .wf-card { height: 100vh; border-radius: 0; box-shadow: none; }
+        body.wf-pip .wf-card-scroll { padding: 16px; }
+        body.wf-pip .wf-title { font-size: 19px; }
+        body.wf-pip .wf-creds-body { grid-template-columns: 1fr; }
+        body.wf-pip .wf-nav { padding: 10px 12px; }
     </style>
     <script src="js/config.js?v=2"></script>
 </head>
-<body>
-    <div class="shell">
-        <aside class="sidebar">
-            <div class="sb-head">
-                <div class="sb-platform-row">
-                    <div class="sb-icon" id="sbIcon"><i class="fas fa-globe"></i></div>
-                    <span class="sb-name" id="sbName">Platform</span>
-                    <button class="sb-close" onclick="window.close()" title="Close" type="button">
-                        <i class="fas fa-times"></i>
-                    </button>
+<body class="board-body wf">
+    <div class="wf-app">
+        <aside class="wf-rail glass" aria-label="Steps">
+            <div class="wf-brand">
+                <span class="wf-plat js-plat-icon"><i class="fas fa-globe"></i></span>
+                <div style="min-width:0">
+                    <h1 class="js-plat-name">Account</h1>
+                    <div class="wf-action js-action"><i class="fas fa-list"></i>Steps</div>
                 </div>
-                <div class="sb-badge" id="sbBadge"><i class="fas fa-list"></i> Workflow</div>
             </div>
-
-            <div class="sb-steps" id="sbSteps">
-                <div style="padding:20px;text-align:center;color:rgba(245,230,206,0.3);font-size:.78rem;">Loading...</div>
+            <ol class="wf-steps" id="wfSteps"></ol>
+            <div class="wf-rail-foot">
+                <div class="meter-row"><span>Progress</span><span class="js-progress-text">–</span></div>
+                <div class="meter"><span class="js-progress-bar"></span></div>
             </div>
-
-            <div class="sb-footer">DIGIPASS &middot; Workflow Guide</div>
         </aside>
 
-        <main class="main">
-            <div class="main-topbar">
-                <span class="step-pill" id="stepPill">Step - of -</span>
-                <span class="topbar-title" id="topbarTitle"></span>
+        <!-- Narrow header (phones and the tiled guide) -->
+        <header class="wf-mini glass">
+            <span class="wf-plat js-plat-icon"><i class="fas fa-globe"></i></span>
+            <div style="min-width:0">
+                <div class="wf-mini-name js-plat-name">Account</div>
+                <div class="wf-action js-action">Steps</div>
             </div>
+            <div class="wf-mini-end">
+                <button type="button" class="pill wf-icon-btn" id="closeBtnMini" aria-label="Close guide"><i class="fas fa-xmark"></i></button>
+            </div>
+        </header>
+        <div class="wf-dots wf-mini-dots" id="wfDots" aria-hidden="true"></div>
 
-            <div class="main-scroll" id="mainScroll">
-                <div class="main-body" id="mainBody">
-                    <div class="state-loading">
-                        <div class="spinner"></div>
-                        <span>Loading instructions...</span>
-                    </div>
+        <main class="wf-main">
+            <div class="wf-top">
+                <span class="wf-crumb">Follow each step, then come back here for the next one.</span>
+                <div class="wf-top-end">
+                    <button type="button" class="pill pill-primary" id="openSiteBtn" hidden><i class="fas fa-arrow-up-right-from-square"></i><span id="openSiteLabel">Open site</span></button>
+                    <button type="button" class="pill pill-outline" id="floatBtn" hidden><i class="fas fa-clone"></i>Float guide</button>
+                    <button type="button" class="pill wf-icon-btn wf-close" id="closeBtn" aria-label="Close guide"><i class="fas fa-xmark"></i></button>
                 </div>
             </div>
 
-            <div class="nav-footer" id="navFooter">
-                <div class="progress-wrap">
-                    <div class="progress-label" id="progressLabel">Step 1 of 1</div>
-                    <div class="progress-track">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
+            <!-- Everything inside #guideCard also works when moved into the floating window -->
+            <section class="wf-card" id="guideCard" aria-live="polite">
+                <div class="wf-card-scroll" data-role="scroll">
+                    <div class="wf-state"><div class="skeleton" style="height:220px"></div></div>
                 </div>
-                <button class="nav-btn btn-ghost" id="prevBtn" onclick="navigate(-1)" disabled type="button">
-                    <i class="fas fa-chevron-left"></i> Previous
-                </button>
-                <button class="nav-btn btn-solid" id="nextBtn" onclick="navigate(1)" type="button">
-                    Next <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
+                <nav class="wf-nav" aria-label="Step navigation">
+                    <button type="button" class="btn-ghost" data-act="prev"><i class="fas fa-chevron-left"></i>Back</button>
+                    <div class="wf-prog">
+                        <div class="meter-row"><span data-role="step-label">Step –</span><span data-role="step-pct"></span></div>
+                        <div class="meter"><span data-role="step-bar"></span></div>
+                    </div>
+                    <button type="button" class="btn-forest" data-act="next">Next<i class="fas fa-chevron-right"></i></button>
+                </nav>
+            </section>
         </main>
+    </div>
+
+    <div class="wf-return glass" id="returnPrompt" role="dialog" aria-live="polite">
+        <p id="returnText">Back from the app? Did that step work?</p>
+        <div class="row">
+            <button type="button" class="btn-ghost" id="returnNo">Not yet</button>
+            <button type="button" class="promo-btn" id="returnYes" style="width:auto;flex:1"><span>Yes, next step</span><span class="chev"><i class="fas fa-chevron-right"></i></span></button>
+        </div>
     </div>
 
     <script src="js/workflow-steps-detailed.js"></script>
     <script>
-        const API_URL = (window.DIGIPASS_API_ORIGIN || '') + '/api';
+        // ---------------- Data ----------------
         let allSteps = [];
         let current = 0;
-        // Progress is shared with the executor dashboard (same browser) so its
-        // board can show each account as not started / in progress / taken care of.
-        let progressAssetId = null;
-
-        function readSavedProgress() {
-            if (!progressAssetId) return null;
-            try { return JSON.parse(localStorage.getItem(`digipass-progress-${progressAssetId}`) || 'null'); }
-            catch (e) { return null; }
-        }
-
-        function saveProgress(step, total, done) {
-            if (!progressAssetId) return;
-            try {
-                localStorage.setItem(`digipass-progress-${progressAssetId}`,
-                    JSON.stringify({ step, total, done, updatedAt: Date.now() }));
-            } catch (e) { /* storage unavailable: board just won't update */ }
-        }
-        let assetInfo = null;
         let platformName = 'Platform';
+        let actionType = 'pass';
+        let assetInfo = null;
+        let progressAssetId = null;
+        let pipWindow = null;
+        let handedOffAt = 0;   // when we last sent the user out to the site/app
 
-        const ICON_RULES = [
-            { keys: ['open web browser', 'web browser', 'open browser', 'open chrome', 'open firefox', 'open safari', 'address bar'], icon: 'fa-globe', label: 'Open Browser' },
-            { keys: ['instagram.com', 'facebook.com', 'linkedin.com', 'twitter.com', 'x.com', 'disneyplus.com', 'netflix.com', 'spotify.com', 'gmail.com', 'google.com', 'amazon.com', 'messenger.com'], icon: 'fa-arrow-up-right-from-square', label: 'Visit Site' },
-            { keys: ['log in', 'login', 'sign in', 'enter username', 'enter email', 'enter your email', 'enter password', 'click "login"', 'click "log in"', 'click "sign in"'], icon: 'fa-right-to-bracket', label: 'Sign In' },
-            { keys: ['two-factor', '2fa', 'authenticat', 'verification code', 'approve the login'], icon: 'fa-shield-halved', label: '2FA Verification' },
-            { keys: ['click profile picture', 'click profile icon', 'profile icon', 'click your profile', 'top right corner', 'profile photo'], icon: 'fa-circle-user', label: 'Open Profile' },
-            { keys: ['accounts center', 'personal details', 'account ownership', 'deactivation or deletion'], icon: 'fa-sliders', label: 'Accounts Center' },
-            { keys: ['click "more"', 'click more', 'bottom-left', 'left sidebar', 'left navigation', 'navigation sidebar'], icon: 'fa-bars', label: 'Open Menu' },
-            { keys: ['click "settings"', 'open settings', 'settings ->', 'settings', 'go to settings', 'click settings'], icon: 'fa-gear', label: 'Settings' },
-            { keys: ['security section', 'login & security', 'security ->', 'click "security"'], icon: 'fa-lock', label: 'Security' },
-            { keys: ['change password', 'new password', 'enter new', 'confirm new password', 'click "change password"', 'update password'], icon: 'fa-key', label: 'Change Password' },
-            { keys: ['re-enter your password', 'enter your password', 'confirm your password', 'enter current password'], icon: 'fa-lock-open', label: 'Confirm Password' },
-            { keys: ['delete account', 'click "delete account"', 'permanently delet', 'select "delete account"'], icon: 'fa-trash', label: 'Delete Account' },
-            { keys: ['deactivate account', 'select "deactivate"', 'choose "deactivate"'], icon: 'fa-circle-pause', label: 'Deactivate' },
-            { keys: ['select a reason', 'choose a reason', 'select reason'], icon: 'fa-list-check', label: 'Select Reason' },
-            { keys: ['click "continue"', 'click continue', 'click "next"', 'continue'], icon: 'fa-arrow-right', label: 'Continue' },
-            { keys: ['confirm on the final', 'final screen', 'click "confirm"', 'confirm deletion', 'confirm'], icon: 'fa-circle-check', label: 'Confirm' },
-            { keys: ['download your data', 'export your data', 'download a copy'], icon: 'fa-download', label: 'Download Data' },
-            { keys: ['messenger icon', 'chat bubble', 'message icon', 'open direct messages', 'access your messages', 'inbox will open', 'open your inbox', 'open inbox', 'open messenger', 'paper plane'], icon: 'fa-comment-dots', label: 'Open Messages' },
-            { keys: ['select recipient', 'choose who', 'find the person', 'search for the person', 'open the conversation', 'click their name', 'type the person'], icon: 'fa-user', label: 'Select Contact' },
-            { keys: ['type your', 'compose', 'write your message', 'click message input', 'message input field', 'farewell message'], icon: 'fa-pen-to-square', label: 'Compose Message' },
-            { keys: ['click send', 'send button', 'click "send"', 'message is sent', 'press send', 'airplane icon'], icon: 'fa-paper-plane', label: 'Send' },
-            { keys: ['subscription', 'billing', 'payment', 'check your card', 'payment method', 'click "subscriptions"'], icon: 'fa-credit-card', label: 'Billing' },
-            { keys: ['trusted contact', 'trusted contacts', 'add executor'], icon: 'fa-user-shield', label: 'Trusted Contacts' },
-            { keys: ['screenshot', 'take screenshots', 'take a screenshot'], icon: 'fa-camera', label: 'Screenshot' },
-            { keys: ['save this info', 'write down', 'save in a secure', 'note any', 'list all', 'document account'], icon: 'fa-floppy-disk', label: 'Save Info' },
-            { keys: ['cancel subscription', 'cancel your subscription', 'click "cancel"'], icon: 'fa-ban', label: 'Cancel' },
-            { keys: ['verify', 'confirm cancellation'], icon: 'fa-circle-check', label: 'Verify' },
-            { keys: ['scroll down', 'scroll to find'], icon: 'fa-arrows-up-down', label: 'Scroll' },
-            { keys: ['press enter', 'press tab'], icon: 'fa-keyboard', label: 'Keyboard' },
-            { keys: ['click "save"', 'click save', 'save changes'], icon: 'fa-floppy-disk', label: 'Save' },
-            { keys: ['wait for', 'fully load', 'page to load'], icon: 'fa-hourglass-half', label: 'Wait' },
-        ];
+        const IS_NARROW = () => window.matchMedia('(max-width: 900px)').matches;
+        const IS_TOUCH = () => window.matchMedia('(pointer: coarse)').matches;
+
+        // Where each platform lives. On phones these https links open the installed app.
+        const PLATFORM_URLS = {
+            'Instagram': 'https://www.instagram.com/',
+            'Facebook': 'https://www.facebook.com/',
+            'Twitter': 'https://x.com/',
+            'LinkedIn': 'https://www.linkedin.com/',
+            'TikTok': 'https://www.tiktok.com/',
+            'Snapchat': 'https://accounts.snapchat.com/',
+            'Discord': 'https://discord.com/app',
+            'Gmail': 'https://mail.google.com/',
+            'Outlook': 'https://outlook.live.com/',
+            'Yahoo Mail': 'https://mail.yahoo.com/',
+            'ProtonMail': 'https://mail.proton.me/',
+            'PayPal': 'https://www.paypal.com/',
+            'Google Pay': 'https://pay.google.com/',
+            'Amazon': 'https://www.amazon.com/',
+            'Google Drive': 'https://drive.google.com/',
+            'Dropbox': 'https://www.dropbox.com/',
+            'OneDrive': 'https://onedrive.live.com/',
+            'iCloud': 'https://www.icloud.com/',
+            'Netflix': 'https://www.netflix.com/',
+            'Spotify': 'https://www.spotify.com/account/',
+            'Disney+': 'https://www.disneyplus.com/',
+            'Hulu': 'https://www.hulu.com/'
+        };
 
         const PLATFORM_ICONS = {
-            instagram: 'fab fa-instagram',
-            facebook: 'fab fa-facebook-f',
-            twitter: 'fab fa-twitter',
-            x: 'fab fa-x-twitter',
-            linkedin: 'fab fa-linkedin-in',
-            gmail: 'fas fa-envelope',
-            google: 'fab fa-google',
-            netflix: 'fas fa-film',
-            spotify: 'fab fa-spotify',
-            amazon: 'fab fa-amazon',
-            apple: 'fab fa-apple',
-            disney: 'fas fa-wand-magic-sparkles',
-            youtube: 'fab fa-youtube',
-            snapchat: 'fab fa-snapchat',
-            tiktok: 'fab fa-tiktok',
-            reddit: 'fab fa-reddit-alien',
-            discord: 'fab fa-discord',
-            whatsapp: 'fab fa-whatsapp',
-            pinterest: 'fab fa-pinterest',
+            instagram: 'fab fa-instagram', facebook: 'fab fa-facebook-f', twitter: 'fab fa-x-twitter', linkedin: 'fab fa-linkedin-in',
+            gmail: 'fas fa-envelope', outlook: 'fas fa-envelope', yahoo: 'fab fa-yahoo', proton: 'fas fa-envelope',
+            'google pay': 'fab fa-google-pay', 'google drive': 'fab fa-google-drive', google: 'fab fa-google',
+            paypal: 'fab fa-paypal', netflix: 'fas fa-film', spotify: 'fab fa-spotify', amazon: 'fab fa-amazon',
+            dropbox: 'fab fa-dropbox', icloud: 'fab fa-apple', disney: 'fas fa-wand-magic-sparkles', tiktok: 'fab fa-tiktok',
+            snapchat: 'fab fa-snapchat', discord: 'fab fa-discord', hulu: 'fas fa-tv'
         };
 
         const ACTION_META = {
-            delete: { icon: 'fa-trash', label: 'Delete Account' },
-            pass: { icon: 'fa-share-nodes', label: 'Pass to Executor' },
-            pass_executor: { icon: 'fa-share-nodes', label: 'Pass to Executor' },
-            last_message: { icon: 'fa-paper-plane', label: 'Last Message' },
-            memorialise: { icon: 'fa-ribbon', label: 'Memorialise' },
-            memorialize: { icon: 'fa-ribbon', label: 'Memorialize' },
-            transfer: { icon: 'fa-right-left', label: 'Transfer' },
-            download: { icon: 'fa-download', label: 'Download' },
-            deactivate: { icon: 'fa-circle-pause', label: 'Deactivate' },
+            delete: { icon: 'fa-trash-can', label: 'Delete account' },
+            pass: { icon: 'fa-hand-holding-heart', label: 'Pass on' },
+            pass_executor: { icon: 'fa-hand-holding-heart', label: 'Pass on' },
+            last_message: { icon: 'fa-feather', label: 'Last message' }
         };
 
+        const ICON_RULES = [
+            { keys: ['open web browser', 'web browser', 'open browser', 'address bar'], icon: 'fa-globe', label: 'Open browser' },
+            { keys: ['.com'], icon: 'fa-arrow-up-right-from-square', label: 'Go to site' },
+            { keys: ['log in', 'login', 'sign in', 'enter username', 'enter email', 'enter password'], icon: 'fa-right-to-bracket', label: 'Sign in' },
+            { keys: ['two-factor', '2fa', 'authenticat', 'verification code'], icon: 'fa-shield-halved', label: 'Verification' },
+            { keys: ['profile picture', 'profile icon', 'your profile', 'top right', 'profile photo'], icon: 'fa-circle-user', label: 'Profile' },
+            { keys: ['accounts center', 'personal details', 'account ownership', 'deactivation or deletion'], icon: 'fa-sliders', label: 'Accounts Center' },
+            { keys: ['settings'], icon: 'fa-gear', label: 'Settings' },
+            { keys: ['security'], icon: 'fa-lock', label: 'Security' },
+            { keys: ['change password', 'new password'], icon: 'fa-key', label: 'Password' },
+            { keys: ['delete account', 'permanently delet'], icon: 'fa-trash-can', label: 'Delete' },
+            { keys: ['deactivate'], icon: 'fa-circle-pause', label: 'Deactivate' },
+            { keys: ['reason'], icon: 'fa-list-check', label: 'Choose a reason' },
+            { keys: ['download your data', 'export', 'download a copy'], icon: 'fa-download', label: 'Download data' },
+            { keys: ['message', 'compose', 'post'], icon: 'fa-pen-to-square', label: 'Write' },
+            { keys: ['send'], icon: 'fa-paper-plane', label: 'Send' },
+            { keys: ['subscription', 'billing', 'payment'], icon: 'fa-credit-card', label: 'Billing' },
+            { keys: ['confirm'], icon: 'fa-circle-check', label: 'Confirm' },
+            { keys: ['continue', 'next'], icon: 'fa-arrow-right', label: 'Continue' },
+            { keys: ['scroll'], icon: 'fa-arrows-up-down', label: 'Scroll' },
+            { keys: ['press enter', 'press tab'], icon: 'fa-keyboard', label: 'Keyboard' },
+            { keys: ['save'], icon: 'fa-floppy-disk', label: 'Save' },
+            { keys: ['wait', 'load'], icon: 'fa-hourglass-half', label: 'Wait' }
+        ];
+
         function esc(value) {
-            if (value == null) return '';
-            const div = document.createElement('div');
-            div.textContent = String(value);
-            return div.innerHTML;
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
         }
 
         function iconFor(text) {
             const low = String(text || '').toLowerCase();
-            for (const rule of ICON_RULES) {
-                if (rule.keys.some((key) => low.includes(key))) {
-                    return { icon: rule.icon, label: rule.label };
-                }
-            }
-            return { icon: 'fa-computer-mouse', label: 'Action' };
+            const rule = ICON_RULES.find(r => r.keys.some(k => low.includes(k)));
+            return rule ? { icon: rule.icon, label: rule.label } : { icon: 'fa-hand-pointer', label: 'Do this' };
         }
 
         function parseAction(raw) {
             if (!raw) return [];
             return String(raw)
-                .split(/\s*(?:->|\u2192|\u00e2\u2020\u2019)\s*|\n+|\d+\)\s+|\d+\.\s+/)
-                .map((chunk) => chunk.trim())
-                .filter((chunk) => chunk.length > 3)
-                .map((text) => ({ text, ...iconFor(text) }));
+                .split(/\s*(?:->|→)\s*|\n+|\d+\)\s+|\d+\.\s+/)
+                .map(s => s.trim())
+                .filter(s => s.length > 3)
+                .map(text => ({ text, ...iconFor(text) }));
         }
 
-        function applyBranding(actionType) {
-            document.getElementById('sbName').textContent = platformName;
-            const platformKey = Object.keys(PLATFORM_ICONS).find((key) => platformName.toLowerCase().includes(key));
-            document.getElementById('sbIcon').innerHTML = `<i class="${platformKey ? PLATFORM_ICONS[platformKey] : 'fas fa-globe'}"></i>`;
-
-            const meta = ACTION_META[actionType] || { icon: 'fa-list', label: 'Workflow' };
-            document.getElementById('sbBadge').innerHTML = `<i class="fas ${meta.icon}"></i> ${esc(meta.label)}`;
+        function platformIcon() {
+            const low = platformName.toLowerCase();
+            const key = Object.keys(PLATFORM_ICONS).sort((a, b) => b.length - a.length).find(k => low.includes(k));
+            return key ? PLATFORM_ICONS[key] : 'fas fa-globe';
         }
 
-        function buildSidebar() {
-            const sidebar = document.getElementById('sbSteps');
-            sidebar.innerHTML = allSteps.map((step, i) => `
-                <div class="sb-step${i === current ? ' active' : ''}" id="sbStep${i}" onclick="goTo(${i})">
-                    <div class="sb-num" id="sbNum${i}">${i + 1}</div>
-                    <div class="sb-step-text">
-                        <div class="sb-step-title">${esc(step.title || `Step ${i + 1}`)}</div>
-                        <div class="sb-step-sub">${esc(step.description || '')}</div>
-                    </div>
-                </div>
-                ${i < allSteps.length - 1 ? '<div class="sb-connector"></div>' : ''}
-            `).join('');
+        // ---------------- Progress (shared with the executor board) ----------------
+        function readSavedProgress() {
+            if (!progressAssetId) return null;
+            try { return JSON.parse(localStorage.getItem(`digipass-progress-${progressAssetId}`) || 'null'); }
+            catch (e) { return null; }
+        }
+        function saveProgress(step, total, done) {
+            if (!progressAssetId) return;
+            try {
+                localStorage.setItem(`digipass-progress-${progressAssetId}`, JSON.stringify({ step, total, done, updatedAt: Date.now() }));
+            } catch (e) { /* storage unavailable: the board just won't update */ }
         }
 
-        function syncSidebar() {
-            allSteps.forEach((_, i) => {
-                const row = document.getElementById(`sbStep${i}`);
-                const num = document.getElementById(`sbNum${i}`);
-                if (!row || !num) return;
+        // ---------------- Rendering ----------------
+        // The card may live in this window or in the floating window, so always
+        // look things up through the card, never through `document`.
+        const card = () => document.getElementById('guideCard') || (pipWindow && pipWindow.document.getElementById('guideCard'));
 
-                row.classList.toggle('active', i === current);
-                row.classList.toggle('done', i < current);
-                num.innerHTML = i < current
-                    ? '<i class="fas fa-check" style="font-size:.55rem"></i>'
-                    : String(i + 1);
-            });
-        }
-
-        function renderCredentials(idx, step) {
-            if (idx !== 0 || !assetInfo?.account_password) return '';
-
-            const hasCredentialStep = !step.credentials || step.credentials.length || assetInfo.account_identifier;
-            if (!hasCredentialStep) return '';
-
-            const encUser = encodeURIComponent(assetInfo.account_identifier || '');
-            const encPass = encodeURIComponent(assetInfo.account_password || '');
-            const hiddenPass = '•'.repeat((assetInfo.account_password || '').length || 8);
-
+        function renderCredentials() {
+            if (!assetInfo || (!assetInfo.account_identifier && !assetInfo.account_password)) return '';
+            const openFirst = current <= 1 ? ' open' : '';
             return `
-                <div class="cred-box">
-                    <div class="cred-header"><i class="fas fa-key"></i> Login Credentials</div>
-                    <div class="cred-grid">
-                        <div class="cred-field">
-                            <label>Username / Email</label>
-                            <div style="display:flex; gap: 8px;">
-                                <div class="cred-val" style="flex:1;">${esc(assetInfo.account_identifier || '')}</div>
-                                <button class="icon-btn" onclick="copyIcon(this, '${encUser}')" type="button" title="Copy Username">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="cred-field">
+                <details class="wf-creds"${openFirst}>
+                    <summary><i class="fas fa-key"></i>Sign-in details for this account<i class="fas fa-chevron-down chev"></i></summary>
+                    <div class="wf-creds-body">
+                        ${assetInfo.account_identifier ? `
+                        <div class="wf-field">
+                            <label>Email or username</label>
+                            <div class="row"><span class="val">${esc(assetInfo.account_identifier)}</span>
+                                <button type="button" class="btn-ghost" data-act="copy" data-copy="user" aria-label="Copy username"><i class="fas fa-copy"></i></button></div>
+                        </div>` : ''}
+                        ${assetInfo.account_password ? `
+                        <div class="wf-field">
                             <label>Password</label>
-                            <div style="display:flex; gap: 8px;">
-                                <div class="cred-val" id="pwdVal" data-pwd="${encPass}" style="flex:1;">${hiddenPass}</div>
-                                <button class="icon-btn" onclick="togglePwd(this)" type="button" title="Show Password">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="icon-btn" onclick="copyIcon(this, '${encPass}')" type="button" title="Copy Password">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
+                            <div class="row"><span class="val" data-role="pwd">${'•'.repeat(Math.min(assetInfo.account_password.length, 12) || 8)}</span>
+                                <button type="button" class="btn-ghost" data-act="reveal" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                                <button type="button" class="btn-ghost" data-act="copy" data-copy="pass" aria-label="Copy password"><i class="fas fa-copy"></i></button></div>
+                        </div>` : ''}
                     </div>
-                </div>
-            `;
+                </details>`;
         }
 
-        function renderActionCard(step) {
-            const chunks = parseAction(step.action);
-            const rows = chunks.map((chunk, i) => `
-                <div class="pipe-row">
-                    <div class="pipe-icon-col">
-                        <div class="pipe-icon"><i class="fas ${esc(chunk.icon)}"></i></div>
-                        ${i < chunks.length - 1 ? '<div class="pipe-line"></div>' : ''}
-                    </div>
-                    <div class="pipe-content">
-                        <div class="pipe-label">${esc(chunk.label)}</div>
-                        <div class="pipe-text">${esc(chunk.text)}</div>
-                    </div>
-                </div>
-            `).join('');
-
-            return `
-                <div class="action-card">
-                    <div class="action-card-head"><i class="fas fa-arrow-pointer"></i> How to do it</div>
-                    ${rows || '<div style="padding:16px;font-size:.85rem;color:var(--ink-soft)">No actions specified.</div>'}
-                </div>
-            `;
-        }
-
-        function renderTips(step) {
-            if (!Array.isArray(step.tips) || !step.tips.length) return '';
-
-            return `
-                <div class="tips-card">
-                    <div class="tips-head"><i class="fas fa-lightbulb"></i> Tips &amp; Notes</div>
-                    <ul class="tips-list">
-                        ${step.tips.map((tip) => `
-                            <li class="tip-row">
-                                <div class="tip-dot"><i class="fas fa-circle"></i></div>
-                                <span>${esc(tip)}</span>
-                            </li>
-                        `).join('')}
-                    </ul>
-                </div>
-            `;
-        }
-
-        function renderMessage(step) {
-            if (!step.message) return '';
-            const encoded = encodeURIComponent(step.message);
-
-            return `
-                <div class="msg-card">
-                    <div class="msg-head">
-                        <div class="msg-label"><i class="fas fa-message"></i> Your Message</div>
-                        <button class="copy-btn" onclick="copyMessage(this, '${encoded}')" type="button">
-                            <i class="fas fa-copy"></i> Copy
-                        </button>
-                    </div>
-                    <div class="msg-body">${esc(step.message)}</div>
-                </div>
-            `;
-        }
-
-        function renderStep(idx) {
-            const step = allSteps[idx];
+        function renderStep() {
+            const root = card();
+            const step = allSteps[current];
+            if (!root || !step) return;
             const total = allSteps.length;
-            if (!step) return;
+            const pct = Math.round(((current + 1) / total) * 100);
+            const meta = ACTION_META[actionType] || { icon: 'fa-list', label: 'Steps' };
+            const actions = parseAction(step.action);
 
-            document.getElementById('stepPill').textContent = `Step ${idx + 1} of ${total}`;
-            document.getElementById('topbarTitle').textContent = step.title || '';
-            document.getElementById('progressLabel').textContent = `Step ${idx + 1} of ${total}`;
-            document.getElementById('progressFill').style.width = `${((idx + 1) / total) * 100}%`;
+            root.querySelector('[data-role="scroll"]').innerHTML = `
+                ${renderCredentials()}
+                <div class="wf-head">
+                    <span class="tag tag-neutral">Step ${current + 1} of ${total}</span>
+                    <span class="tag ${actionType === 'delete' ? 'tag-delete' : actionType === 'last_message' ? 'tag-message' : 'tag-pass'}"><i class="fas ${meta.icon}"></i>${esc(meta.label)}</span>
+                </div>
+                <h2 class="wf-title">${esc(step.title || `Step ${current + 1}`)}</h2>
+                ${step.description ? `<p class="wf-desc">${esc(step.description)}</p>` : ''}
+                ${actions.length ? `
+                <div class="wf-section">
+                    <div class="wf-section-head"><i class="fas fa-hand-pointer"></i>What to do</div>
+                    <ol class="wf-do">
+                        ${actions.map(a => `<li><span class="do-ico"><i class="fas ${a.icon}"></i></span><span><span class="do-kind">${esc(a.label)}</span>${esc(a.text)}</span></li>`).join('')}
+                    </ol>
+                </div>` : ''}
+                ${step.message ? `
+                <div class="wf-section">
+                    <div class="wf-section-head"><i class="fas fa-feather"></i>Their message to post</div>
+                    <div class="wf-msg"><p>${esc(step.message)}</p>
+                        <button type="button" class="btn-forest" data-act="copy" data-copy="message"><i class="fas fa-copy"></i>Copy message</button></div>
+                </div>` : ''}
+                ${Array.isArray(step.tips) && step.tips.length ? `
+                <div class="wf-section">
+                    <div class="wf-section-head"><i class="fas fa-lightbulb"></i>Good to know</div>
+                    <ul class="wf-tips">${step.tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+                </div>` : ''}
+            `;
+            root.querySelector('[data-role="scroll"]').scrollTop = 0;
 
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            prevBtn.disabled = idx === 0;
+            root.querySelector('[data-role="step-label"]').textContent = `Step ${current + 1} of ${total}`;
+            root.querySelector('[data-role="step-pct"]').textContent = `${pct}%`;
+            root.querySelector('[data-role="step-bar"]').style.width = `${pct}%`;
+
+            const prev = root.querySelector('[data-act="prev"]');
+            const next = root.querySelector('[data-act="next"]');
+            prev.disabled = current === 0;
+            const last = current === total - 1;
+            next.dataset.act = last ? 'done' : 'next';
+            next.innerHTML = last ? '<i class="fas fa-check"></i>Taken care of' : 'Next<i class="fas fa-chevron-right"></i>';
+
+            renderRail(pct);
 
             const saved = readSavedProgress();
-            saveProgress(idx + 1, total, Boolean(saved && saved.done));
+            saveProgress(current + 1, total, Boolean(saved && saved.done));
+        }
 
-            if (idx === total - 1) {
-                nextBtn.className = 'nav-btn btn-done';
-                nextBtn.innerHTML = '<i class="fas fa-check"></i> Done';
-                nextBtn.onclick = () => {
-                    saveProgress(total, total, true);
-                    window.close();
-                };
-            } else {
-                nextBtn.className = 'nav-btn btn-solid';
-                nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
-                nextBtn.onclick = () => navigate(1);
+        function renderRail(pct) {
+            document.getElementById('wfSteps').innerHTML = allSteps.map((s, i) => `
+                <li><button type="button" class="wf-step${i === current ? ' active' : ''}${i < current ? ' done' : ''}" data-goto="${i}" ${i === current ? 'aria-current="step"' : ''}>
+                    <span class="wf-num">${i < current ? '<i class="fas fa-check"></i>' : i + 1}</span>
+                    <span><span class="wf-step-title">${esc(s.title || `Step ${i + 1}`)}</span>${s.description ? `<span class="wf-step-sub" style="display:block">${esc(s.description)}</span>` : ''}</span>
+                </button></li>`).join('');
+            document.querySelectorAll('.js-progress-text').forEach(el => { el.textContent = `${current + 1} of ${allSteps.length}`; });
+            document.querySelectorAll('.js-progress-bar').forEach(el => { el.style.width = `${pct}%`; });
+            document.getElementById('wfDots').innerHTML = allSteps.map((_, i) =>
+                `<span class="${i < current ? 'done' : i === current ? 'active' : ''}"></span>`).join('');
+        }
+
+        function goTo(i) {
+            if (i < 0 || i >= allSteps.length) return;
+            current = i;
+            renderStep();
+            if (IS_NARROW() && !pipWindow) window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function finish() {
+            saveProgress(allSteps.length, allSteps.length, true);
+            const root = card();
+            root.querySelector('[data-role="scroll"]').innerHTML = `
+                <div class="state-panel" style="margin:20px auto">
+                    <div class="state-icon"><i class="fas fa-circle-check"></i></div>
+                    <h2>${esc(platformName)} is taken care of</h2>
+                    <p>Thank you. This account now shows as done on your board. You can close this window.</p>
+                </div>`;
+            root.querySelector('[data-act="prev"]').disabled = false;
+            const next = root.querySelector('[data-act="done"], [data-act="next"]');
+            next.dataset.act = 'close';
+            next.innerHTML = '<i class="fas fa-xmark"></i>Close';
+        }
+
+        // ---------------- Card interactions (delegated, so they work in the floating window) ----------------
+        async function copyText(text, button) {
+            try {
+                await navigator.clipboard.writeText(text);
+            } catch (e) {
+                const ta = button.ownerDocument.createElement('textarea');
+                ta.value = text; button.ownerDocument.body.appendChild(ta); ta.select();
+                button.ownerDocument.execCommand('copy'); ta.remove();
+            }
+            const html = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i>' + (button.textContent.trim() ? 'Copied' : '');
+            setTimeout(() => { button.innerHTML = html; }, 1600);
+        }
+
+        function onCardClick(e) {
+            const btn = e.target.closest('[data-act]');
+            if (!btn) return;
+            const act = btn.dataset.act;
+            if (act === 'prev') goTo(current - 1);
+            else if (act === 'next') goTo(current + 1);
+            else if (act === 'done') finish();
+            else if (act === 'close') closeGuide();
+            else if (act === 'copy') {
+                const what = btn.dataset.copy;
+                const text = what === 'user' ? assetInfo.account_identifier : what === 'pass' ? assetInfo.account_password : allSteps[current].message;
+                copyText(text || '', btn);
+            } else if (act === 'reveal') {
+                const val = btn.closest('.row').querySelector('[data-role="pwd"]');
+                const showing = btn.dataset.showing === '1';
+                val.textContent = showing ? '•'.repeat(Math.min(assetInfo.account_password.length, 12) || 8) : assetInfo.account_password;
+                btn.dataset.showing = showing ? '0' : '1';
+                btn.innerHTML = showing ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+                btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+            }
+        }
+
+        // ---------------- Opening the real site ----------------
+        function siteUrl() { return PLATFORM_URLS[platformName] || null; }
+
+        // Laptop: put the site in a window filling the space to the right of this guide.
+        // Phone: a normal link, which opens the installed app if there is one.
+        function openSite() {
+            const url = siteUrl();
+            if (!url) return;
+            handedOffAt = Date.now();
+
+            if (IS_TOUCH() && IS_NARROW()) {
+                window.open(url, '_blank', 'noopener');
+                return;
             }
 
-            document.getElementById('mainBody').innerHTML = `
-                <div class="step-enter">
-                    ${renderCredentials(idx, step)}
-                    <div class="step-eyebrow">Step ${idx + 1} - ${esc(step.description || '')}</div>
-                    <h1 class="step-h1">${esc(step.title || `Step ${idx + 1}`)}</h1>
-                    <div class="divider"></div>
-                    ${renderActionCard(step)}
-                    ${renderTips(step)}
-                    ${renderMessage(step)}
-                </div>
-            `;
+            const scr = window.screen;
+            const left0 = scr.availLeft || 0;
+            const top0 = scr.availTop || 0;
+            // Narrow guide on the left, site on the rest of the screen
+            const guideW = Math.min(480, Math.round(scr.availWidth * 0.34));
+            try { window.moveTo(left0, top0); window.resizeTo(guideW, scr.availHeight); } catch (e) { /* only works for popup windows */ }
+            const guideRight = Math.max(window.screenX + window.outerWidth, left0 + guideW);
+            const siteW = Math.max(600, left0 + scr.availWidth - guideRight);
+            const features = `popup=yes,left=${guideRight},top=${top0},width=${siteW},height=${scr.availHeight}`;
+            const win = window.open(url, 'digipass-site', features);
+            if (!win) window.open(url, '_blank', 'noopener'); // popup blocked: plain tab
         }
 
-        function navigate(direction) {
-            const next = current + direction;
-            if (next >= 0 && next < allSteps.length) {
-                goTo(next);
-            }
-        }
+        // ---------------- Floating guide (Chrome/Edge desktop) ----------------
+        async function floatGuide() {
+            if (!('documentPictureInPicture' in window)) return;
+            if (pipWindow) { pipWindow.close(); return; }
 
-        function goTo(idx) {
-            current = idx;
-            syncSidebar();
-            renderStep(idx);
-            document.getElementById('mainScroll').scrollTo({ top: 0, behavior: 'smooth' });
-        }
+            const node = document.getElementById('guideCard');
+            const placeholder = document.createElement('div');
+            placeholder.className = 'wf-state';
+            placeholder.id = 'guidePlaceholder';
+            placeholder.innerHTML = '<p>The guide is floating in its own window. Close it to bring it back here.</p>';
 
-        function copyMessage(button, encodedMessage) {
-            const message = decodeURIComponent(encodedMessage);
-            navigator.clipboard.writeText(message).then(() => {
-                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                button.classList.add('copied');
-                setTimeout(() => {
-                    button.innerHTML = '<i class="fas fa-copy"></i> Copy';
-                    button.classList.remove('copied');
-                }, 2200);
-            }).catch(() => {
-                button.textContent = 'Copy failed';
+            pipWindow = await documentPictureInPicture.requestWindow({ width: 400, height: 620 });
+            // Copy the page's styles into the floating window
+            [...document.styleSheets].forEach(sheet => {
+                try {
+                    const style = pipWindow.document.createElement('style');
+                    style.textContent = [...sheet.cssRules].map(r => r.cssText).join('\n');
+                    pipWindow.document.head.appendChild(style);
+                } catch (e) {
+                    if (sheet.href) {
+                        const link = pipWindow.document.createElement('link');
+                        link.rel = 'stylesheet'; link.href = sheet.href;
+                        pipWindow.document.head.appendChild(link);
+                    }
+                }
             });
+            pipWindow.document.title = `${platformName} guide`;
+            pipWindow.document.body.className = 'board-body wf-pip';
+            node.parentNode.insertBefore(placeholder, node);
+            pipWindow.document.body.append(node);
+            document.getElementById('floatBtn').innerHTML = '<i class="fas fa-clone"></i>Bring guide back';
+
+            pipWindow.addEventListener('pagehide', () => {
+                const ph = document.getElementById('guidePlaceholder');
+                ph.replaceWith(node);
+                pipWindow = null;
+                document.getElementById('floatBtn').innerHTML = '<i class="fas fa-clone"></i>Float guide';
+            });
+
+            // Take them to the site in this tab's browser; the guide stays on top
+            const url = siteUrl();
+            if (url) { handedOffAt = Date.now(); window.open(url, '_blank', 'noopener'); }
         }
 
-        function copyIcon(button, encodedText) {
-            const text = decodeURIComponent(encodedText);
-            navigator.clipboard.writeText(text).then(() => {
-                const icon = button.querySelector('i');
-                const oldClass = icon.className;
-                icon.className = 'fas fa-check';
-                button.classList.add('copied');
-                setTimeout(() => {
-                    icon.className = oldClass;
-                    button.classList.remove('copied');
-                }, 2000);
-            }).catch(() => {});
+        // ---------------- Phone: "back from the app?" ----------------
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState !== 'visible' || !handedOffAt || pipWindow) return;
+            if (!IS_NARROW()) return;
+            if (Date.now() - handedOffAt < 4000) return; // came straight back; probably didn't do anything yet
+            handedOffAt = 0;
+            const last = current === allSteps.length - 1;
+            document.getElementById('returnText').textContent = last
+                ? `Back from ${platformName}? Did you finish the last step?`
+                : `Back from ${platformName}? Did step ${current + 1} work?`;
+            document.querySelector('#returnYes span').textContent = last ? 'Yes, all done' : 'Yes, next step';
+            document.getElementById('returnPrompt').classList.add('show');
+        });
+        document.getElementById('returnYes').addEventListener('click', () => {
+            document.getElementById('returnPrompt').classList.remove('show');
+            if (current === allSteps.length - 1) finish(); else goTo(current + 1);
+        });
+        document.getElementById('returnNo').addEventListener('click', () => {
+            document.getElementById('returnPrompt').classList.remove('show');
+        });
+
+        // ---------------- Wiring ----------------
+        function closeGuide() {
+            if (pipWindow) pipWindow.close();
+            window.close();
         }
 
-        function togglePwd(button) {
-            const pwdVal = document.getElementById('pwdVal');
-            const icon = button.querySelector('i');
-            const isHidden = icon.classList.contains('fa-eye');
-            
-            if (isHidden) {
-                icon.className = 'fas fa-eye-slash';
-                pwdVal.textContent = decodeURIComponent(pwdVal.getAttribute('data-pwd'));
-            } else {
-                icon.className = 'fas fa-eye';
-                pwdVal.textContent = '•'.repeat(decodeURIComponent(pwdVal.getAttribute('data-pwd')).length || 8);
-            }
-        }
+        document.getElementById('guideCard').addEventListener('click', onCardClick);
+        document.getElementById('wfSteps').addEventListener('click', (e) => {
+            const b = e.target.closest('[data-goto]');
+            if (b) goTo(Number(b.dataset.goto));
+        });
+        document.getElementById('closeBtn').addEventListener('click', closeGuide);
+        document.getElementById('closeBtnMini').addEventListener('click', closeGuide);
+        document.getElementById('openSiteBtn').addEventListener('click', openSite);
+        document.getElementById('floatBtn').addEventListener('click', floatGuide);
+        document.addEventListener('keydown', (e) => {
+            if (e.target.closest('input, textarea')) return;
+            if (e.key === 'ArrowRight') goTo(current + 1);
+            if (e.key === 'ArrowLeft') goTo(current - 1);
+        });
 
         function showError(message) {
-            document.getElementById('mainBody').innerHTML = `
-                <div class="state-error">
-                    <i class="fas fa-triangle-exclamation" style="flex-shrink:0;margin-top:2px"></i>
-                    <span>${esc(message)}</span>
-                </div>
-            `;
-            document.getElementById('stepPill').textContent = 'Error';
-            document.getElementById('topbarTitle').textContent = '';
-            document.getElementById('navFooter').style.display = 'none';
+            card().querySelector('[data-role="scroll"]').innerHTML = `
+                <div class="state-panel" style="margin:20px auto">
+                    <div class="state-icon" style="background:var(--danger-soft);color:var(--danger)"><i class="fas fa-triangle-exclamation"></i></div>
+                    <h2>This guide could not open</h2><p>${esc(message)}</p>
+                </div>`;
+            card().querySelector('.wf-nav').style.display = 'none';
         }
 
-        function bootstrap() {
-            // Resume where the executor left off, unless the account is already finished
-            const saved = readSavedProgress();
-            const resumeAt = saved && !saved.done && saved.step >= 1 && saved.step <= allSteps.length ? saved.step - 1 : 0;
-            current = resumeAt;
-            buildSidebar();
-            syncSidebar();
-            document.getElementById('navFooter').style.display = 'flex';
-            renderStep(resumeAt);
-        }
+        function applyBranding() {
+            const meta = ACTION_META[actionType] || { icon: 'fa-list', label: 'Steps' };
+            document.querySelectorAll('.js-plat-name').forEach(el => { el.textContent = platformName; });
+            document.querySelectorAll('.js-plat-icon').forEach(el => { el.innerHTML = `<i class="${platformIcon()}"></i>`; });
+            document.querySelectorAll('.js-action').forEach(el => { el.innerHTML = `<i class="fas ${meta.icon}"></i>${esc(meta.label)}`; });
+            document.title = `${platformName}: ${meta.label} - DIGIPASS`;
 
-        async function loadInstructions() {
-            try {
-                const assetId = sessionStorage.getItem('digipass_asset_id');
-                const actionType = sessionStorage.getItem('digipass_action') || 'last_message';
-                platformName = sessionStorage.getItem('digipass_platform_name') || 'Platform';
-                const accountIdentifier = sessionStorage.getItem('digipass_account') || '';
-                const password = sessionStorage.getItem('digipass_password') || '';
-                const message = sessionStorage.getItem('digipass_message') || '';
-
-                applyBranding(actionType);
-
-                if (!assetId) {
-                    showError('Missing asset. Please open this workflow from the executor dashboard.');
-                    return;
-                }
-                progressAssetId = assetId;
-
-                // Get workflow data for this platform and action
-                let steps = [];
-                
-                if (typeof WORKFLOWS !== 'undefined' && WORKFLOWS[platformName] && WORKFLOWS[platformName].actions[actionType]) {
-                    const workflowData = WORKFLOWS[platformName].actions[actionType];
-                    // Clone steps to avoid modifying the original array
-                    steps = JSON.parse(JSON.stringify(workflowData.steps || []));
-                    
-                    // If action is last_message and we have a message, attach it to the step that has showFarewellMessage
-                    if (message && steps.length > 0) {
-                        const stepIndex = steps.findIndex(s => s.showFarewellMessage);
-                        if (stepIndex !== -1) {
-                            steps[stepIndex].message = message;
-                        } else {
-                            // Or append as a step if needed
-                            steps.push({
-                                stepNumber: steps.length + 1,
-                                title: 'Special Instructions',
-                                description: 'Additional information',
-                                action: 'Please send the following message:',
-                                message: message,
-                                tips: ['Follow the instructions provided']
-                            });
-                        }
-                    }
-                } else {
-                    // Fallback
-                    steps = [
-                        {
-                            stepNumber: 1,
-                            title: 'Account Information',
-                            description: 'Review account details',
-                            action: `Platform: ${platformName} | Account: ${accountIdentifier}`,
-                            tips: ['Review the account information below']
-                        },
-                        {
-                            stepNumber: 2,
-                            title: 'Action Type',
-                            description: `Action: ${actionType}`,
-                            action: `Required action on this account: ${actionType}`,
-                            tips: ['Proceed with the specified action']
-                        }
-                    ];
-                    
-                    if (password) {
-                        steps.push({
-                            stepNumber: 3,
-                            title: 'Credentials',
-                            description: 'Account credentials',
-                            action: 'Password is provided in this workflow',
-                            credentials: ['password'],
-                            tips: ['Keep credentials secure']
-                        });
-                    }
-                    
-                    if (message) {
-                        steps.push({
-                            stepNumber: steps.length + 1,
-                            title: 'Special Instructions',
-                            description: 'Additional information',
-                            action: 'Please send the following message:',
-                            message: message,
-                            tips: ['Follow the instructions provided']
-                        });
-                    }
-                }
-                
-                allSteps = steps;
-
-                // assetInfo is used by renderCredentials and renderMessage
-                assetInfo = {
-                    platform_name: platformName,
-                    account_identifier: accountIdentifier,
-                    account_password: password,
-                    last_message: message
-                };
-
-                bootstrap();
-            } catch (error) {
-                console.error('Workflow instruction error:', error);
-                showError(error.message || 'Unable to load workflow instructions.');
+            if (siteUrl()) {
+                const btn = document.getElementById('openSiteBtn');
+                btn.hidden = false;
+                document.getElementById('openSiteLabel').textContent = IS_TOUCH() && IS_NARROW()
+                    ? `Open ${platformName}`
+                    : `Open ${platformName} side by side`;
             }
+            if ('documentPictureInPicture' in window && !IS_TOUCH()) {
+                document.getElementById('floatBtn').hidden = false;
+            }
+        }
+
+        function loadInstructions() {
+            const assetId = sessionStorage.getItem('digipass_asset_id');
+            actionType = sessionStorage.getItem('digipass_action') || 'pass';
+            platformName = sessionStorage.getItem('digipass_platform_name') || 'Account';
+            const accountIdentifier = sessionStorage.getItem('digipass_account') || '';
+            const password = sessionStorage.getItem('digipass_password') || '';
+            const message = sessionStorage.getItem('digipass_message') || '';
+
+            applyBranding();
+
+            if (!assetId) {
+                showError('Open this guide from the executor portal by choosing an account.');
+                return;
+            }
+            progressAssetId = assetId;
+
+            let steps = [];
+            const wf = typeof WORKFLOWS !== 'undefined' && WORKFLOWS[platformName] && WORKFLOWS[platformName].actions[actionType];
+            if (wf) {
+                steps = JSON.parse(JSON.stringify(wf.steps || []));
+                if (message && steps.length) {
+                    const i = steps.findIndex(s => s.showFarewellMessage);
+                    if (i !== -1) steps[i].message = message;
+                    else steps.push({ title: 'Post their message', description: 'Share the words they left', action: 'Post the message below on the account', message, tips: [] });
+                }
+            } else {
+                steps = [
+                    { title: `Sign in to ${platformName}`, description: 'Use the sign-in details above', action: `Open ${platformName} → Sign in with the email or username and password provided`, tips: ['If a verification code is sent to the owner\'s phone or email, you may need access to it.'] },
+                    { title: actionType === 'delete' ? 'Find the delete option' : actionType === 'last_message' ? 'Post their message' : 'Take over the account', description: 'Look in the account settings', action: 'Open Settings → Look for Account, Privacy or Security', message: message || undefined, tips: ['Most services keep account closure under Settings → Account.'] }
+                ];
+            }
+
+            allSteps = steps;
+            assetInfo = { account_identifier: accountIdentifier, account_password: password, last_message: message };
+
+            const saved = readSavedProgress();
+            current = saved && !saved.done && saved.step >= 1 && saved.step <= steps.length ? saved.step - 1 : 0;
+            renderStep();
         }
 
         loadInstructions();

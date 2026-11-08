@@ -413,6 +413,19 @@
             if (password) sessionStorage.setItem('digipass_password', password);
             else sessionStorage.removeItem('digipass_password');
 
+            // Laptop: open the guide as a narrow window on the left, so its "Open … side by
+            // side" button can put the real site in the rest of the screen.
+            // Phone: a normal tab.
+            const desktop = window.matchMedia('(pointer: fine)').matches && window.screen.availWidth >= 1024;
+            if (desktop) {
+                const s = window.screen;
+                const w = Math.min(480, Math.round(s.availWidth * 0.34));
+                // One window per account: a reused window would keep the previous
+                // account's sessionStorage (it is only copied when a window is created).
+                const guide = window.open('workflow-window.html', `digipass-guide-${assetId}`,
+                    `popup=yes,left=${s.availLeft || 0},top=${s.availTop || 0},width=${w},height=${s.availHeight}`);
+                if (guide) { guide.focus(); return; }
+            }
             window.open('workflow-window.html', '_blank');
         }
 
