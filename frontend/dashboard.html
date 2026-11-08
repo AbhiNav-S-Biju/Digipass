@@ -10,21 +10,17 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/board.css?v=3">
+    <link rel="stylesheet" href="css/board.css?v=4">
 </head>
 <body class="board-body">
     <!-- Kept for dashboard.js, which binds logout to this element -->
     <button id="logoutBtn" type="button" hidden></button>
 
-    <!-- Phone navigation: glass dock with a raised "Add account" action -->
+    <!-- Phone navigation: glass dock; the selected item floats as a round button -->
     <nav class="dock glass" aria-label="Primary">
         <a class="dock-item active" data-page="dashboard" href="#dashboard"><i class="fas fa-house"></i><span>Home</span></a>
         <a class="dock-item" data-page="assets" href="#assets"><i class="fas fa-key"></i><span>Assets</span></a>
         <a class="dock-item" data-page="executors" href="#executors"><i class="fas fa-user-shield"></i><span>People</span></a>
-        <div class="dock-fab-slot">
-            <button type="button" class="dock-fab" onclick="openAssetDrawer()" aria-label="Add an account"><i class="fas fa-plus"></i></button>
-            <span class="dock-fab-label" aria-hidden="true">Add</span>
-        </div>
         <a class="dock-item" data-page="will" href="#will"><i class="fas fa-file-signature"></i><span>Will</span></a>
         <a class="dock-item" data-page="switch" href="#switch"><i class="fas fa-heart-pulse"></i><span>Switch</span></a>
     </nav>
@@ -616,9 +612,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/config.js?v=2"></script>
-    <script src="js/shell.js?v=1"></script>
+    <script src="js/shell.js?v=2"></script>
     <script src="js/utils.js?v=11"></script>
-    <script src="js/dashboard.js?v=13"></script>
+    <script src="js/dashboard.js?v=14"></script>
 
     <!-- Overview widgets -->
     <script>
@@ -844,6 +840,7 @@
         }
 
         DigipassShell.initSidebar();
+        DigipassShell.initIndicators();
         DigipassShell.initMenu('profileTrigger', 'profileDropdown', true);
         DigipassShell.initMenu('mProfileTrigger', 'mProfilePop', false);
         try {

@@ -20,15 +20,23 @@ function initSendGrid() {
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT) || 587,
       secure: process.env.SMTP_SECURE === 'true',
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+      // Some hosts (e.g. free web services) block SMTP ports; fail fast instead of
+      // holding the "add executor" request open for minutes.
+      connectionTimeout: 8000,
+      greetingTimeout: 8000,
+      socketTimeout: 10000
     });
     console.log('[Mailer] SMTP fallback ready');
   }
   if (process.env.RESEND_API_KEY) {
     console.log('[Mailer] Resend fallback ready');
   }
+  if (process.env.BREVO_API_KEY) {
+    console.log('[Mailer] Brevo ready (tried first)');
+  }
 
-  return sendgridInitialized || Boolean(smtpTransport) || Boolean(process.env.RESEND_API_KEY);
+  return sendgridInitialized || Boolean(smtpTransport) || Boolean(process.env.RESEND_API_KEY) || Boolean(process.env.BREVO_API_KEY);
 }
 
 function invitationHtml(executorName, verificationUrl) {
@@ -72,12 +80,27 @@ async function viaResend(msg) {
   return { delivered: true, provider: 'resend', messageId: body.id };
 }
 
+// Brevo (Sendinblue) HTTP API: works on hosts that block outbound SMTP ports, and its
+// free plan can send from one verified sender address without owning a domain.
+async function viaBrevo(msg) {
+  const fromMatch = /^(.*)<(.+)>$/.exec(msg.from);
+  const sender = fromMatch ? { name: fromMatch[1].trim() || 'DIGIPASS', email: fromMatch[2].trim() } : { name: 'DIGIPASS', email: msg.from };
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ sender, to: [{ email: msg.to }], subject: msg.subject, htmlContent: msg.html })
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.message || `Brevo error ${res.status}`);
+  return { delivered: true, provider: 'brevo', messageId: body.messageId };
+}
+
 function providerError(error) {
   return error.response?.body?.errors?.[0]?.message || error.message || 'unknown error';
 }
 
 /**
- * Send the executor invitation. Tries SendGrid, then SMTP, then Resend, so one
+ * Send the executor invitation. Tries Brevo, SendGrid, SMTP, then Resend, so one
  * provider running out of credits does not block invitations. Never throws:
  * when every provider fails, the caller gets delivered:false plus the link so
  * the owner can share it another way.
@@ -92,6 +115,7 @@ async function sendExecutorVerificationEmail({ executorName, executorEmail, toke
   };
 
   const providers = [];
+  if (process.env.BREVO_API_KEY) providers.push(['Brevo', viaBrevo]);
   if (sendgridInitialized && process.env.SENDGRID_API_KEY) providers.push(['SendGrid', viaSendGrid]);
   if (smtpTransport) providers.push(['SMTP', viaSmtp]);
   if (process.env.RESEND_API_KEY) providers.push(['Resend', viaResend]);

@@ -9,19 +9,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/board.css?v=3">
+    <link rel="stylesheet" href="css/board.css?v=4">
     <script src="js/config.js?v=2"></script>
-    <script src="js/shell.js?v=1"></script>
+    <script src="js/shell.js?v=2"></script>
 </head>
 <body class="board-body">
-    <!-- Phone navigation: glass dock with a raised "Download will" action -->
+    <!-- Phone navigation: glass dock; the selected item floats as a round button -->
     <nav class="dock glass" aria-label="Primary">
         <button type="button" class="dock-item active" data-progress-filter=""><i class="fas fa-layer-group"></i><span>All</span></button>
         <button type="button" class="dock-item" data-progress-filter="todo"><i class="far fa-circle"></i><span>To start</span></button>
-        <div class="dock-fab-slot">
-            <button type="button" class="dock-fab" onclick="document.getElementById('downloadWillBtn').click()" aria-label="Download the digital will"><i class="fas fa-file-arrow-down"></i></button>
-            <span class="dock-fab-label" aria-hidden="true">Will</span>
-        </div>
         <button type="button" class="dock-item" data-progress-filter="doing"><i class="fas fa-circle-half-stroke"></i><span>Ongoing</span></button>
         <button type="button" class="dock-item" data-progress-filter="done"><i class="fas fa-circle-check"></i><span>Done</span></button>
     </nav>
@@ -563,6 +559,7 @@
         });
 
         DigipassShell.initSidebar();
+        DigipassShell.initIndicators();
         DigipassShell.initMenu('mProfileTrigger', 'mProfilePop', false);
         loadAssets();
     </script>

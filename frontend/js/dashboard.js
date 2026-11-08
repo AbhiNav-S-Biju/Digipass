@@ -1210,7 +1210,7 @@ async function handleExecutorSubmit(event) {
     } else {
       // Email providers can run out of credits; the invite still works as a link/QR.
       showNotification('Executor added. The email could not be sent, so share the invite link instead.', 'success', 6000);
-      openInviteShare(response.data.executor_id, response.data.executor_name);
+      openInviteShare(response.data.executor_id, response.data.executor_name, response.data.email_delivery?.reason);
     }
     
     // Update dashboard widgets to reflect the new executor
@@ -1406,7 +1406,7 @@ async function executorClickHandler(e) {
 
 // Fresh invite link + QR for an executor who hasn't verified yet. Works without
 // any email provider, so invitations aren't blocked when email credits run out.
-async function openInviteShare(executorId, executorName) {
+async function openInviteShare(executorId, executorName, emailFailure) {
   const modalEl = document.getElementById('inviteShareModal');
   const loading = document.getElementById('inviteShareLoading');
   const body = document.getElementById('inviteShareBody');
@@ -1415,6 +1415,10 @@ async function openInviteShare(executorId, executorName) {
   const nativeBtn = document.getElementById('inviteNativeShare');
 
   setText('inviteShareTitle', executorName ? `Share ${executorName}'s invite` : 'Share the invite');
+  // Say why no email went out, so a misconfigured or exhausted provider is visible
+  setText('inviteShareSub', emailFailure
+    ? `The invitation email couldn't be sent (${emailFailure}). Send this link yourself, or let them scan the code.`
+    : 'Send this link to your executor, or let them scan the code.');
   loading.hidden = false;
   body.hidden = true;
   nativeBtn.hidden = true;
