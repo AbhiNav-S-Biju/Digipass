@@ -10,61 +10,55 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/board.css?v=2">
+    <link rel="stylesheet" href="css/board.css?v=3">
 </head>
 <body class="board-body">
     <!-- Kept for dashboard.js, which binds logout to this element -->
     <button id="logoutBtn" type="button" hidden></button>
 
-    <div class="app">
-        <!-- Icon rail -->
-        <nav class="rail" aria-label="Primary">
-            <div class="rail-logo" aria-hidden="true">
-                <svg viewBox="0 0 40 40"><rect x="7" y="10" width="22" height="17" rx="3.5" fill="none" stroke="#fdf6ec" stroke-width="2"/><path d="M7 17 L29 17" stroke="#fdf6ec" stroke-width="1.6"/><rect x="10" y="20" width="5" height="4" rx="1" fill="#b7d8bf"/><rect x="17" y="20" width="5" height="4" rx="1" fill="#b7d8bf" opacity=".5"/><path d="M25 6 L25 11" stroke="#fdf6ec" stroke-width="2" stroke-linecap="round"/><circle cx="25" cy="5" r="2.6" fill="#fdf6ec"/></svg>
-            </div>
-            <div class="rail-group">
-                <a class="rail-btn active" data-page="dashboard" href="#dashboard" aria-label="Overview"><i class="fas fa-house"></i><span class="rail-tip">Overview</span></a>
-                <a class="rail-btn" data-page="assets" href="#assets" aria-label="Digital assets"><i class="fas fa-table-columns"></i><span class="rail-tip">Digital assets</span></a>
-                <a class="rail-btn" data-page="executors" href="#executors" aria-label="Executors"><i class="fas fa-user-group"></i><span class="rail-tip">Executors</span></a>
-                <a class="rail-btn" data-page="will" href="#will" aria-label="Digital will"><i class="fas fa-file-signature"></i><span class="rail-tip">Digital will</span></a>
-                <a class="rail-btn" data-page="switch" href="#switch" aria-label="Dead Man's Switch"><i class="fas fa-heart-pulse"></i><span class="rail-tip">Dead Man's Switch</span></a>
-            </div>
-            <div class="rail-spacer"></div>
-            <div class="rail-group">
-                <a class="rail-btn" href="/profile.html?tab=security" aria-label="Settings"><i class="fas fa-gear"></i><span class="rail-tip">Settings</span></a>
-                <div class="profile-menu">
-                    <button type="button" class="rail-avatar" id="profileTrigger" aria-haspopup="true" aria-expanded="false" aria-label="Account menu"><span id="profileInitial">U</span></button>
-                    <div class="profile-pop" id="profileDropdown" role="menu">
-                        <div class="pp-head">
-                            <div class="pp-name" id="dropdownName">User</div>
-                            <div class="pp-mail" id="dropdownEmail"></div>
-                        </div>
-                        <a href="/profile.html" role="menuitem"><i class="fas fa-user"></i>My profile</a>
-                        <a href="/profile.html?tab=activity" role="menuitem"><i class="fas fa-clock-rotate-left"></i>Activity log</a>
-                        <button type="button" class="danger" role="menuitem" onclick="document.getElementById('logoutBtn').click()"><i class="fas fa-arrow-right-from-bracket"></i>Log out</button>
-                    </div>
-                </div>
-            </div>
-        </nav>
+    <!-- Phone navigation: glass dock with a raised "Add account" action -->
+    <nav class="dock glass" aria-label="Primary">
+        <a class="dock-item active" data-page="dashboard" href="#dashboard"><i class="fas fa-house"></i><span>Home</span></a>
+        <a class="dock-item" data-page="assets" href="#assets"><i class="fas fa-key"></i><span>Assets</span></a>
+        <a class="dock-item" data-page="executors" href="#executors"><i class="fas fa-user-shield"></i><span>People</span></a>
+        <div class="dock-fab-slot">
+            <button type="button" class="dock-fab" onclick="openAssetDrawer()" aria-label="Add an account"><i class="fas fa-plus"></i></button>
+            <span class="dock-fab-label" aria-hidden="true">Add</span>
+        </div>
+        <a class="dock-item" data-page="will" href="#will"><i class="fas fa-file-signature"></i><span>Will</span></a>
+        <a class="dock-item" data-page="switch" href="#switch"><i class="fas fa-heart-pulse"></i><span>Switch</span></a>
+    </nav>
 
-        <!-- Secondary panel -->
-        <aside class="panel" id="sidePanel" aria-label="Estate">
-            <div class="panel-heading"><h2>Your estate</h2></div>
-            <ul class="panel-nav">
-                <li><a data-page="dashboard" href="#dashboard" class="active"><i class="fas fa-seedling"></i>Overview<span class="count tnum" id="navCountReady">0%</span></a></li>
-                <li><a data-page="assets" href="#assets"><i class="fas fa-key"></i>Digital assets<span class="count tnum" id="navCountAssets">0</span></a></li>
-                <li><a data-page="executors" href="#executors"><i class="fas fa-user-shield"></i>Executors<span class="count tnum" id="navCountExecutors">0</span></a></li>
-                <li><a data-page="will" href="#will"><i class="fas fa-scroll"></i>Digital will<span class="count" id="navCountWill">–</span></a></li>
-                <li><a data-page="switch" href="#switch"><i class="fas fa-heart-pulse"></i>Dead Man's Switch<span class="count" id="navCountSwitch">–</span></a></li>
-            </ul>
-
-            <div class="panel-heading">
-                <h2>Executors</h2>
-                <a data-page="executors" href="#executors">View all</a>
+    <div class="app" id="app">
+        <!-- Glass sidebar (desktop/tablet). Collapses to icons only. -->
+        <aside class="sidebar glass" id="sidebar" aria-label="Primary">
+            <div class="sb-top">
+                <a class="sb-brand" href="#dashboard" data-page="dashboard" aria-label="DIGIPASS overview">
+                    <span class="rail-logo" aria-hidden="true">
+                        <svg viewBox="0 0 40 40"><rect x="7" y="10" width="22" height="17" rx="3.5" fill="none" stroke="#fdf6ec" stroke-width="2"/><path d="M7 17 L29 17" stroke="#fdf6ec" stroke-width="1.6"/><rect x="10" y="20" width="5" height="4" rx="1" fill="#b7d8bf"/><rect x="17" y="20" width="5" height="4" rx="1" fill="#b7d8bf" opacity=".5"/><path d="M25 6 L25 11" stroke="#fdf6ec" stroke-width="2" stroke-linecap="round"/><circle cx="25" cy="5" r="2.6" fill="#fdf6ec"/></svg>
+                    </span>
+                    <span class="sb-brand-name">Digipass</span>
+                </a>
+                <button type="button" class="sb-toggle" id="sbToggle" aria-label="Collapse menu" aria-expanded="true" aria-controls="sidebar"><i class="fas fa-angles-left"></i></button>
             </div>
-            <ul class="people" id="panelPeople">
-                <li class="people-empty">Loading…</li>
-            </ul>
+
+            <div class="sb-heading"><span>Your estate</span></div>
+            <nav class="sb-nav" aria-label="Estate sections">
+                <a class="sb-item active" data-page="dashboard" href="#dashboard"><i class="fas fa-house"></i><span class="sb-label">Overview</span><span class="sb-count tnum" id="navCountReady">0%</span><span class="sb-tip">Overview</span></a>
+                <a class="sb-item" data-page="assets" href="#assets"><i class="fas fa-key"></i><span class="sb-label">Digital assets</span><span class="sb-count tnum" id="navCountAssets">0</span><span class="sb-tip">Digital assets</span></a>
+                <a class="sb-item" data-page="executors" href="#executors"><i class="fas fa-user-shield"></i><span class="sb-label">Executors</span><span class="sb-count tnum" id="navCountExecutors">0</span><span class="sb-tip">Executors</span></a>
+                <a class="sb-item" data-page="will" href="#will"><i class="fas fa-file-signature"></i><span class="sb-label">Digital will</span><span class="sb-count" id="navCountWill">–</span><span class="sb-tip">Digital will</span></a>
+                <a class="sb-item" data-page="switch" href="#switch"><i class="fas fa-heart-pulse"></i><span class="sb-label">Dead Man's Switch</span><span class="sb-count" id="navCountSwitch">–</span><span class="sb-tip">Dead Man's Switch</span></a>
+            </nav>
+
+            <div class="sb-people">
+                <div class="sb-heading"><span>Executors</span><a data-page="executors" href="#executors">View all</a></div>
+                <ul class="people" id="panelPeople">
+                    <li class="people-empty">Loading…</li>
+                </ul>
+            </div>
+
+            <div class="sb-spacer"></div>
 
             <div class="promo" id="promoCard">
                 <h3>Check in to stay in control</h3>
@@ -74,14 +68,53 @@
                     <span>Check in now</span><span class="chev"><i class="fas fa-chevron-right"></i></span>
                 </button>
             </div>
+
+            <div class="sb-foot">
+                <button type="button" class="sb-item sb-mini" onclick="manualCheckIn(this)" aria-label="Check in now"><i class="fas fa-circle-check"></i><span class="sb-tip">Check in now</span></button>
+                <a class="sb-item" href="/profile.html?tab=security"><i class="fas fa-gear"></i><span class="sb-label">Settings</span><span class="sb-tip">Settings</span></a>
+                <div class="profile-menu">
+                    <button type="button" class="sb-item sb-profile" id="profileTrigger" aria-haspopup="true" aria-expanded="false" aria-label="Account menu">
+                        <span class="rail-avatar js-initials" id="profileInitial">U</span>
+                        <span class="sb-who"><strong class="js-name" id="dropdownNameShort">User</strong><small class="js-email"></small></span>
+                    </button>
+                    <div class="profile-pop" id="profileDropdown" role="menu">
+                        <div class="pp-head">
+                            <div class="pp-name js-name" id="dropdownName">User</div>
+                            <div class="pp-mail js-email" id="dropdownEmail"></div>
+                        </div>
+                        <a href="/profile.html" role="menuitem"><i class="fas fa-user"></i>My profile</a>
+                        <a href="/profile.html?tab=activity" role="menuitem"><i class="fas fa-clock-rotate-left"></i>Activity log</a>
+                        <button type="button" class="danger" role="menuitem" onclick="document.getElementById('logoutBtn').click()"><i class="fas fa-arrow-right-from-bracket"></i>Log out</button>
+                    </div>
+                </div>
+            </div>
         </aside>
-        <div class="panel-scrim" id="panelScrim" onclick="togglePanel(false)"></div>
 
         <main class="main" id="main">
+            <!-- Phone top bar (sidebar is hidden on phones) -->
+            <div class="m-head">
+                <span class="rail-logo" aria-hidden="true">
+                    <svg viewBox="0 0 40 40"><rect x="7" y="10" width="22" height="17" rx="3.5" fill="none" stroke="#fdf6ec" stroke-width="2"/><path d="M7 17 L29 17" stroke="#fdf6ec" stroke-width="1.6"/><rect x="10" y="20" width="5" height="4" rx="1" fill="#b7d8bf"/><rect x="17" y="20" width="5" height="4" rx="1" fill="#b7d8bf" opacity=".5"/><path d="M25 6 L25 11" stroke="#fdf6ec" stroke-width="2" stroke-linecap="round"/><circle cx="25" cy="5" r="2.6" fill="#fdf6ec"/></svg>
+                </span>
+                <span class="m-name">Digipass</span>
+                <div class="m-end profile-menu">
+                    <button type="button" class="pill sm" onclick="manualCheckIn(this)"><i class="fas fa-circle-check"></i>Check in</button>
+                    <button type="button" class="rail-avatar js-initials" id="mProfileTrigger" aria-haspopup="true" aria-expanded="false" aria-label="Account menu">U</button>
+                    <div class="profile-pop" id="mProfilePop" role="menu">
+                        <div class="pp-head">
+                            <div class="pp-name js-name">User</div>
+                            <div class="pp-mail js-email"></div>
+                        </div>
+                        <a href="/profile.html" role="menuitem"><i class="fas fa-user"></i>My profile</a>
+                        <a href="/profile.html?tab=security" role="menuitem"><i class="fas fa-gear"></i>Settings</a>
+                        <a href="/profile.html?tab=activity" role="menuitem"><i class="fas fa-clock-rotate-left"></i>Activity log</a>
+                        <button type="button" class="danger" role="menuitem" onclick="document.getElementById('logoutBtn').click()"><i class="fas fa-arrow-right-from-bracket"></i>Log out</button>
+                    </div>
+                </div>
+            </div>
             <!-- ============ Overview ============ -->
             <section id="dashboardPage" class="page active" aria-labelledby="overviewTitle">
                 <header class="topbar">
-                    <button type="button" class="pill menu-toggle" onclick="togglePanel(true)" aria-label="Open estate menu"><i class="fas fa-bars"></i></button>
                     <div class="topbar-title">
                         <h1 id="overviewTitle">Welcome back, <span id="userName">there</span></h1>
                         <p>Here is how ready your digital estate is.</p>
@@ -126,7 +159,6 @@
             <!-- ============ Digital assets ============ -->
             <section id="assetsPage" class="page" aria-labelledby="assetsTitle">
                 <header class="topbar">
-                    <button type="button" class="pill menu-toggle" onclick="togglePanel(true)" aria-label="Open estate menu"><i class="fas fa-bars"></i></button>
                     <div class="topbar-title">
                         <h1 id="assetsTitle">Digital assets</h1>
                         <p>Each account sits in the column of what should happen to it.</p>
@@ -179,7 +211,6 @@
             <!-- ============ Executors ============ -->
             <section id="executorsPage" class="page" aria-labelledby="executorsTitle">
                 <header class="topbar">
-                    <button type="button" class="pill menu-toggle" onclick="togglePanel(true)" aria-label="Open estate menu"><i class="fas fa-bars"></i></button>
                     <div class="topbar-title">
                         <h1 id="executorsTitle">Executors</h1>
                         <p>The people you trust to carry out your wishes.</p>
@@ -213,7 +244,6 @@
             <!-- ============ Digital will ============ -->
             <section id="willPage" class="page" aria-labelledby="willTitle">
                 <header class="topbar">
-                    <button type="button" class="pill menu-toggle" onclick="togglePanel(true)" aria-label="Open estate menu"><i class="fas fa-bars"></i></button>
                     <div class="topbar-title">
                         <h1 id="willTitle">Digital will</h1>
                         <p>An official PDF record of your accounts and the people who will handle them.</p>
@@ -267,7 +297,6 @@
             <!-- ============ Dead Man's Switch ============ -->
             <section id="switchPage" class="page" aria-labelledby="switchTitle">
                 <header class="topbar">
-                    <button type="button" class="pill menu-toggle" onclick="togglePanel(true)" aria-label="Open estate menu"><i class="fas fa-bars"></i></button>
                     <div class="topbar-title">
                         <h1 id="switchTitle">Dead Man's Switch</h1>
                         <p>Check in now and then. Your executors are only told if you stop.</p>
@@ -501,7 +530,7 @@
                             </div>
                             <div class="col-12 col-md-6">
                                 <label for="editAccountPassword" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="editAccountPassword" name="editAccountPassword" required autocomplete="new-password">
+                                <input type="password" class="form-control" id="editAccountPassword" name="editAccountPassword" autocomplete="new-password" placeholder="Leave blank to keep the saved password">
                             </div>
                         </div>
                         <div class="mb-3">
@@ -524,6 +553,39 @@
                 <div class="modal-footer">
                     <button type="button" class="btn-ghost" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn-forest" id="editAssetSubmitBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ Share executor invite ============ -->
+    <div class="modal fade" id="inviteShareModal" tabindex="-1" aria-labelledby="inviteShareTitle">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h2 class="modal-title" id="inviteShareTitle">Share the invite</h2>
+                        <p class="drawer-sub" id="inviteShareSub">Send this link to your executor, or let them scan the code.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="inviteShareLoading"><div class="skeleton" style="height:200px"></div></div>
+                    <div id="inviteShareBody" hidden>
+                        <div style="display:grid;place-items:center;margin-bottom:14px">
+                            <img id="inviteQr" hidden src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="QR code for the executor invite link" width="200" height="200" style="border-radius:16px;background:#fff;padding:8px">
+                        </div>
+                        <label for="inviteLink" class="form-label">Invite link</label>
+                        <div style="display:flex;gap:8px">
+                            <input type="text" id="inviteLink" class="form-control" readonly>
+                            <button type="button" class="btn-forest" id="inviteCopyBtn"><i class="fas fa-copy"></i>Copy</button>
+                        </div>
+                        <p class="form-hint">The link works for 24 hours. Creating a new one replaces the old link.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-ghost" data-bs-dismiss="modal">Done</button>
+                    <button type="button" class="btn-soft" id="inviteNativeShare" hidden><i class="fas fa-share-nodes"></i>Share…</button>
                 </div>
             </div>
         </div>
@@ -554,8 +616,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/config.js?v=2"></script>
+    <script src="js/shell.js?v=1"></script>
     <script src="js/utils.js?v=11"></script>
-    <script src="js/dashboard.js?v=12"></script>
+    <script src="js/dashboard.js?v=13"></script>
 
     <!-- Overview widgets -->
     <script>
@@ -763,13 +826,8 @@
         };
     </script>
 
-    <!-- Shell: panel, drawers, profile menu -->
+    <!-- Shell: sidebar, drawers, profile menus -->
     <script>
-        function togglePanel(open) {
-            document.getElementById('sidePanel').classList.toggle('open', open);
-            document.getElementById('panelScrim').classList.toggle('open', open);
-        }
-
         function openAssetDrawer(action) {
             if (action) {
                 const radio = document.querySelector(`input[name="actionType"][value="${action}"]`);
@@ -785,35 +843,13 @@
             bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('executorDrawer')).show();
         }
 
-        // Profile menu on the rail avatar
-        (function () {
-            const trigger = document.getElementById('profileTrigger');
-            const pop = document.getElementById('profileDropdown');
-            trigger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const open = !pop.classList.contains('open');
-                pop.classList.toggle('open', open);
-                trigger.setAttribute('aria-expanded', String(open));
-            });
-            document.addEventListener('click', (e) => {
-                if (!pop.contains(e.target)) {
-                    pop.classList.remove('open');
-                    trigger.setAttribute('aria-expanded', 'false');
-                }
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') { pop.classList.remove('open'); togglePanel(false); }
-            });
-
-            try {
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const name = user.fullName || user.name || 'User';
-                document.getElementById('profileInitial').textContent =
-                    name.split(/\s+/).filter(Boolean).map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
-                document.getElementById('dropdownName').textContent = name;
-                document.getElementById('dropdownEmail').textContent = user.email || '';
-            } catch (e) { /* non-critical */ }
-        })();
+        DigipassShell.initSidebar();
+        DigipassShell.initMenu('profileTrigger', 'profileDropdown', true);
+        DigipassShell.initMenu('mProfileTrigger', 'mProfilePop', false);
+        try {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            DigipassShell.fillProfile(user.fullName || user.name || 'User', user.email || '');
+        } catch (e) { /* non-critical */ }
     </script>
 </body>
 </html>

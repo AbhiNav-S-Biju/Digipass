@@ -130,16 +130,16 @@ function navigateToPage(pageName) {
     return;
   }
 
-  // Rail and side panel both carry links for each page; keep them in sync.
-  document.querySelectorAll('.rail a[data-page], .panel-nav a[data-page]').forEach(l => {
+  // Sidebar (desktop) and dock (phone) both carry links for each page; keep them in sync.
+  document.querySelectorAll('.sb-item[data-page], .dock-item[data-page]').forEach(l => {
     const isActive = l.dataset.page === pageName;
     l.classList.toggle('active', isActive);
     if (isActive) l.setAttribute('aria-current', 'page'); else l.removeAttribute('aria-current');
   });
   document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p === targetPage));
 
-  // Close the slide-in panel on small screens
-  if (typeof togglePanel === 'function') togglePanel(false);
+  // On phones the whole page scrolls; start each section at the top
+  if (window.matchMedia('(max-width: 767px)').matches) window.scrollTo(0, 0);
 
   // Load page data
   dashboardDebug('[navigateToPage] Loading data for:', pageName);
@@ -967,7 +967,7 @@ function assetCard(asset) {
       <p class="bcard-desc">${escapeHtml(asset.account_identifier)}</p>
       ${message}
       <div class="bcard-foot">
-        <span class="meta"><i class="fas fa-key"></i>${asset.account_password ? 'Password saved' : 'No password'}</span>
+        <span class="meta"><i class="fas fa-key"></i>${asset.has_password ? 'Password saved' : 'No password'}</span>
         <span class="meta push"><i class="far fa-calendar"></i>${formatShortDate(asset.created_at)}</span>
       </div>
     </article>`;
@@ -1052,7 +1052,10 @@ function openEditAssetModal(assetId) {
   document.getElementById('editAssetId').value = asset.asset_id;
   document.getElementById('editPlatformName').value = asset.platform_name;
   document.getElementById('editAccountIdentifier').value = asset.account_identifier;
-  document.getElementById('editAccountPassword').value = asset.account_password || '';
+  // The stored password is never sent to the browser; leave blank to keep it
+  const editPwd = document.getElementById('editAccountPassword');
+  editPwd.value = '';
+  editPwd.placeholder = asset.has_password ? 'Saved. Type a new one to replace it' : 'No password saved yet';
   
   // Set action type
   document.querySelector(`input[name="editActionType"][value="${asset.action_type}"]`).checked = true;
@@ -1108,7 +1111,8 @@ async function handleEditAssetSubmit() {
   const actionType = document.querySelector('input[name="editActionType"]:checked')?.value;
   const lastMessage = document.getElementById('editLastMessage').value.trim();
 
-  if (!platformName || !accountIdentifier || !accountPassword || !actionType) {
+  // Password is optional here: blank keeps the one already stored
+  if (!platformName || !accountIdentifier || !actionType) {
     showNotification('Please fill in all required fields.', 'error');
     return;
   }
@@ -1202,9 +1206,11 @@ async function handleExecutorSubmit(event) {
     event.target.reset();
     hideDrawer('executorDrawer');
     if (response.data.verification_email_sent) {
-      showNotification(`Executor added successfully. Verification email sent to ${response.data.executor_email}`, 'success');
+      showNotification(`Executor added. Verification email sent to ${response.data.executor_email}.`, 'success');
     } else {
-      showNotification(`Executor added, but email was not sent: ${response.data.email_delivery?.reason || 'check SendGrid settings'}`, 'error', 7000);
+      // Email providers can run out of credits; the invite still works as a link/QR.
+      showNotification('Executor added. The email could not be sent, so share the invite link instead.', 'success', 6000);
+      openInviteShare(response.data.executor_id, response.data.executor_name);
     }
     
     // Update dashboard widgets to reflect the new executor
@@ -1242,6 +1248,7 @@ function executorCard(executor) {
         <div class="more">
           <button type="button" class="more-btn" data-more aria-haspopup="true" aria-expanded="false" aria-label="Options for ${escapeHtml(executor.executor_name)}"><i class="fas fa-ellipsis"></i></button>
           <div class="more-menu" role="menu">
+            ${status === 'Invited' ? `<button type="button" role="menuitem" data-share-id="${executor.executor_id}" data-share-name="${escapeHtml(executor.executor_name)}"><i class="fas fa-qrcode"></i>Share invite link</button><hr>` : ''}
             ${status === 'Active' ? `<button type="button" role="menuitem" data-revoke-id="${executor.executor_id}"><i class="fas fa-lock"></i>Revoke access</button><hr>` : ''}
             <button type="button" role="menuitem" class="danger" data-delete-id="${executor.executor_id}"><i class="fas fa-user-minus"></i>Remove executor</button>
           </div>
@@ -1373,6 +1380,12 @@ async function executorClickHandler(e) {
   }
   if (e.target.closest('.more-menu')) closeMoreMenus();
 
+  const shareButton = e.target.closest('[data-share-id]');
+  if (shareButton) {
+    openInviteShare(shareButton.dataset.shareId, shareButton.dataset.shareName);
+    return;
+  }
+
   const grantButton = e.target.closest('[data-grant-id]');
   if (grantButton) {
     await handleGrantAccess(grantButton);
@@ -1388,6 +1401,61 @@ async function executorClickHandler(e) {
   const deleteButton = e.target.closest('[data-delete-id]');
   if (deleteButton) {
     await handleDeleteExecutor(deleteButton);
+  }
+}
+
+// Fresh invite link + QR for an executor who hasn't verified yet. Works without
+// any email provider, so invitations aren't blocked when email credits run out.
+async function openInviteShare(executorId, executorName) {
+  const modalEl = document.getElementById('inviteShareModal');
+  const loading = document.getElementById('inviteShareLoading');
+  const body = document.getElementById('inviteShareBody');
+  const linkInput = document.getElementById('inviteLink');
+  const copyBtn = document.getElementById('inviteCopyBtn');
+  const nativeBtn = document.getElementById('inviteNativeShare');
+
+  setText('inviteShareTitle', executorName ? `Share ${executorName}'s invite` : 'Share the invite');
+  loading.hidden = false;
+  body.hidden = true;
+  nativeBtn.hidden = true;
+  bootstrap.Modal.getOrCreateInstance(modalEl).show();
+
+  try {
+    const response = await apiCall(`/executors/${executorId}/resend-verification`, 'POST');
+    const link = response.data.verification_link;
+    linkInput.value = link;
+    const qr = document.getElementById('inviteQr');
+    if (response.data.verification_qr_code) {
+      qr.src = response.data.verification_qr_code;
+      qr.hidden = false;
+    } else {
+      qr.hidden = true;
+    }
+    loading.hidden = true;
+    body.hidden = false;
+
+    copyBtn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(link);
+      } catch (e) {
+        linkInput.select();
+        document.execCommand('copy');
+      }
+      copyBtn.innerHTML = '<i class="fas fa-check"></i>Copied';
+      setTimeout(() => { copyBtn.innerHTML = '<i class="fas fa-copy"></i>Copy'; }, 2000);
+    };
+
+    if (navigator.share) {
+      nativeBtn.hidden = false;
+      nativeBtn.onclick = () => navigator.share({
+        title: 'DIGIPASS executor invite',
+        text: 'You have been named as an executor on DIGIPASS. Use this link to verify and set your password:',
+        url: link
+      }).catch(() => {});
+    }
+  } catch (error) {
+    bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+    showNotification(error.message || 'Could not create an invite link. Please try again.', 'error');
   }
 }
 

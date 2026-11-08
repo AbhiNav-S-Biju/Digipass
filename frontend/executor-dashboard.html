@@ -9,55 +9,66 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/board.css?v=2">
+    <link rel="stylesheet" href="css/board.css?v=3">
     <script src="js/config.js?v=2"></script>
+    <script src="js/shell.js?v=1"></script>
 </head>
 <body class="board-body">
-    <div class="app">
-        <!-- Icon rail -->
-        <nav class="rail" aria-label="Primary">
-            <div class="rail-logo" aria-hidden="true">
-                <svg viewBox="0 0 40 40"><rect x="7" y="10" width="22" height="17" rx="3.5" fill="none" stroke="#fdf6ec" stroke-width="2"/><path d="M7 17 L29 17" stroke="#fdf6ec" stroke-width="1.6"/><rect x="10" y="20" width="5" height="4" rx="1" fill="#b7d8bf"/><rect x="17" y="20" width="5" height="4" rx="1" fill="#b7d8bf" opacity=".5"/><path d="M25 6 L25 11" stroke="#fdf6ec" stroke-width="2" stroke-linecap="round"/><circle cx="25" cy="5" r="2.6" fill="#fdf6ec"/></svg>
-            </div>
-            <div class="rail-group">
-                <button type="button" class="rail-btn active" aria-label="Accounts" aria-current="page"><i class="fas fa-table-columns"></i><span class="rail-tip">Accounts</span></button>
-                <button type="button" class="rail-btn" aria-label="Download digital will" onclick="document.getElementById('downloadWillBtn').click()"><i class="fas fa-file-arrow-down"></i><span class="rail-tip">Download will</span></button>
-            </div>
-            <div class="rail-spacer"></div>
-            <div class="rail-group">
-                <button type="button" class="rail-btn" id="logoutBtn" aria-label="Log out"><i class="fas fa-arrow-right-from-bracket"></i><span class="rail-tip">Log out</span></button>
-                <span class="rail-avatar" id="executorAvatar" aria-hidden="true">E</span>
-            </div>
-        </nav>
+    <!-- Phone navigation: glass dock with a raised "Download will" action -->
+    <nav class="dock glass" aria-label="Primary">
+        <button type="button" class="dock-item active" data-progress-filter=""><i class="fas fa-layer-group"></i><span>All</span></button>
+        <button type="button" class="dock-item" data-progress-filter="todo"><i class="far fa-circle"></i><span>To start</span></button>
+        <div class="dock-fab-slot">
+            <button type="button" class="dock-fab" onclick="document.getElementById('downloadWillBtn').click()" aria-label="Download the digital will"><i class="fas fa-file-arrow-down"></i></button>
+            <span class="dock-fab-label" aria-hidden="true">Will</span>
+        </div>
+        <button type="button" class="dock-item" data-progress-filter="doing"><i class="fas fa-circle-half-stroke"></i><span>Ongoing</span></button>
+        <button type="button" class="dock-item" data-progress-filter="done"><i class="fas fa-circle-check"></i><span>Done</span></button>
+    </nav>
 
-        <!-- Secondary panel -->
-        <aside class="panel" id="sidePanel" aria-label="Estate">
-            <div class="panel-heading"><h2 id="estateHeading">Estate</h2></div>
-            <p class="panel-sub">You are helping carry out these wishes.</p>
-            <ul class="panel-nav" id="progressNav">
-                <li><button type="button" class="active" data-progress-filter=""><i class="fas fa-layer-group"></i>All accounts<span class="count tnum" id="assetCount">0</span></button></li>
-                <li><button type="button" data-progress-filter="todo"><i class="far fa-circle"></i>Not started<span class="count tnum" id="countTodo">0</span></button></li>
-                <li><button type="button" data-progress-filter="doing"><i class="fas fa-circle-half-stroke"></i>In progress<span class="count tnum" id="countDoing">0</span></button></li>
-                <li><button type="button" data-progress-filter="done"><i class="fas fa-circle-check"></i>Taken care of<span class="count tnum" id="countDone">0</span></button></li>
-            </ul>
+    <div class="app" id="app">
+        <!-- Glass sidebar (desktop/tablet). Collapses to icons only. -->
+        <aside class="sidebar glass" id="sidebar" aria-label="Primary">
+            <div class="sb-top">
+                <span class="sb-brand">
+                    <span class="rail-logo" aria-hidden="true">
+                        <svg viewBox="0 0 40 40"><rect x="7" y="10" width="22" height="17" rx="3.5" fill="none" stroke="#fdf6ec" stroke-width="2"/><path d="M7 17 L29 17" stroke="#fdf6ec" stroke-width="1.6"/><rect x="10" y="20" width="5" height="4" rx="1" fill="#b7d8bf"/><rect x="17" y="20" width="5" height="4" rx="1" fill="#b7d8bf" opacity=".5"/><path d="M25 6 L25 11" stroke="#fdf6ec" stroke-width="2" stroke-linecap="round"/><circle cx="25" cy="5" r="2.6" fill="#fdf6ec"/></svg>
+                    </span>
+                    <span class="sb-brand-name">Digipass</span>
+                </span>
+                <button type="button" class="sb-toggle" id="sbToggle" aria-label="Collapse menu" aria-expanded="true" aria-controls="sidebar"><i class="fas fa-angles-left"></i></button>
+            </div>
 
-            <div class="panel-heading"><h2>People</h2></div>
-            <ul class="people">
-                <li class="person">
-                    <span class="avatar" data-tone="2" id="ownerAvatar">–</span>
-                    <div style="min-width:0">
-                        <div class="person-name" id="ownerName">Estate owner</div>
-                        <div class="person-role">Their wishes</div>
-                    </div>
-                </li>
-                <li class="person">
-                    <span class="avatar" data-tone="1" id="executorAvatarSm">E</span>
-                    <div style="min-width:0">
-                        <div class="person-name" id="executorName">You</div>
-                        <div class="person-role" id="executorEmail">Executor</div>
-                    </div>
-                </li>
-            </ul>
+            <div class="sb-heading"><span id="estateHeading">Estate</span></div>
+            <p class="sb-sub">You are helping carry out these wishes.</p>
+            <nav class="sb-nav" id="progressNav" aria-label="Accounts by progress">
+                <button type="button" class="sb-item active" data-progress-filter=""><i class="fas fa-layer-group"></i><span class="sb-label">All accounts</span><span class="sb-count tnum" id="assetCount">0</span><span class="sb-tip">All accounts</span></button>
+                <button type="button" class="sb-item" data-progress-filter="todo"><i class="far fa-circle"></i><span class="sb-label">Not started</span><span class="sb-count tnum" id="countTodo">0</span><span class="sb-tip">Not started</span></button>
+                <button type="button" class="sb-item" data-progress-filter="doing"><i class="fas fa-circle-half-stroke"></i><span class="sb-label">In progress</span><span class="sb-count tnum" id="countDoing">0</span><span class="sb-tip">In progress</span></button>
+                <button type="button" class="sb-item" data-progress-filter="done"><i class="fas fa-circle-check"></i><span class="sb-label">Taken care of</span><span class="sb-count tnum" id="countDone">0</span><span class="sb-tip">Taken care of</span></button>
+            </nav>
+
+            <div class="sb-people">
+                <div class="sb-heading"><span>People</span></div>
+                <ul class="people">
+                    <li class="person">
+                        <span class="avatar" data-tone="2" id="ownerAvatar">–</span>
+                        <div style="min-width:0">
+                            <div class="person-name" id="ownerName">Estate owner</div>
+                            <div class="person-role">Their wishes</div>
+                        </div>
+                    </li>
+                    <li class="person">
+                        <span class="avatar" data-tone="1" id="executorAvatarSm">E</span>
+                        <div style="min-width:0">
+                            <div class="person-name" id="executorName">You</div>
+                            <div class="person-role" id="executorEmail">Executor</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sb-spacer"></div>
 
             <div class="promo">
                 <h3>Their digital will</h3>
@@ -66,13 +77,38 @@
                     <span>Download PDF</span><span class="chev"><i class="fas fa-arrow-down"></i></span>
                 </button>
             </div>
+
+            <div class="sb-foot">
+                <button type="button" class="sb-item sb-mini" onclick="document.getElementById('downloadWillBtn').click()" aria-label="Download the digital will"><i class="fas fa-file-arrow-down"></i><span class="sb-tip">Download will</span></button>
+                <button type="button" class="sb-item" id="logoutBtn"><i class="fas fa-arrow-right-from-bracket"></i><span class="sb-label">Log out</span><span class="sb-tip">Log out</span></button>
+                <div class="sb-item sb-profile" aria-hidden="true">
+                    <span class="rail-avatar" id="executorAvatar">E</span>
+                    <span class="sb-who"><strong class="js-name">Executor</strong><small class="js-email"></small></span>
+                </div>
+            </div>
         </aside>
-        <div class="panel-scrim" id="panelScrim" onclick="togglePanel(false)"></div>
 
         <main class="main">
+            <!-- Phone top bar (sidebar is hidden on phones) -->
+            <div class="m-head">
+                <span class="rail-logo" aria-hidden="true">
+                    <svg viewBox="0 0 40 40"><rect x="7" y="10" width="22" height="17" rx="3.5" fill="none" stroke="#fdf6ec" stroke-width="2"/><path d="M7 17 L29 17" stroke="#fdf6ec" stroke-width="1.6"/><rect x="10" y="20" width="5" height="4" rx="1" fill="#b7d8bf"/><rect x="17" y="20" width="5" height="4" rx="1" fill="#b7d8bf" opacity=".5"/><path d="M25 6 L25 11" stroke="#fdf6ec" stroke-width="2" stroke-linecap="round"/><circle cx="25" cy="5" r="2.6" fill="#fdf6ec"/></svg>
+                </span>
+                <span class="m-name">Digipass</span>
+                <div class="m-end profile-menu">
+                    <button type="button" class="rail-avatar js-initials" id="mProfileTrigger" aria-haspopup="true" aria-expanded="false" aria-label="Account menu">E</button>
+                    <div class="profile-pop" id="mProfilePop" role="menu">
+                        <div class="pp-head">
+                            <div class="pp-name js-name">Executor</div>
+                            <div class="pp-mail js-email"></div>
+                        </div>
+                        <button type="button" role="menuitem" onclick="document.getElementById('downloadWillBtn').click()"><i class="fas fa-file-arrow-down"></i>Download will</button>
+                        <button type="button" class="danger" role="menuitem" onclick="document.getElementById('logoutBtn').click()"><i class="fas fa-arrow-right-from-bracket"></i>Log out</button>
+                    </div>
+                </div>
+            </div>
             <section class="page active" aria-labelledby="pageTitle">
                 <header class="topbar">
-                    <button type="button" class="pill menu-toggle" onclick="togglePanel(true)" aria-label="Open estate menu"><i class="fas fa-bars"></i></button>
                     <div class="topbar-title">
                         <h1 id="pageTitle">Accounts</h1>
                         <p>Take each one at your own pace. Your progress is saved on this device.</p>
@@ -145,10 +181,6 @@
             return String(name || '?').trim().split(/\s+/).filter(Boolean).map(p => p[0]).join('').substring(0, 2).toUpperCase() || '?';
         }
 
-        function togglePanel(open) {
-            document.getElementById('sidePanel').classList.toggle('open', open);
-            document.getElementById('panelScrim').classList.toggle('open', open);
-        }
 
         // ---------- Session ----------
         const token = localStorage.getItem('executorToken');
@@ -167,6 +199,7 @@
             document.getElementById('executorEmail').textContent = executorEmail || 'Executor';
             document.getElementById('executorAvatar').textContent = getInitials(executorName);
             document.getElementById('executorAvatarSm').textContent = getInitials(executorName);
+            DigipassShell.fillProfile(executorName, executorEmail);
             document.getElementById('ownerName').textContent = ownerName;
             document.getElementById('ownerAvatar').textContent = getInitials(ownerName);
             document.getElementById('estateHeading').textContent = `Estate of ${ownerFirst}`;
@@ -441,7 +474,7 @@
         });
 
         document.addEventListener('click', (e) => { if (!e.target.closest('.more')) closeMenus(); });
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeMenus(); togglePanel(false); } });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenus(); });
 
         // The workflow window writes progress in another tab; move cards as it happens.
         window.addEventListener('storage', (e) => {
@@ -472,8 +505,10 @@
         document.querySelectorAll('[data-progress-filter]').forEach(btn => {
             btn.addEventListener('click', () => {
                 state.progress = btn.dataset.progressFilter;
-                document.querySelectorAll('[data-progress-filter]').forEach(b => b.classList.toggle('active', b === btn));
-                togglePanel(false);
+                // Sidebar and phone dock share the same filters; keep both highlighted
+                document.querySelectorAll('[data-progress-filter]').forEach(b =>
+                    b.classList.toggle('active', b.dataset.progressFilter === state.progress));
+                if (window.matchMedia('(max-width: 767px)').matches) window.scrollTo(0, 0);
                 render();
             });
         });
@@ -527,6 +562,8 @@
             }
         });
 
+        DigipassShell.initSidebar();
+        DigipassShell.initMenu('mProfileTrigger', 'mProfilePop', false);
         loadAssets();
     </script>
 </body>
