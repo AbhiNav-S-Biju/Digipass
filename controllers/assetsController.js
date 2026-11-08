@@ -21,6 +21,8 @@ function buildAssetResponse(asset) {
     account_identifier: asset.account_identifier,
     action_type: asset.action_type,
     last_message: asset.last_message,
+    // The owner's list never receives the password itself, only whether one is stored
+    has_password: Boolean(asset.has_password ?? asset.account_password),
     created_at: asset.created_at
   };
 }
@@ -100,7 +102,8 @@ async function getAssets(req, res) {
     const userId = getAuthenticatedUserId(req);
 
     const result = await pool.query(
-      `SELECT asset_id, platform_name, category, account_identifier, action_type, last_message, created_at
+      `SELECT asset_id, platform_name, category, account_identifier, action_type, last_message, created_at,
+              (account_password IS NOT NULL AND account_password <> '') AS has_password
        FROM digital_assets
        WHERE user_id = $1
        ORDER BY created_at DESC`,
@@ -135,11 +138,12 @@ async function updateAsset(req, res) {
       });
     }
 
-    // Validation
-    if (!platform_name || !category || !account_identifier || !account_password || !action_type) {
+    // Validation. account_password is optional on update: blank keeps the stored one,
+    // because the owner's list never sends the existing password back to the browser.
+    if (!platform_name || !category || !account_identifier || !action_type) {
       return res.status(400).json({
         success: false,
-        message: 'platform_name, category, account_identifier, account_password, and action_type are required'
+        message: 'platform_name, category, account_identifier, and action_type are required'
       });
     }
 
@@ -156,6 +160,10 @@ async function updateAsset(req, res) {
         message: 'last_message is required when action_type is "last_message"'
       });
     }
+
+    const newPassword = typeof account_password === 'string' && account_password.trim()
+      ? account_password.trim()
+      : null;
 
     // Check if asset exists and belongs to user
     const existingAsset = await pool.query(
@@ -174,14 +182,14 @@ async function updateAsset(req, res) {
     const result = await pool.query(
       `UPDATE digital_assets 
        SET platform_name = $1, category = $2, account_identifier = $3, 
-           account_password = $4, action_type = $5, last_message = $6, updated_at = NOW()
+           account_password = COALESCE($4, account_password), action_type = $5, last_message = $6, updated_at = NOW()
        WHERE asset_id = $7 AND user_id = $8
        RETURNING asset_id, platform_name, category, account_identifier, account_password, action_type, last_message, created_at`,
       [
         platform_name.trim(),
         category,
         account_identifier.trim(),
-        account_password.trim(),
+        newPassword,
         action_type,
         last_message || null,
         assetId,

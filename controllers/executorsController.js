@@ -131,6 +131,8 @@ async function addExecutor(req, res, next) {
           message_id: emailDelivery.messageId || null,
           reason: emailDelivery.reason || null
         },
+        // When no email went out, the owner gets the link to share another way
+        verification_link: emailDelivery.delivered ? undefined : emailDelivery.verificationUrl,
         verification_preview_url: process.env.NODE_ENV === 'development' ? emailDelivery.verificationUrl : undefined
       }
     });
