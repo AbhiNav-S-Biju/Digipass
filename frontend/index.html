@@ -3,1513 +3,653 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIGIPASS - Organize Your Digital Life</title>
-    <meta name="description" content="Secure your digital estate with Digipass. Store passwords, create your digital will, and assign trusted executors — fully encrypted.">
+    <title>DIGIPASS · Every account gets the ending you choose</title>
+    <meta name="description" content="Decide what happens to each of your online accounts after you die, name the people you trust, and DIGIPASS guides them through every one.">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231b3a2d'/%3E%3Cpath d='M20 18h16c9 0 16 6 16 14s-7 14-16 14h-6v10H20V18zm10 20h6c4 0 7-3 7-6s-3-6-7-6h-6v12z' fill='%23fdf6ec'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/board.css?v=5">
     <style>
-        /* ========== DESIGN TOKENS ========== */
-        :root {
-            --cream: #f5ead8;
-            --cream-light: #fdf6ec;
-            --forest-deep: #1b3a2d;
-            --forest-mid: #2d5a42;
-            --forest-light: #3d7a5a;
-            --sand: #e8d9c0;
-            --sand-deep: #d4c4a0;
-            --text-dark: #1a2e22;
-            --text-muted: #5a7260;
-            --accent-green: #3d7a5a;
-            --accent-light: #d4ead8;
-            --glow: rgba(61, 122, 90, 0.18);
-        }
-
-        * { font-family: 'DM Sans', sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
-        h1, h2, h3, h4, h5, h6, .navbar-brand { font-family: 'DM Serif Display', serif; }
-
+        /* ---------- Landing (tokens from board.css) ---------- */
         html { scroll-behavior: smooth; }
-
-        body {
-            background-color: var(--cream);
-            color: var(--text-dark);
-            overflow-x: hidden;
-        }
-
-        /* ========== SCROLL REVEAL ========== */
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);
-        }
-        .reveal.reveal-left {
-            transform: translateX(-50px);
-        }
-        .reveal.reveal-right {
-            transform: translateX(50px);
-        }
-        .reveal.reveal-scale {
-            transform: scale(0.92) translateY(20px);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: none;
-        }
-        .reveal-delay-1 { transition-delay: 0.1s; }
-        .reveal-delay-2 { transition-delay: 0.2s; }
-        .reveal-delay-3 { transition-delay: 0.3s; }
-        .reveal-delay-4 { transition-delay: 0.4s; }
-
-        /* ========== NAVBAR ========== */
-        .navbar {
-            background-color: var(--forest-deep) !important;
-            height: 62px;
-            padding: 0 2.5rem;
-            box-shadow: 0 1px 0 rgba(255,255,255,0.05);
-            transition: background 0.4s;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .navbar.scrolled {
-            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
-        }
-
-        .navbar-brand {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--cream-light) !important;
-            letter-spacing: 0;
-        }
-
-        .navbar-collapse { justify-content: flex-end; }
-
-        .nav-link {
-            color: rgba(245, 234, 216, 0.65) !important;
-            font-size: 13.5px;
-            font-weight: 400;
-            padding: 0 0.75rem !important;
-            transition: color 0.3s ease;
-        }
-        .nav-link:hover { color: var(--cream-light) !important; }
-
-        .navbar-toggler { border: none; padding: 0; margin-right: -0.75rem; }
-        .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23fdf6ec' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2.5' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-            background-size: 1.5rem;
-        }
-
-        #authBtn {
-            background-color: var(--accent-green) !important;
-            color: var(--cream-light) !important;
-            border: none !important;
-            padding: 8px 20px;
-            border-radius: 6px;
-            font-size: 13.5px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        #authBtn:hover {
-            background-color: var(--forest-light) !important;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(61,122,90,0.35);
-        }
-
-        @media (max-width: 860px) {
-            .navbar { padding: 0 1.5rem; }
-            .navbar-collapse {
-                background-color: var(--forest-mid);
-                padding: 1rem 0;
-                position: absolute;
-                top: 62px; left: 0; right: 0;
-            }
-            .nav-item:last-child {
-                border-top: 1px solid rgba(255,255,255,0.08);
-                padding-top: 0.75rem;
-                margin-top: 0.75rem;
-            }
-        }
-
-        /* ========== HERO ========== */
-        .hero {
-            position: relative;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 100px 5vw 80px;
-            overflow: hidden;
-        }
-
-        /* Animated background gradient orbs */
-        .hero-bg {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.25;
-            animation: orbFloat 12s ease-in-out infinite;
-        }
-
-        .orb-1 {
-            width: 560px; height: 560px;
-            background: radial-gradient(circle, var(--forest-mid), transparent 70%);
-            top: -120px; left: -180px;
-            animation-delay: 0s;
-        }
-
-        .orb-2 {
-            width: 420px; height: 420px;
-            background: radial-gradient(circle, var(--accent-green), transparent 70%);
-            bottom: 40px; right: -80px;
-            animation-delay: 4s;
-        }
-
-        .orb-3 {
-            width: 300px; height: 300px;
-            background: radial-gradient(circle, #8cbf9c, transparent 70%);
-            top: 50%; left: 50%;
-            animation-delay: 8s;
-            opacity: 0.12;
-        }
-
-        @keyframes orbFloat {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(20px, -30px) scale(1.05); }
-            66% { transform: translate(-15px, 20px) scale(0.95); }
-        }
-
-        /* ── Hero split layout ── */
-        .hero-split {
-            position: relative;
-            z-index: 2;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* Hero left: text */
-        .hero-content {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background-color: var(--sand);
-            color: var(--forest-mid);
-            padding: 7px 16px;
-            border-radius: 999px;
-            font-size: 11.5px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            margin-bottom: 28px;
-            border: 1px solid var(--sand-deep);
-            animation: badgePulse 3s ease-in-out infinite;
-        }
-
-        @keyframes badgePulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(61,122,90,0); }
-            50% { box-shadow: 0 0 0 5px rgba(61,122,90,0.1); }
-        }
-
-        .hero-badge-dot {
-            width: 6px; height: 6px;
-            background: var(--accent-green);
-            border-radius: 50%;
-            animation: dotBlink 2s ease-in-out infinite;
-        }
-
-        @keyframes dotBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        /* Stylish hero title — Playfair Display only for h1 */
-        .hero h1 {
-            font-family: 'Playfair Display', serif !important;
-            font-size: clamp(38px, 5vw, 72px);
-            color: var(--text-dark);
-            line-height: 1.08;
-            margin-bottom: 22px;
-            font-weight: 800;
-            letter-spacing: -0.01em;
-        }
-
-        .hero h1 em {
-            font-style: italic;
-            color: var(--forest-mid);
-        }
-
-        .hero p {
-            font-size: 16.5px;
-            color: var(--text-muted);
-            line-height: 1.78;
-            margin-bottom: 36px;
-            font-weight: 300;
-            max-width: 480px;
-        }
-
-        .hero-cta {
-            display: flex;
-            gap: 14px;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
-        }
-
-        .btn-hero-primary {
-            background: var(--forest-deep);
-            color: var(--cream-light);
-            border: none;
-            padding: 14px 32px;
-            border-radius: 10px;
-            font-size: 14.5px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-hero-primary::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .btn-hero-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 28px rgba(27,58,45,0.35);
-        }
-        .btn-hero-primary:hover::after { opacity: 1; }
-
-        .btn-hero-outline {
-            background: transparent;
-            color: var(--forest-deep);
-            border: 1.5px solid var(--forest-deep);
-            padding: 13px 31px;
-            border-radius: 10px;
-            font-size: 14.5px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
-        }
-
-        .btn-hero-outline:hover {
-            background: var(--forest-deep);
-            color: var(--cream-light);
-            transform: translateY(-2px);
-        }
-
-        /* Trust bar */
-        .trust-bar {
-            display: flex;
-            gap: 1.75rem;
-            padding-top: 24px;
-            border-top: 1px solid var(--sand-deep);
-            flex-wrap: wrap;
-        }
-
-        .trust-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12.5px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .trust-dot {
-            width: 6px; height: 6px;
-            background-color: var(--accent-green);
-            border-radius: 50%;
-        }
-
-        /* Hero right: image */
-        .hero-image-side {
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-image-wrap {
-            position: relative;
-        }
-
-        .hero-image-wrap img {
-            width: 100%;
-            border-radius: 22px;
-            box-shadow: 0 40px 100px rgba(27,58,45,0.25), 0 8px 28px rgba(27,58,45,0.12);
-            animation: heroImageFloat 6s ease-in-out infinite;
-            border: 1px solid var(--sand-deep);
-            display: block;
-        }
-
-        @keyframes heroImageFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-12px) rotate(0.4deg); }
-        }
-
-        /* Floating mini-badges on the hero image */
-        .hero-float-badge {
-            position: absolute;
-            background: var(--cream-light);
-            border: 1px solid var(--sand-deep);
-            border-radius: 12px;
-            padding: 9px 14px;
-            box-shadow: 0 8px 24px rgba(27,58,45,0.13);
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-dark);
-            white-space: nowrap;
-            animation: badgeFloat 4s ease-in-out infinite;
-        }
-
-        .hero-float-badge.hfb-tl {
-            top: -18px;
-            left: -20px;
-        }
-
-        .hero-float-badge.hfb-br {
-            bottom: -18px;
-            right: -20px;
-            animation-delay: 2s;
-        }
-
-        @keyframes badgeFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-7px); }
-        }
-
-        .hfb-icon {
-            width: 28px; height: 28px;
-            background: var(--accent-light);
-            border-radius: 7px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
-
-        /* ── Hero responsive ── */
-        @media (max-width: 860px) {
-            .hero {
-                padding: 80px 1.5rem 60px;
-            }
-            .hero-split {
-                grid-template-columns: 1fr;
-                gap: 48px;
-                text-align: center;
-            }
-            .hero-content {
-                align-items: center;
-            }
-            .hero p { max-width: 100%; }
-            .trust-bar { justify-content: center; }
-            .hero-float-badge { display: none; }
-        }
-
-        @media (max-width: 560px) {
-            .hero h1 { font-size: 36px; }
-            .hero p { font-size: 15px; }
-            .btn-hero-primary, .btn-hero-outline { width: 100%; padding: 13px 20px; }
-            .hero-cta { flex-direction: column; }
-        }
-
-        /* ========== SECTION BASE ========== */
-        .section {
-            padding: 100px 2.5rem;
-        }
-
-        .section-inner {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .section-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.14em;
-            color: var(--accent-green);
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-
-        .section-title {
-            font-size: clamp(28px, 4vw, 42px);
-            color: var(--text-dark);
-            line-height: 1.18;
-            margin-bottom: 16px;
-        }
-
-        .section-subtitle {
-            font-size: 16px;
-            color: var(--text-muted);
-            line-height: 1.75;
-            font-weight: 300;
-        }
-
-        .divider {
-            border: none;
-            border-top: 1px solid var(--sand-deep);
-            margin: 0;
-        }
-
-        /* ========== FEATURE HIGHLIGHTS STRIP ========== */
-        .highlights-strip {
-            background: var(--forest-deep);
-            padding: 56px 2.5rem;
-        }
-
-        .highlights-inner {
-            max-width: 1060px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-        }
-
-        .highlight-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px;
-            padding: 24px 20px;
-            text-align: center;
-            transition: background 0.3s;
-        }
-
-        .highlight-card:hover {
-            background: rgba(255,255,255,0.07);
-        }
-
-        .highlight-icon {
-            font-size: 28px;
-            margin-bottom: 12px;
-        }
-
-        .highlight-title {
-            font-family: 'DM Serif Display', serif;
-            font-size: 15px;
-            color: var(--cream-light);
-            margin-bottom: 6px;
-        }
-
-        .highlight-desc {
-            font-size: 12.5px;
-            color: rgba(245,234,216,0.5);
-            line-height: 1.65;
-        }
-
-        @media (max-width: 860px) {
-            .highlights-inner { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 560px) {
-            .highlights-inner { grid-template-columns: 1fr; }
-            .highlights-strip { padding: 40px 1.25rem; }
-        }
-
-        /* ========== FEATURE SPLIT ========== */
-        .feature-split-wrap {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 64px;
-            align-items: center;
-        }
-
-        .feature-split-wrap.reverse { direction: rtl; }
-        .feature-split-wrap.reverse > * { direction: ltr; }
-
-        .feature-split-text {}
-
-        .feature-split-text .section-title { text-align: left; }
-        .feature-split-text .section-subtitle { margin-bottom: 28px; }
-
-        .feature-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .feature-list li {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            margin-bottom: 18px;
-            font-size: 14px;
-            color: var(--text-muted);
-            line-height: 1.65;
-        }
-
-        .fl-marker {
-            width: 22px; height: 22px;
-            min-width: 22px;
-            background: var(--accent-light);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 1px;
-        }
-
-        .fl-marker svg {
-            width: 12px; height: 12px;
-            stroke: var(--forest-deep);
-            stroke-width: 2.5;
-            fill: none;
-        }
-
-        /* Feature image block */
-        .feature-img-block {
-            position: relative;
-        }
-
-        .feature-img-block img {
-            width: 100%;
-            border-radius: 18px;
-            box-shadow: 0 20px 60px rgba(27,58,45,0.15), 0 4px 16px rgba(27,58,45,0.08);
-            border: 1px solid var(--sand-deep);
-            transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);
-        }
-
-        .feature-img-block:hover img {
-            transform: scale(1.02) translateY(-4px);
-        }
-
-        .feature-img-badge {
-            position: absolute;
-            background: var(--cream-light);
-            border: 1px solid var(--sand-deep);
-            border-radius: 12px;
-            padding: 10px 16px;
-            box-shadow: 0 8px 24px rgba(27,58,45,0.12);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 12.5px;
-            font-weight: 600;
-            color: var(--text-dark);
-            animation: badgeFloat 4s ease-in-out infinite;
-        }
-
-        .feature-img-badge.badge-br {
-            bottom: -16px; right: -16px;
-            animation-delay: 2s;
-        }
-
-        .feature-img-badge.badge-tl {
-            top: -16px; left: -16px;
-        }
-
-        @keyframes badgeFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-6px); }
-        }
-
-        .badge-icon {
-            width: 28px; height: 28px;
-            background: var(--accent-light);
-            border-radius: 7px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
-
-        /* ========== FEATURE CARDS ========== */
-        .feature-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-        }
-
-        .feature-card {
-            background: var(--cream-light);
-            border: 1px solid var(--sand-deep);
-            border-radius: 16px;
-            padding: 28px 22px;
-            position: relative;
-            overflow: hidden;
-            cursor: default;
-            transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--forest-deep);
-            opacity: 0.12;
-        }
-
-        .feature-card.featured::before { opacity: 1; }
-
-        .feature-card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, var(--glow), transparent);
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 48px rgba(27,58,45,0.12);
-            border-color: var(--sand);
-        }
-        .feature-card:hover::after { opacity: 1; }
-
-        .fc-icon {
-            width: 44px; height: 44px;
-            background: var(--sand);
-            border-radius: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 18px;
-            position: relative;
-            z-index: 1;
-            transition: background 0.3s;
-        }
-
-        .feature-card.featured .fc-icon { background: var(--accent-light); }
-        .feature-card:hover .fc-icon { background: var(--accent-light); }
-
-        .fc-icon svg {
-            width: 22px; height: 22px;
-            stroke: var(--forest-mid);
-            stroke-width: 1.6;
-            fill: none;
-        }
-
-        .feature-card h3 {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .feature-card p {
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.65;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* ========== HOW IT WORKS ========== */
-        .steps-section {
-            background: var(--forest-deep);
-            padding: 100px 2.5rem;
-        }
-
-        .steps-inner {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .steps-header {
-            text-align: center;
-            margin-bottom: 64px;
-        }
-
-        .steps-header .section-label { color: rgba(245,234,216,0.5); }
-        .steps-header .section-title { color: var(--cream-light); }
-
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0;
-            position: relative;
-        }
-
-        .steps-connector {
-            position: absolute;
-            top: 32px;
-            left: calc(16.666% + 32px);
-            right: calc(16.666% + 32px);
-            height: 1px;
-            background: linear-gradient(90deg, rgba(245,234,216,0.15) 0%, rgba(245,234,216,0.3) 50%, rgba(245,234,216,0.15) 100%);
-        }
-
-        .step-card {
-            text-align: center;
-            padding: 0 24px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .step-number {
-            width: 64px; height: 64px;
-            background: linear-gradient(135deg, var(--forest-mid), var(--forest-light));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'DM Serif Display', serif;
-            font-size: 26px;
-            color: var(--cream-light);
-            margin: 0 auto 24px;
-            box-shadow: 0 0 0 8px rgba(245,234,216,0.06);
-            transition: all 0.4s;
-        }
-
-        .step-card:hover .step-number {
-            box-shadow: 0 0 0 14px rgba(245,234,216,0.1);
-            transform: scale(1.05);
-        }
-
-        .step-card h3 {
-            font-size: 17px;
-            color: var(--cream-light);
-            margin-bottom: 10px;
-        }
-
-        .step-card p {
-            font-size: 13.5px;
-            color: rgba(245,234,216,0.55);
-            line-height: 1.7;
-            max-width: 200px;
-            margin: 0 auto;
-        }
-
-        /* ========== TESTIMONIALS ========== */
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .testimonial-card {
-            background: var(--cream-light);
-            border: 1px solid var(--sand-deep);
-            border-radius: 16px;
-            padding: 28px 24px;
-            transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
-        }
-
-        .testimonial-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(27,58,45,0.1);
-        }
-
-        .testimonial-stars {
-            color: var(--accent-green);
-            font-size: 13px;
-            margin-bottom: 14px;
-            letter-spacing: 2px;
-        }
-
-        .testimonial-text {
-            font-size: 14px;
-            color: var(--text-dark);
-            line-height: 1.7;
-            margin-bottom: 20px;
-            font-style: italic;
-        }
-
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .author-avatar {
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            background: var(--sand);
-            border: 2px solid var(--sand-deep);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            color: var(--forest-mid);
-            font-weight: 600;
-        }
-
-        .author-info { }
-        .author-name { font-size: 13px; font-weight: 600; color: var(--text-dark); }
-        .author-role { font-size: 11.5px; color: var(--text-muted); }
-
-        /* ========== CTA SECTION ========== */
-        .cta-section {
-            padding: 100px 2.5rem;
-        }
-
-        .cta-card {
-            background: linear-gradient(135deg, var(--forest-deep) 0%, var(--forest-mid) 100%);
-            border-radius: 24px;
-            padding: 72px 64px;
-            text-align: center;
-            max-width: 780px;
-            margin: 0 auto;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta-card::before {
-            content: '';
-            position: absolute;
-            top: -80px; right: -80px;
-            width: 320px; height: 320px;
-            background: radial-gradient(circle, rgba(141,195,156,0.15), transparent 70%);
-            border-radius: 50%;
-        }
-
-        .cta-card::after {
-            content: '';
-            position: absolute;
-            bottom: -60px; left: -60px;
-            width: 240px; height: 240px;
-            background: radial-gradient(circle, rgba(141,195,156,0.1), transparent 70%);
-            border-radius: 50%;
-        }
-
-        .cta-card-inner { position: relative; z-index: 1; }
-
-        .cta-card h2 {
-            font-size: clamp(28px, 4vw, 40px);
-            color: var(--cream-light);
-            margin-bottom: 16px;
-        }
-
-        .cta-card p {
-            font-size: 16px;
-            color: rgba(245,234,216,0.65);
-            margin-bottom: 36px;
-            line-height: 1.7;
-            font-weight: 300;
-        }
-
-        .btn-cta {
-            background: var(--cream-light);
-            color: var(--forest-deep);
-            border: none;
-            padding: 15px 38px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
-        }
-
-        .btn-cta:hover {
-            background: var(--cream);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 32px rgba(0,0,0,0.2);
-        }
-
-        .cta-perks {
-            display: flex;
-            justify-content: center;
-            gap: 28px;
-            margin-top: 28px;
-            flex-wrap: wrap;
-        }
-
-        .cta-perk {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-size: 12.5px;
-            color: rgba(245,234,216,0.55);
-        }
-
-        .cta-perk-check {
-            width: 16px; height: 16px;
-            background: rgba(141,195,156,0.25);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #8dc39c;
-            font-size: 9px;
-            font-weight: 700;
-        }
-
-        /* ========== FOOTER ========== */
-        footer {
-            background: var(--forest-deep);
-            padding: 28px 2.5rem;
-            text-align: center;
-            color: rgba(245,234,216,0.4);
-            font-size: 12.5px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 900px) {
-            .feature-split-wrap, .feature-split-wrap.reverse {
-                grid-template-columns: 1fr;
-                gap: 40px;
-                direction: ltr;
-            }
-            .feature-cards-grid { grid-template-columns: repeat(2, 1fr); }
-            .steps-grid { grid-template-columns: 1fr; gap: 40px; }
-            .steps-connector { display: none; }
-            .testimonials-grid { grid-template-columns: 1fr; }
-            .cta-card { padding: 52px 32px; }
-            .section { padding: 72px 1.5rem; }
-            .steps-section { padding: 72px 1.5rem; }
-            .cta-section { padding: 72px 1.5rem; }
-        }
-
-        @media (max-width: 560px) {
-            .feature-cards-grid { grid-template-columns: 1fr; }
-            .feature-img-badge { display: none; }
-            .cta-card { padding: 40px 24px; }
-            .cta-perks { flex-direction: column; align-items: center; gap: 12px; }
-            footer { padding: 20px 1rem; font-size: 11px; }
-        }
-
-        /* ========== PARTICLE CANVAS ========== */
-        #particle-canvas {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
+        body.land { margin: 0; font-family: var(--font); color: var(--ink); background: var(--ground); -webkit-font-smoothing: antialiased; }
+        body.land ::selection { background: var(--sage-deep); color: var(--forest-deep); }
+        .land a { color: inherit; }
+        .wrap { width: min(1240px, calc(100% - 48px)); margin: 0 auto; }
+        .land h1, .land h2, .land h3 { margin: 0; letter-spacing: -0.03em; }
+
+        /* Nav */
+        .nav { position: fixed; inset: 0 0 auto; z-index: 50; transition: background 0.3s, box-shadow 0.3s, color 0.3s; color: var(--cream-light); }
+        .nav .wrap { display: flex; align-items: center; gap: 28px; height: 72px; }
+        .nav .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; text-decoration: none; margin-right: auto; }
+        .nav .brand span { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: rgba(253, 246, 236, 0.12); border: 1px solid rgba(253, 246, 236, 0.18); }
+        .nav .brand svg { width: 20px; height: 20px; }
+        .nav a.link { text-decoration: none; font-size: 15px; font-weight: 500; opacity: 0.85; }
+        .nav a.link:hover { opacity: 1; }
+        .nav .start { text-decoration: none; background: var(--cream-light); color: var(--forest-deep); font-weight: 700; font-size: 15px; padding: 11px 20px; border-radius: 999px; transition: transform 0.2s var(--ease-out); }
+        .nav .start:hover { transform: translateY(-1px); }
+        .nav.solid { background: rgba(236, 227, 210, 0.92); color: var(--ink); box-shadow: 0 1px 0 var(--line); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+        .nav.solid .brand span { background: var(--forest-deep); border-color: transparent; }
+        .nav.solid .start { background: var(--forest-deep); color: var(--cream-light); }
+
+        /* Hero */
+        /* The hero board bleeds over the forest/sand edge so the first viewport ends on it */
+        .hero { background: linear-gradient(var(--forest-deep) 0 calc(100% - 150px), var(--ground) calc(100% - 150px)); color: var(--cream-light); padding: 128px 0 40px; position: relative; }
+        .hero-side .hero-exec { margin: 18px 0 0; font-size: 14px; line-height: 1.4; color: rgba(253, 246, 236, 0.85); max-width: none; }
+        .hero-side .hero-exec a { color: var(--cream-light); font-weight: 700; }
+        .hero-top { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 56px; align-items: end; position: relative; }
+        .hero h1 { font-size: clamp(40px, 5.4vw, 70px); line-height: 1.03; font-weight: 800; max-width: 15ch; }
+        .hero h1 .soft { color: #8cbf9c; }
+        .hero-side p { font-size: 18px; line-height: 1.55; color: rgba(253, 246, 236, 0.94); margin: 0 0 22px; max-width: 38ch; }
+        .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-cream, .btn-line, .btn-dark {
+            display: inline-flex; align-items: center; gap: 10px; text-decoration: none;
+            padding: 16px 26px; border-radius: 999px; font-weight: 700; font-size: 16px;
+            transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), background 0.2s;
+        }
+        .land .btn-cream { background: var(--cream-light); color: var(--forest-deep); }
+        .btn-cream:hover, .btn-dark:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -14px rgba(0, 0, 0, 0.55); }
+        .land .btn-line { border: 1.5px solid rgba(253, 246, 236, 0.45); color: var(--cream-light); }
+        .btn-line:hover { background: rgba(253, 246, 236, 0.08); }
+        .land .btn-dark { background: var(--forest-deep); color: var(--cream-light); }
+        .btn-cream i, .btn-dark i { transition: transform 0.25s var(--ease-out); }
+        .btn-cream:hover i, .btn-dark:hover i { transform: translateX(3px); }
+
+        /* Boards (hero + handover stage) */
+        .board-mock { background: var(--ground); color: var(--ink); border-radius: 30px; padding: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.6); }
+        .hero .board-mock { margin-top: 52px; position: relative; }
+        .bcol { background: var(--column); border-radius: 22px; padding: 12px; min-height: 230px; display: flex; flex-direction: column; gap: 10px; }
+        .bcol-head { display: flex; align-items: center; gap: 8px; padding: 4px 6px 2px; font-weight: 700; font-size: 15px; }
+        .bcol-head .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--dot, var(--forest-light)); }
+        .bcol-head .n { margin-left: auto; color: var(--ink-muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+        .acard { background: var(--card); border-radius: 18px; padding: 12px 14px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 6px; will-change: transform; }
+        .acard .top { display: flex; align-items: center; gap: 10px; }
+        .acard .ico { width: 32px; height: 32px; flex: none; aspect-ratio: 1; border-radius: 10px; display: grid; place-items: center; background: var(--cream); color: var(--forest-deep); font-size: 15px; }
+        .acard b { font-size: 16px; letter-spacing: -0.01em; }
+        .acard small { font-size: 13px; color: var(--ink-muted); }
+        .acard .tag { align-self: flex-start; }
+        .acard .bar { height: 5px; border-radius: 4px; background: rgba(27, 58, 45, 0.08); overflow: hidden; display: none; }
+        .acard .bar span { display: block; height: 100%; background: var(--forest-deep); border-radius: 4px; width: 0; transition: width 0.6s var(--ease-out); }
+        .exec-mode .acard .bar { display: block; }
+
+        /* Hero cards drop into their columns on load */
+        .hero .acard { opacity: 0; animation: drop 0.8s var(--spring) forwards; animation-delay: calc(0.45s + var(--i) * 0.16s); }
+        @keyframes drop {
+            0% { opacity: 0; transform: translateY(-46px) rotate(-3deg); }
+            60% { opacity: 1; }
+            100% { opacity: 1; transform: none; }
+        }
+
+        /* Section scaffolding */
+        .sec { padding: 112px 0; }
+        .kick { display: none; }
+        .sec h2 { font-size: clamp(32px, 4.2vw, 54px); line-height: 1.05; font-weight: 800; max-width: 18ch; }
+        .sec .lead { font-size: 18px; line-height: 1.6; color: var(--ink-muted); max-width: 56ch; margin: 18px 0 0; }
+
+        /* The handover: a pinned stage scrubbed by scroll */
+        .story { position: relative; height: 420vh; }
+        .story-pin { position: sticky; top: 0; height: 100vh; display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr); gap: 56px; align-items: center; }
+        .chapters { position: relative; min-height: 280px; }
+        .chapter { position: absolute; inset: 0; opacity: 0; transform: translateY(18px); transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out); pointer-events: none; }
+        .chapter.on { opacity: 1; transform: none; pointer-events: auto; }
+        .chapter h2 { font-size: clamp(28px, 3.2vw, 42px); line-height: 1.08; font-weight: 800; }
+        .chapter p { font-size: 17px; line-height: 1.6; color: var(--ink-muted); margin: 16px 0 0; max-width: 44ch; }
+        .story-progress { display: flex; gap: 6px; margin-top: 28px; position: absolute; bottom: -56px; left: 0; }
+        .story-progress span { width: 34px; height: 4px; border-radius: 4px; background: rgba(27, 58, 45, 0.14); transition: background 0.3s; }
+        .story-progress span.on { background: var(--forest-deep); }
+
+        .stage { position: relative; }
+        /* One stable board: fixed column height in both owner and executor modes, so the
+           FLIP reads as cards travelling, not the board resizing */
+        .stage .board-mock { box-shadow: var(--shadow-pop); background: #e4d9c4; }
+        .stage .bcol { height: min(68vh, 600px); min-height: 0; overflow: hidden; }
+        .stage .exec-mode .acard { padding: 10px 12px; gap: 6px; }
+        .stage .exec-mode .acard .tag { display: none; }
+        .stage .exec-mode .acard .ico { width: 28px; height: 28px; font-size: 13px; }
+        .stage-layer { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; opacity: 0; transition: opacity 0.5s var(--ease-out); }
+        .stage-layer.on { opacity: 1; }
+
+        /* Chapter 2: people */
+        .people-card { pointer-events: auto; width: min(420px, 90%); background: var(--card); border-radius: 26px; padding: 20px; box-shadow: var(--shadow-pop); }
+        .people-card .ttl { margin: 0 0 12px; font-size: 16px; font-weight: 700; }
+        .person-row { display: flex; align-items: center; gap: 12px; padding: 10px 4px; border-top: 1px solid var(--line); }
+        .person-row:first-of-type { border-top: 0; }
+        .person-row .avatar { width: 40px; height: 40px; font-size: 13px; }
+        .person-row b { display: block; font-size: 15px; }
+        .person-row small { color: var(--ink-muted); font-size: 13px; }
+        .person-row .tag { margin-left: auto; transition: background 0.4s, color 0.4s; }
+
+        /* Chapter 3: heartbeat */
+        .pulse-card { width: min(480px, 92%); background: var(--forest-deep); color: var(--cream-light); border-radius: 26px; padding: 24px; box-shadow: var(--shadow-pop); }
+        .pulse-card .days { font-size: 54px; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1; }
+        .pulse-card .days small { font-size: 16px; font-weight: 500; color: rgba(253, 246, 236, 0.7); letter-spacing: 0; margin-left: 6px; }
+        .pulse-card p { margin: 10px 0 14px; color: rgba(253, 246, 236, 0.78); font-size: 15px; }
+        .ekg { width: 100%; height: 90px; display: block; }
+        .ekg path { fill: none; stroke: #8cbf9c; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1200; stroke-dashoffset: 1200; animation: trace 2.4s linear infinite; }
+        .pulse-card.slow .ekg path { animation-duration: 4.2s; }
+        .pulse-card.stopped .ekg path { animation: none; stroke-dashoffset: 0; opacity: 0.35; }
+        .pulse-card .ekg .flat { stroke: #8cbf9c; stroke-width: 3; opacity: 0; transition: opacity 0.4s; }
+        .pulse-card.stopped .ekg .flat { opacity: 1; animation: none; stroke-dasharray: none; stroke-dashoffset: 0; }
+        @keyframes trace { to { stroke-dashoffset: 0; } }
+        .pulse-card .note { color: var(--cream-light); display: flex; gap: 10px; align-items: center; background: rgba(253, 246, 236, 0.08); border-radius: 14px; padding: 12px 14px; font-size: 14px; opacity: 0; transform: translateY(6px); transition: opacity 0.4s, transform 0.4s; }
+        .pulse-card.stopped .note { opacity: 1; transform: none; }
+
+        /* Guide preview */
+        .guide-sec { background: var(--forest-deep); color: var(--cream-light); }
+        .guide-sec h2 { color: var(--cream-light); }
+        .guide-sec .lead { color: rgba(253, 246, 236, 0.9); }
+        .guide-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 56px; align-items: center; }
+        .gmock { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 14px; background: rgba(253, 246, 236, 0.06); border: 1px solid rgba(212, 234, 216, 0.16); border-radius: 30px; padding: 14px; }
+        .gsteps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+        .gsteps li { display: flex; gap: 10px; align-items: center; padding: 10px; border-radius: 14px; font-size: 14px; color: rgba(253, 246, 236, 0.9); border: 1px solid transparent; transition: background 0.4s, border-color 0.4s, color 0.4s; }
+        .gsteps .n { width: 28px; height: 28px; flex: none; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 12px; border: 1px solid rgba(253, 246, 236, 0.3); transition: background 0.4s, box-shadow 0.4s; }
+        .gsteps li.done .n { background: rgba(140, 191, 156, 0.28); border-color: transparent; }
+        .gsteps li.now { background: rgba(212, 234, 216, 0.14); border-color: rgba(212, 234, 216, 0.3); color: var(--cream-light); }
+        .gsteps li.now .n { background: var(--forest-light); border-color: rgba(253, 246, 236, 0.4); box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.5); }
+        .gcard { background: var(--card); color: var(--ink); border-radius: 22px; padding: 20px; min-height: 300px; display: flex; flex-direction: column; gap: 10px; }
+        .gcard .ttl { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.02em; }
+        .gcard .do { background: var(--cream-light); border-radius: 12px; padding: 10px 12px; font-size: 14px; display: flex; gap: 10px; align-items: center; }
+        .gcard .do i { width: 28px; text-align: center; color: var(--forest-deep); }
+        .gcard .msg { background: var(--sage); border-radius: 12px; padding: 12px; font-size: 14px; color: var(--forest-deep); }
+        .gcard .swap { animation: fadeUp 0.45s var(--ease-out); }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        .feature-points { list-style: none; padding: 0; margin: 26px 0 0; display: grid; gap: 14px; }
+        .feature-points li { display: flex; gap: 12px; font-size: 16px; color: rgba(253, 246, 236, 0.92); }
+        .feature-points i { color: #8cbf9c; margin-top: 4px; }
+
+        /* Will + facts */
+        .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: center; }
+        .will-doc { position: relative; height: 420px; }
+        .will-page { position: absolute; width: 300px; height: 390px; background: #fffdf9; border-radius: 10px; box-shadow: var(--shadow-lift); padding: 28px 26px; transition: transform 0.8s var(--spring); }
+        .will-page:nth-child(1) { left: 18%; top: 20px; transform: rotate(-6deg); }
+        .will-page:nth-child(2) { left: 30%; top: 0; transform: rotate(4deg); }
+        .will-doc.in .will-page:nth-child(1) { transform: rotate(-9deg) translateX(-30px); }
+        .will-doc.in .will-page:nth-child(2) { transform: rotate(2deg) translateX(24px); }
+        .will-page .ttl { margin: 0 0 4px; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+        .will-page .meta { font-size: 11px; color: var(--ink-muted); margin-bottom: 18px; }
+        .will-line { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; padding: 8px 0; border-top: 1px solid var(--line); }
+        .will-line span:last-child { color: var(--ink-muted); }
+        .will-sign { margin-top: 22px; border-top: 1.5px solid var(--ink); width: 60%; padding-top: 6px; font-size: 11px; color: var(--ink-muted); }
+
+        .facts { list-style: none; margin: 32px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line-strong); }
+        .facts li { padding: 22px 22px 22px 0; border-bottom: 1px solid var(--line-strong); }
+        .facts li:nth-child(odd) { border-right: 1px solid var(--line-strong); }
+        .facts li:nth-child(even) { padding-left: 22px; }
+        .facts b { display: block; font-size: 17px; margin-bottom: 6px; letter-spacing: -0.01em; }
+        .facts span { font-size: 15px; color: var(--ink-muted); line-height: 1.55; }
+
+        /* Close */
+        .close { padding: 120px 0 72px; text-align: left; }
+        .close-card { background: var(--forest-deep); color: var(--cream-light); border-radius: 36px; padding: 64px; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 40px; align-items: end; position: relative; overflow: hidden; }
+        .close-card h2 { font-size: clamp(32px, 4.4vw, 58px); line-height: 1.04; font-weight: 800; color: var(--cream-light); }
+        .close-card p { color: rgba(253, 246, 236, 0.92); font-size: 17px; line-height: 1.6; margin: 0 0 22px; }
+        .close-card .exec { display: block; margin-top: 18px; font-size: 15px; color: rgba(253, 246, 236, 0.8); }
+        .close-card .exec a { color: var(--cream-light); font-weight: 700; }
+        footer { padding: 28px 0 40px; color: var(--ink-muted); font-size: 14px; }
+        footer .wrap { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+        footer .wrap span:first-child { margin-right: auto; font-weight: 700; color: var(--ink); }
+
+        /* Scroll reveals (content stays visible without JS) */
+        .js .rv { opacity: 0; transform: translateY(24px); transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out); }
+        .js .rv.in { opacity: 1; transform: none; }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 960px) {
+            .hero-top, .guide-grid, .split, .close-card { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+            .story { height: auto; }
+            .story-pin { position: static; height: auto; grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 72px 0; }
+            .chapters { min-height: 0; }
+            .chapter { position: static; opacity: 1; transform: none; margin-bottom: 26px; }
+            .story-progress { display: none; }
+            .stage-layer { position: static; opacity: 1; margin-top: 16px; }
+            .stage.static .board-mock { display: none; }
+            .close-card { padding: 40px 28px; }
+        }
+        @media (max-width: 640px) {
+            .nav a.link[href="#how"], .nav a.link[href="executor-login.html"] { display: none; }
+            .hero { padding: 104px 0 56px; }
+            .board-mock { grid-template-columns: minmax(0, 1fr); padding: 12px; border-radius: 24px; }
+            .bcol { min-height: 0; }
+            .stage .bcol { min-height: 0; }
+            .gmock { grid-template-columns: minmax(0, 1fr); }
+            .gsteps { flex-direction: row; overflow-x: auto; scrollbar-width: none; }
+            .gsteps li { flex: none; }
+            .gsteps li .lbl { display: none; }
+            .facts { grid-template-columns: minmax(0, 1fr); }
+            .facts li:nth-child(odd) { border-right: 0; }
+            .facts li:nth-child(even) { padding-left: 0; }
+            .will-doc { height: 380px; }
+            .will-page { width: 240px; height: 330px; padding: 20px; }
+            .will-page:nth-child(1) { left: 4%; }
+            .will-page:nth-child(2) { left: 22%; }
+            .sec { padding: 80px 0; }
+            .pulse-card .days small { display: block; margin: 6px 0 0; }
+            /* Stacked board: hide columns that have no cards */
+            .board-mock .bcol:not(:has(.acard)) { display: none; }
+        }
+        footer a { text-decoration: none; }
+        footer a:hover { color: var(--ink); }
+        @media (prefers-reduced-motion: reduce) {
+            .hero .acard { animation: none; opacity: 1; }
+            .ekg path { animation: none; stroke-dashoffset: 0; }
+            .js .rv { opacity: 1; transform: none; }
         }
     </style>
 </head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg" id="mainNavbar">
-        <div class="container-fluid px-3 px-md-4">
-            <a class="navbar-brand" href="#">
-                <svg width="160" height="40" viewBox="0 0 200 54" xmlns="http://www.w3.org/2000/svg" style="display:block;height:40px;width:auto;">
-                    <rect x="0" y="6" width="40" height="40" rx="10" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
-                    <rect x="9" y="14" width="22" height="17" rx="3.5" fill="none" stroke="#fdf6ec" stroke-width="1.8"/>
-                    <path d="M9 21 L31 21" stroke="#fdf6ec" stroke-width="1.4" fill="none"/>
-                    <rect x="12" y="24" width="5" height="4" rx="1" fill="#8cbf9c"/>
-                    <rect x="19" y="24" width="5" height="4" rx="1" fill="#8cbf9c" opacity=".45"/>
-                    <path d="M27 10 L27 15" stroke="#fdf6ec" stroke-width="1.8" stroke-linecap="round"/>
-                    <circle cx="27" cy="9" r="3" fill="#fdf6ec"/>
-                    <text x="49" y="29" font-family="'DM Serif Display', serif" font-size="22" fill="#fdf6ec">Digipass</text>
-                    <text x="50" y="41" font-family="'DM Sans', sans-serif" font-size="8.5" fill="rgba(245,234,216,0.5)" letter-spacing="2.8">DIGITAL ESTATE</text>
-                </svg>
+<body class="land">
+    <script>document.documentElement.classList.add('js');</script>
+
+    <header class="nav" id="nav">
+        <div class="wrap">
+            <a class="brand" href="index.html" aria-label="DIGIPASS home">
+                <span aria-hidden="true"><svg viewBox="0 0 40 40"><rect x="7" y="10" width="22" height="17" rx="3.5" fill="none" stroke="#fdf6ec" stroke-width="2"/><path d="M7 17 L29 17" stroke="#fdf6ec" stroke-width="1.6"/><rect x="10" y="20" width="5" height="4" rx="1" fill="#b7d8bf"/><rect x="17" y="20" width="5" height="4" rx="1" fill="#b7d8bf" opacity=".5"/><path d="M25 6 L25 11" stroke="#fdf6ec" stroke-width="2" stroke-linecap="round"/><circle cx="25" cy="5" r="2.6" fill="#fdf6ec"/></svg></span>
+                Digipass
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="isLoggedIn() ? location.href='dashboard.html' : location.href='login.html'; return false;">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="executor-login.html">Executor</a>
-                    </li>
-                    <li class="nav-item ms-2">
-                        <button id="authBtn" class="btn btn-primary btn-sm" onclick="handleAuthClick()">Sign In</button>
-                    </li>
+            <a class="link" href="#how">How it works</a>
+            <a class="link" href="executor-login.html">For executors</a>
+            <a class="link" href="login.html" id="authLink">Sign in</a>
+            <a class="start" href="register.html" id="startLink">Start free</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- ================= Hero ================= -->
+        <section class="hero" aria-labelledby="heroTitle">
+            <div class="wrap">
+                <div class="hero-top">
+                    <h1 id="heroTitle">Every account gets the <span class="soft">ending you choose.</span></h1>
+                    <div class="hero-side">
+                        <p>Decide what happens to your email, photos, money and social accounts after you're gone. If you stop checking in, the people you trust are guided through every one.</p>
+                        <div class="cta-row">
+                            <a class="btn-cream" href="register.html">Start free <i class="fas fa-arrow-right"></i></a>
+                            <a class="btn-line" href="#how">See how it works</a>
+                        </div>
+                        <p class="hero-exec">Named as an executor? <a href="executor-login.html">Sign in here</a></p>
+                    </div>
+                </div>
+
+                <div class="board-mock" aria-label="Example: accounts sorted by what should happen to them">
+                    <div class="bcol">
+                        <div class="bcol-head"><span class="dot" style="--dot:#8cbf9c"></span>Pass on<span class="n">2</span></div>
+                        <div class="acard" style="--i:0"><span class="tag tag-pass">Storage</span><div class="top"><span class="ico"><i class="fab fa-google-drive"></i></span><b>Google Photos</b></div><small>Handed to Maya</small></div>
+                        <div class="acard" style="--i:3"><span class="tag tag-pass">Email</span><div class="top"><span class="ico"><i class="fas fa-envelope"></i></span><b>Gmail</b></div><small>Arjun takes it over</small></div>
+                    </div>
+                    <div class="bcol">
+                        <div class="bcol-head"><span class="dot" style="--dot:var(--sand-deep)"></span>Delete<span class="n">2</span></div>
+                        <div class="acard" style="--i:1"><span class="tag tag-delete">Entertainment</span><div class="top"><span class="ico"><i class="fas fa-tv"></i></span><b>Netflix</b></div><small>Cancel the plan, then close</small></div>
+                        <div class="acard" style="--i:4"><span class="tag tag-delete">Finance</span><div class="top"><span class="ico"><i class="fab fa-paypal"></i></span><b>PayPal</b></div><small>Withdraw, then close</small></div>
+                    </div>
+                    <div class="bcol">
+                        <div class="bcol-head"><span class="dot" style="--dot:var(--forest-mid)"></span>Last message<span class="n">1</span></div>
+                        <div class="acard" style="--i:2"><span class="tag tag-message">Social</span><div class="top"><span class="ico"><i class="fab fa-instagram"></i></span><b>Instagram</b></div><small>&ldquo;Go see the sea for me.&rdquo;</small></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= The handover, scrubbed by scroll ================= -->
+        <section class="story" id="how" aria-label="How DIGIPASS works">
+            <div class="wrap story-pin">
+                <div class="chapters">
+                    <article class="chapter on" data-chapter="0">
+                        <h2>Choose an ending for each account.</h2>
+                        <p>Pass it on to someone, close it for good, or leave a last message to be posted. Every account carries the decision you made, not just a password.</p>
+                    </article>
+                    <article class="chapter" data-chapter="1">
+                        <h2>Name the people you trust.</h2>
+                        <p>Invite executors by email or with a link. They verify and set their own password. Nothing opens to them until you, or the switch, say so.</p>
+                    </article>
+                    <article class="chapter" data-chapter="2">
+                        <h2>Check in, now and then.</h2>
+                        <p>Choose how often: every week, every year, anything in between. Signing in counts. If the check-ins stop, access opens for your executors.</p>
+                    </article>
+                    <article class="chapter" data-chapter="3">
+                        <h2>They're guided through every one.</h2>
+                        <p>Your executor sees each account with the ending you chose, and follows plain steps for that platform until it's taken care of.</p>
+                    </article>
+                    <div class="story-progress" aria-hidden="true"><span class="on"></span><span></span><span></span><span></span></div>
+                </div>
+
+                <div class="stage" id="stage">
+                    <div class="board-mock" id="stageBoard">
+                        <div class="bcol" data-col="0"><div class="bcol-head"><span class="dot"></span><span class="col-name">Pass on</span><span class="n">0</span></div></div>
+                        <div class="bcol" data-col="1"><div class="bcol-head"><span class="dot"></span><span class="col-name">Delete</span><span class="n">0</span></div></div>
+                        <div class="bcol" data-col="2"><div class="bcol-head"><span class="dot"></span><span class="col-name">Last message</span><span class="n">0</span></div></div>
+                    </div>
+
+                    <div class="stage-layer" data-layer="1">
+                        <div class="people-card">
+                            <p class="ttl">Your executors</p>
+                            <div class="person-row"><span class="avatar" data-tone="1">AN</span><div><b>Arjun Nair</b><small>Brother</small></div><span class="tag tag-neutral" data-to="Verified">Invited</span></div>
+                            <div class="person-row"><span class="avatar" data-tone="2">MI</span><div><b>Maya Iyer</b><small>Daughter</small></div><span class="tag tag-neutral" data-to="Verified">Invited</span></div>
+                            <div class="person-row"><span class="avatar" data-tone="4">LJ</span><div><b>Lena Joseph</b><small>Lawyer</small></div><span class="tag tag-neutral" data-to="Invited">Invited</span></div>
+                        </div>
+                    </div>
+
+                    <div class="stage-layer" data-layer="2">
+                        <div class="pulse-card" id="pulseCard">
+                            <div class="days"><span id="daysLeft">19</span><small id="daysLabel">days until the next check-in is due</small></div>
+                            <p>Every check-in resets the clock.</p>
+                            <svg class="ekg" viewBox="0 0 440 90" preserveAspectRatio="none" aria-hidden="true">
+                                <path d="M0 50 H70 L86 50 L98 20 L112 78 L124 38 L134 50 H210 L226 50 L238 20 L252 78 L264 38 L274 50 H350 L366 50 L378 20 L392 78 L404 38 L414 50 H440"/>
+                                <line class="flat" x1="0" y1="50" x2="440" y2="50"/>
+                            </svg>
+                            <div class="note"><i class="fas fa-lock-open"></i>No check-ins for the whole interval, so access opens for Arjun and Maya.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= Guide preview ================= -->
+        <section class="sec guide-sec" aria-labelledby="guideTitle">
+            <div class="wrap guide-grid">
+                <div class="rv">
+                    <h2 id="guideTitle">Your executor never has to guess.</h2>
+                    <p class="lead">Each account opens a guide written for that platform and that ending: where to sign in, what to tap, the message to post. It sits beside the real site on a laptop and hands off to the app on a phone.</p>
+                    <ul class="feature-points">
+                        <li><i class="fas fa-circle-check"></i><span>Sign-in details ready to copy on every step</span></li>
+                        <li><i class="fas fa-circle-check"></i><span>Progress saves as they go, and the board updates</span></li>
+                        <li><i class="fas fa-circle-check"></i><span>Calm, plain language for a hard week</span></li>
+                    </ul>
+                </div>
+                <div class="gmock rv" id="guideMock" aria-label="Example executor guide for Instagram">
+                    <ol class="gsteps">
+                        <li class="done"><span class="n">1</span><span class="lbl">Sign in to Instagram</span></li>
+                        <li class="now"><span class="n">2</span><span class="lbl">Post the last message</span></li>
+                        <li><span class="n">3</span><span class="lbl">Request a memorial</span></li>
+                        <li><span class="n">4</span><span class="lbl">Taken care of</span></li>
+                    </ol>
+                    <div class="gcard" id="guideCard" aria-live="polite"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= Will ================= -->
+        <section class="sec" aria-labelledby="willTitle">
+            <div class="wrap split">
+                <div class="will-doc" id="willDoc" aria-hidden="true">
+                    <div class="will-page">
+                        <p class="ttl">Executors</p>
+                        <div class="meta">Digital will · page 2</div>
+                        <div class="will-line"><span>Arjun Nair</span><span>Brother · has access</span></div>
+                        <div class="will-line"><span>Maya Iyer</span><span>Daughter · verified</span></div>
+                        <div class="will-line"><span>Lena Joseph</span><span>Lawyer · invited</span></div>
+                    </div>
+                    <div class="will-page">
+                        <p class="ttl">Digital will</p>
+                        <div class="meta">Accounts and what should happen to them</div>
+                        <div class="will-line"><span>Gmail</span><span>Pass on</span></div>
+                        <div class="will-line"><span>Google Photos</span><span>Pass on</span></div>
+                        <div class="will-line"><span>Netflix</span><span>Delete</span></div>
+                        <div class="will-line"><span>PayPal</span><span>Delete</span></div>
+                        <div class="will-line"><span>Instagram</span><span>Last message</span></div>
+                    </div>
+                </div>
+                <div class="rv">
+                    <h2 id="willTitle">Your wishes, on paper too.</h2>
+                    <p class="lead">Generate a digital will as a PDF whenever you like: every account and its ending, your executors, and a personal message in your own words. Your executors can download it once they have access.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= What you should know ================= -->
+        <section class="sec" style="padding-top:24px" aria-labelledby="factsTitle">
+            <div class="wrap">
+                <h2 id="factsTitle">What you should know.</h2>
+                <ul class="facts">
+                    <li><b>You decide who sees what, and when.</b><span>Executors see nothing until you grant access or your check-ins stop. You can revoke access at any time.</span></li>
+                    <li><b>Executors see the sign-ins you leave.</b><span>That's the point: once they have access, they can open each account. Only add what you're comfortable handing over.</span></li>
+                    <li><b>Your own login is protected.</b><span>Account passwords for DIGIPASS itself are hashed, and invite links for executors expire after 24 hours.</span></li>
+                    <li><b>It's free.</b><span>Create an account, add your first few accounts, and come back whenever your life changes.</span></li>
                 </ul>
             </div>
-        </div>
-    </nav>
+        </section>
 
-    <!-- ===== HERO ===== -->
-    <section class="hero">
-        <div class="hero-bg">
-            <div class="orb orb-1"></div>
-            <div class="orb orb-2"></div>
-            <div class="orb orb-3"></div>
-        </div>
-        <canvas id="particle-canvas"></canvas>
-
-        <div class="hero-split">
-            <!-- LEFT: Text -->
-            <div class="hero-content">
-                <div class="hero-badge reveal">
-                    <div class="hero-badge-dot"></div>
-                    Your Digital Estate Manager
-                </div>
-                <h1 class="reveal reveal-delay-1">
-                    Your digital life,<br><em>secured forever</em>
-                </h1>
-                <p class="reveal reveal-delay-2">
-                    Store passwords, create your digital will, and assign trusted executors — all encrypted, all private, built for peace of mind.
-                </p>
-                <div class="hero-cta reveal reveal-delay-3">
-                    <button class="btn-hero-primary" onclick="location.href='register.html'">
-                        Create Account &nbsp;→
-                    </button>
-                    <button class="btn-hero-outline" onclick="location.href='login.html'">
-                        Sign In
-                    </button>
-                </div>
-                <div class="trust-bar reveal reveal-delay-4">
-                    <div class="trust-item"><div class="trust-dot"></div><span>Fully Encrypted</span></div>
-                    <div class="trust-item"><div class="trust-dot"></div><span>100% Private</span></div>
-                    <div class="trust-item"><div class="trust-dot"></div><span>No Credit Card</span></div>
-                    <div class="trust-item"><div class="trust-dot"></div><span>Instant Setup</span></div>
-                </div>
-            </div>
-
-            <!-- RIGHT: Image -->
-            <div class="hero-image-side reveal reveal-right reveal-delay-2">
-                <div class="hero-image-wrap">
-                    <img src="hero_vault.png" alt="Digipass secure digital vault illustration" loading="eager">
-                    <div class="hero-float-badge hfb-tl">
-                        <div class="hfb-icon">🔒</div>
-                        <div>
-                            <div style="font-size:10px;color:var(--text-muted);font-weight:400;">Storage</div>
-                            <div>End-to-End Encrypted</div>
-                        </div>
-                    </div>
-                    <div class="hero-float-badge hfb-br">
-                        <div class="hfb-icon">📋</div>
-                        <div>
-                            <div style="font-size:10px;color:var(--text-muted);font-weight:400;">Digital Will</div>
-                            <div>PDF Generated</div>
-                        </div>
+        <!-- ================= Close ================= -->
+        <section class="close">
+            <div class="wrap">
+                <div class="close-card">
+                    <h2>Ten minutes now saves them a hundred guesses later.</h2>
+                    <div>
+                        <p>Start with the accounts that matter most. You can always add more.</p>
+                        <a class="btn-cream" href="register.html">Start free <i class="fas fa-arrow-right"></i></a>
+                        <span class="exec">Named as an executor? <a href="executor-login.html">Sign in here</a></span>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
-    <hr class="divider">
-
-    <!-- ===== FEATURE HIGHLIGHTS STRIP ===== -->
-    <div class="highlights-strip">
-        <div class="highlights-inner">
-            <div class="highlight-card reveal reveal-delay-1">
-                <div class="highlight-icon">🗄️</div>
-                <div class="highlight-title">Secure Asset Vault</div>
-                <div class="highlight-desc">Store passwords, recovery codes &amp; account details for every digital account you own — all in one encrypted vault.</div>
-            </div>
-            <div class="highlight-card reveal reveal-delay-2">
-                <div class="highlight-icon">📄</div>
-                <div class="highlight-title">PDF Digital Will</div>
-                <div class="highlight-desc">Auto-generate a legally-structured PDF listing all your assets and executor assignments at the click of a button.</div>
-            </div>
-            <div class="highlight-card reveal reveal-delay-3">
-                <div class="highlight-icon">👥</div>
-                <div class="highlight-title">Executor System</div>
-                <div class="highlight-desc">Invite trusted people as executors. They gain scoped, secure access to your accounts only when you authorise it.</div>
-            </div>
-            <div class="highlight-card reveal reveal-delay-4">
-                <div class="highlight-icon">⏱️</div>
-                <div class="highlight-title">Dead Man's Switch</div>
-                <div class="highlight-desc">A scheduled check-in system that automatically alerts your executors via email if you stop responding.</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== FEATURE: DIGITAL ASSETS ===== -->
-    <section class="section">
-        <div class="section-inner">
-            <div class="feature-split-wrap">
-                <div class="feature-split-text reveal reveal-left">
-                    <div class="section-label">Digital Assets</div>
-                    <h2 class="section-title">Keep all your accounts in one secure place</h2>
-                    <p class="section-subtitle">Store passwords, usernames, recovery codes, and critical details for every digital account — encrypted end-to-end, accessible only by you.</p>
-                    <ul class="feature-list">
-                        <li>
-                            <div class="fl-marker"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                            Email and social media accounts
-                        </li>
-                        <li>
-                            <div class="fl-marker"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                            Bank accounts and crypto wallets
-                        </li>
-                        <li>
-                            <div class="fl-marker"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                            Cloud storage and documents
-                        </li>
-                        <li>
-                            <div class="fl-marker"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                            Subscription services and licenses
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-img-block reveal reveal-right">
-                    <img src="dashboard_preview.png" alt="Digipass dashboard showing secured accounts" loading="lazy">
-                    <div class="feature-img-badge badge-br">
-                        <div class="badge-icon">🔒</div>
-                        <div>
-                            <div style="font-size:11px;color:var(--text-muted);font-weight:400;">Status</div>
-                            <div>End-to-End Encrypted</div>
-                        </div>
-                    </div>
-                    <div class="feature-img-badge badge-tl">
-                        <div class="badge-icon">✅</div>
-                        <div>
-                            <div style="font-size:11px;color:var(--text-muted);font-weight:400;">Accounts</div>
-                            <div>All Synced</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <hr class="divider">
-
-    <!-- ===== FEATURE: EXECUTOR ===== -->
-    <section class="section">
-        <div class="section-inner">
-            <div class="feature-split-wrap reverse">
-                <div class="feature-split-text reveal reveal-right">
-                    <div class="section-label">Digital Will & Executors</div>
-                    <h2 class="section-title">Pass the torch to people you trust</h2>
-                    <p class="section-subtitle">Generate a complete PDF will, assign trusted executors, and set a dead man's switch — so your loved ones are never left in the dark.</p>
-                    <ul class="feature-list">
-                        <li>
-                            <div class="fl-marker"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                            Auto-generate a PDF digital will
-                        </li>
-                        <li>
-                            <div class="fl-marker"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                            Assign multiple trusted executors
-                        </li>
-                        <li>
-                            <div class="fl-marker"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                            Dead man's switch with email alerts
-                        </li>
-                        <li>
-                            <div class="fl-marker"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                            Granular per-asset access control
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-img-block reveal reveal-left">
-                    <img src="executor_handover.png" alt="Digital inheritance and executor access handover" loading="lazy">
-                    <div class="feature-img-badge badge-br">
-                        <div class="badge-icon">📋</div>
-                        <div>
-                            <div style="font-size:11px;color:var(--text-muted);font-weight:400;">Digital Will</div>
-                            <div>Ready to Generate</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <hr class="divider">
-
-    <!-- ===== FEATURES GRID ===== -->
-    <section class="section" style="background: linear-gradient(180deg, var(--cream) 0%, var(--cream-light) 100%);">
-        <div class="section-inner">
-            <div class="text-center mb-5 reveal">
-                <div class="section-label">Everything Included</div>
-                <h2 class="section-title">What You Can Do with Digipass</h2>
-            </div>
-            <div class="feature-cards-grid">
-                <div class="feature-card reveal reveal-delay-1">
-                    <div class="fc-icon">
-                        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                    </div>
-                    <h3>Digital Will</h3>
-                    <p>Generate a complete PDF listing all accounts with executors and inheritance instructions.</p>
-                </div>
-                <div class="feature-card reveal reveal-delay-2">
-                    <div class="fc-icon">
-                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    </div>
-                    <h3>Assign Executors</h3>
-                    <p>Add trusted people. They receive secure, controlled access when it matters.</p>
-                </div>
-                <div class="feature-card featured reveal reveal-delay-3">
-                    <div class="fc-icon">
-                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    </div>
-                    <h3>Dead Man's Switch</h3>
-                    <p>Set check-in reminders. Miss one and your executors are automatically notified.</p>
-                </div>
-                <div class="feature-card reveal reveal-delay-4">
-                    <div class="fc-icon">
-                        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                    </div>
-                    <h3>AES-256 Encryption</h3>
-                    <p>Your data is encrypted in transit and at rest. We never see your sensitive details.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== HOW IT WORKS ===== -->
-    <section class="steps-section">
-        <div class="steps-inner">
-            <div class="steps-header">
-                <div class="section-label reveal">Simple Setup</div>
-                <h2 class="section-title reveal reveal-delay-1">Get Started in 3 Steps</h2>
-            </div>
-            <div class="steps-grid">
-                <div class="steps-connector"></div>
-                <div class="step-card reveal reveal-delay-1">
-                    <div class="step-number">1</div>
-                    <h3>Create Account</h3>
-                    <p>Sign up with your email in under 2 minutes. No credit card required.</p>
-                </div>
-                <div class="step-card reveal reveal-delay-2">
-                    <div class="step-number">2</div>
-                    <h3>Add Your Accounts</h3>
-                    <p>Enter details for each digital account you want to protect and organise.</p>
-                </div>
-                <div class="step-card reveal reveal-delay-3">
-                    <div class="step-number">3</div>
-                    <h3>Assign Executors</h3>
-                    <p>Invite people you trust and configure your preferences and digital will.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== ENCRYPTION FEATURE ===== -->
-    <section class="section">
-        <div class="section-inner">
-            <div class="feature-split-wrap">
-                <div class="feature-split-text reveal reveal-left">
-                    <div class="section-label">Security First</div>
-                    <h2 class="section-title">Military-grade encryption, always on</h2>
-                    <p class="section-subtitle">We designed Digipass with a zero-knowledge architecture. Your master key never leaves your device — we cryptographically cannot read your data.</p>
-                    <ul class="feature-list">
-                        <li>
-                            <div class="fl-marker"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                            AES-256-GCM encryption at rest
-                        </li>
-                        <li>
-                            <div class="fl-marker"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                            TLS 1.3 for all data in transit
-                        </li>
-                        <li>
-                            <div class="fl-marker"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                            Zero-knowledge architecture
-                        </li>
-                        <li>
-                            <div class="fl-marker"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                            No plaintext stored — ever
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-img-block reveal reveal-right">
-                    <img src="encryption_shield.png" alt="Digipass AES-256 encryption shield" loading="lazy">
-                    <div class="feature-img-badge badge-br">
-                        <div class="badge-icon">🛡️</div>
-                        <div>
-                            <div style="font-size:11px;color:var(--text-muted);font-weight:400;">Encryption</div>
-                            <div>AES-256-GCM Active</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== TESTIMONIALS ===== -->
-    <section class="section" style="background: var(--cream-light);">
-        <div class="section-inner">
-            <div class="text-center mb-5 reveal">
-                <div class="section-label">Trusted By Users</div>
-                <h2 class="section-title">What People Are Saying</h2>
-            </div>
-            <div class="testimonials-grid">
-                <div class="testimonial-card reveal reveal-delay-1">
-                    <div class="testimonial-stars">★★★★★</div>
-                    <p class="testimonial-text">"Finally, a place where I can store everything my family would need if something happened to me. The peace of mind is incredible."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">A</div>
-                        <div class="author-info">
-                            <div class="author-name">Arjun M.</div>
-                            <div class="author-role">Software Engineer</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card reveal reveal-delay-2">
-                    <div class="testimonial-stars">★★★★★</div>
-                    <p class="testimonial-text">"The executor system is genius. I set it up, assigned my spouse, and now I don't worry about what happens to my 50+ accounts."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">S</div>
-                        <div class="author-info">
-                            <div class="author-name">Sneha R.</div>
-                            <div class="author-role">Financial Advisor</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card reveal reveal-delay-3">
-                    <div class="testimonial-stars">★★★★★</div>
-                    <p class="testimonial-text">"The dead man's switch feature changed how I think about digital legacy. Clean UI, fast setup. Exactly what I needed."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">K</div>
-                        <div class="author-info">
-                            <div class="author-name">Kiran T.</div>
-                            <div class="author-role">Entrepreneur</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== CTA ===== -->
-    <section class="cta-section">
-        <div class="cta-card reveal reveal-scale">
-            <div class="cta-card-inner">
-                <div class="section-label" style="color:rgba(245,234,216,0.5);">Start Today</div>
-                <h2>Ready to organize your digital life?</h2>
-                <p>Start for free. No credit card required. Takes 2 minutes to set up.</p>
-                <button class="btn-cta" onclick="location.href='register.html'">Create Your Account →</button>
-                <div class="cta-perks">
-                    <div class="cta-perk"><div class="cta-perk-check">✓</div><span>Fully encrypted storage</span></div>
-                    <div class="cta-perk"><div class="cta-perk-check">✓</div><span>Free digital will generation</span></div>
-                    <div class="cta-perk"><div class="cta-perk-check">✓</div><span>Executor management included</span></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== FOOTER ===== -->
     <footer>
-        <div class="container">
-            <p>© 2026 DIGIPASS. Keep your digital affairs in order.</p>
+        <div class="wrap">
+            <span>Digipass</span>
+            <a href="login.html">Sign in</a>
+            <a href="register.html">Create account</a>
+            <a href="executor-login.html">Executor portal</a>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        /* ========== AUTH ========== */
+        /* ---------- Auth links ---------- */
         function isLoggedIn() { return !!localStorage.getItem('token'); }
-
-        function handleAuthClick() {
-            if (isLoggedIn()) {
+        if (isLoggedIn()) {
+            const start = document.getElementById('startLink');
+            start.textContent = 'Open dashboard';
+            start.href = 'dashboard.html';
+            const auth = document.getElementById('authLink');
+            auth.textContent = 'Sign out';
+            auth.addEventListener('click', (e) => {
+                e.preventDefault();
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
-                location.href = 'index.html';
-            } else {
-                location.href = 'login.html';
-            }
+                location.reload();
+            });
         }
 
-        /* Update auth button on load */
-        window.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('authBtn');
-            if (isLoggedIn()) { btn.textContent = 'Sign Out'; }
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        /* ---------- Nav turns solid past the hero ---------- */
+        const nav = document.getElementById('nav');
+        const hero = document.querySelector('.hero');
+        const navObserver = new IntersectionObserver(([entry]) => {
+            nav.classList.toggle('solid', !entry.isIntersecting);
+        }, { rootMargin: '-72px 0px 0px 0px' });
+        navObserver.observe(hero);
+
+        /* ---------- Reveals ---------- */
+        const rvObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) { entry.target.classList.add('in'); rvObserver.unobserve(entry.target); }
+            });
+        }, { threshold: 0.18 });
+        document.querySelectorAll('.rv, #willDoc').forEach(el => rvObserver.observe(el));
+
+        /* ---------- The handover stage ---------- */
+        const ACCOUNTS = [
+            { name: 'Google Photos', icon: 'fab fa-google-drive', fate: 0, tag: 'Storage', owner: 'Handed to Maya', exec: [0, 1, 2, 2] },
+            { name: 'Netflix', icon: 'fas fa-tv', fate: 1, tag: 'Entertainment', owner: 'Cancel, then close', exec: [1, 2, 2, 2] },
+            { name: 'Instagram', icon: 'fab fa-instagram', fate: 2, tag: 'Social', owner: '"Go see the sea for me."', exec: [0, 0, 1, 2] },
+            { name: 'Gmail', icon: 'fas fa-envelope', fate: 0, tag: 'Email', owner: 'Arjun takes it over', exec: [0, 1, 1, 2] },
+            { name: 'PayPal', icon: 'fab fa-paypal', fate: 1, tag: 'Finance', owner: 'Withdraw, then close', exec: [0, 0, 1, 2] }
+        ];
+        const FATE_TAG = ['tag-pass', 'tag-delete', 'tag-message'];
+        const OWNER_COLS = [['Pass on', '#8cbf9c'], ['Delete', 'var(--sand-deep)'], ['Last message', 'var(--forest-mid)']];
+        const EXEC_COLS = [['Not started', 'var(--sand-deep)'], ['In progress', 'var(--forest-light)'], ['Taken care of', 'var(--forest-deep)']];
+        const EXEC_LABEL = ['Not started yet', 'Step 2 of 4', 'Taken care of'];
+
+        const board = document.getElementById('stageBoard');
+        const cols = [...board.querySelectorAll('.bcol')];
+        const cards = ACCOUNTS.map((a) => {
+            const el = document.createElement('div');
+            el.className = 'acard';
+            el.innerHTML = `<span class="tag ${FATE_TAG[a.fate]}">${a.tag}</span>
+                <div class="top"><span class="ico"><i class="${a.icon}"></i></span><b>${a.name}</b></div>
+                <small class="sub">${a.owner}</small>
+                <div class="bar"><span></span></div>`;
+            return el;
         });
 
-        /* ========== NAVBAR SCROLL SHADOW ========== */
+        // FLIP: move cards between columns and animate from where they were
+        function place(targetOf, labelOf, barOf) {
+            const first = cards.map(c => c.getBoundingClientRect());
+            cards.forEach((c, i) => {
+                cols[targetOf(i)].appendChild(c);
+                c.querySelector('.sub').textContent = labelOf(i);
+                c.querySelector('.bar span').style.width = barOf(i);
+            });
+            cols.forEach(col => { col.querySelector('.n').textContent = col.querySelectorAll('.acard').length; });
+            if (reduceMotion) return;
+            cards.forEach((c, i) => {
+                const last = c.getBoundingClientRect();
+                const dx = first[i].left - last.left, dy = first[i].top - last.top;
+                if (!first[i].width || (!dx && !dy)) return;
+                c.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }],
+                    { duration: 700, easing: 'cubic-bezier(0.34, 1.3, 0.64, 1)', delay: i * 45 });
+            });
+        }
+
+        function setColumns(defs) {
+            cols.forEach((col, i) => {
+                col.querySelector('.col-name').textContent = defs[i][0];
+                col.querySelector('.dot').style.setProperty('--dot', defs[i][1]);
+            });
+        }
+
+        let mode = null;      // 'owner' | 'exec'
+        let execStep = -1;
+        function showOwner() {
+            if (mode === 'owner') return;
+            mode = 'owner';
+            board.classList.remove('exec-mode');
+            setColumns(OWNER_COLS);
+            place(i => ACCOUNTS[i].fate, i => ACCOUNTS[i].owner, () => '0%');
+        }
+        function showExec(step) {
+            if (mode === 'exec' && step === execStep) return;
+            const entering = mode !== 'exec';
+            mode = 'exec'; execStep = step;
+            board.classList.add('exec-mode');
+            if (entering) setColumns(EXEC_COLS);
+            place(i => ACCOUNTS[i].exec[step], i => EXEC_LABEL[ACCOUNTS[i].exec[step]],
+                i => ['0%', '50%', '100%'][ACCOUNTS[i].exec[step]]);
+        }
+
+        const chapters = [...document.querySelectorAll('.chapter')];
+        const dots = [...document.querySelectorAll('.story-progress span')];
+        const layers = [...document.querySelectorAll('.stage-layer')];
+        const pulse = document.getElementById('pulseCard');
+        const daysLeft = document.getElementById('daysLeft');
+        const daysLabel = document.getElementById('daysLabel');
+        const story = document.querySelector('.story');
+        let chapterNow = -1;
+
+        function setChapter(n) {
+            if (n === chapterNow) return;
+            chapterNow = n;
+            chapters.forEach((c, i) => c.classList.toggle('on', i === n));
+            dots.forEach((d, i) => d.classList.toggle('on', i <= n));
+            layers.forEach(l => l.classList.toggle('on', Number(l.dataset.layer) === n));
+            board.style.transition = 'opacity .5s, filter .5s';
+            board.style.opacity = (n === 1 || n === 2) ? '0.18' : '1';
+            board.style.filter = (n === 1 || n === 2) ? 'blur(2px)' : 'none';
+            if (n === 1) {
+                document.querySelectorAll('.people-card .tag[data-to]').forEach((t, i) => {
+                    setTimeout(() => {
+                        if (chapterNow !== 1) return;
+                        t.textContent = t.dataset.to;
+                        t.className = 'tag ' + (t.dataset.to === 'Verified' ? 'tag-pass' : 'tag-neutral');
+                    }, 500 + i * 450);
+                });
+            }
+        }
+
+        function onScroll() {
+            const r = story.getBoundingClientRect();
+            const total = story.offsetHeight - window.innerHeight;
+            const p = Math.min(1, Math.max(0, -r.top / total));
+            const n = Math.min(3, Math.floor(p * 4));
+            setChapter(n);
+            if (n < 3) showOwner();
+            const local = p * 4 - n; // progress inside the chapter
+
+            if (n === 2) {
+                // The counter reaches 0 exactly when the pulse stops, so the copy never contradicts itself
+                const days = Math.max(0, Math.round(19 * (1 - Math.min(1, local / 0.78))));
+                daysLeft.textContent = String(days);
+                const stopped = local > 0.78;
+                daysLabel.textContent = stopped ? 'days left: the interval has run out' : 'days until the next check-in is due';
+                pulse.classList.toggle('slow', local > 0.4);
+                pulse.classList.toggle('stopped', stopped);
+            }
+            if (n === 3) showExec(Math.min(3, Math.floor(local * 4)));
+        }
+
+        const pinned = () => window.matchMedia('(min-width: 961px)').matches;
+        function initStage() {
+            if (pinned() && !reduceMotion) {
+                document.getElementById('stage').classList.remove('static');
+                showOwner();
+                onScroll();
+            } else {
+                // Small screens / reduced motion: show every chapter's state in order
+                document.getElementById('stage').classList.add('static');
+                mode = null; showOwner();
+                chapters.forEach(c => c.classList.add('on'));
+                layers.forEach(l => l.classList.add('on'));
+                pulse.classList.add('stopped');
+                daysLeft.textContent = '0';
+                daysLabel.textContent = 'days left: the interval has run out';
+                document.querySelectorAll('.people-card .tag[data-to]').forEach(t => {
+                    t.textContent = t.dataset.to; t.className = 'tag ' + (t.dataset.to === 'Verified' ? 'tag-pass' : 'tag-neutral');
+                });
+                // Each chapter's picture sits right after its text, so the story reads top to bottom
+                chapters[1].after(layers[0]);
+                chapters[2].after(layers[1]);
+                chapters[3].after(board);
+                board.style.opacity = '1'; board.style.filter = 'none';
+                showExec(3);
+            }
+        }
+        let ticking = false;
         window.addEventListener('scroll', () => {
-            const nav = document.getElementById('mainNavbar');
-            nav.classList.toggle('scrolled', window.scrollY > 30);
+            if (ticking || !pinned() || reduceMotion) return;
+            ticking = true;
+            requestAnimationFrame(() => { onScroll(); ticking = false; });
         }, { passive: true });
+        initStage();
 
-        /* ========== SCROLL REVEAL ========== */
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
+        /* ---------- Guide preview: steps advance on their own while visible ---------- */
+        const GUIDE = [
+            { title: 'Sign in to Instagram', body: [['fa-right-to-bracket', 'Open instagram.com or the app'], ['fa-copy', 'Copy the email and password Meera left']] },
+            { title: 'Post the last message', body: [['fa-pen-to-square', 'Tap + and choose Post'], ['fa-paste', 'Paste the message exactly as written']], msg: '"Thank you for every birthday wish and every photo. Look after each other, and go see the sea for me."' },
+            { title: 'Request a memorial', body: [['fa-gear', 'Settings, then Accounts Center'], ['fa-ribbon', 'Ask Instagram to memorialise the profile']] },
+            { title: 'Taken care of', body: [['fa-circle-check', 'Mark it done; the board moves the card for you']] }
+        ];
+        const gSteps = [...document.querySelectorAll('.gsteps li')];
+        const gCard = document.getElementById('guideCard');
+        let gIndex = 1, gTimer = null;
+        function renderGuide() {
+            const g = GUIDE[gIndex];
+            gSteps.forEach((li, i) => { li.classList.toggle('done', i < gIndex); li.classList.toggle('now', i === gIndex); });
+            gCard.innerHTML = `<div class="swap">
+                <span class="tag tag-message"><i class="fas fa-feather"></i>Last message</span>
+                <p class="ttl" style="margin-top:10px">${g.title}</p>
+                ${g.body.map(([ic, t]) => `<div class="do" style="margin-top:8px"><i class="fas ${ic}"></i>${t}</div>`).join('')}
+                ${g.msg ? `<div class="msg" style="margin-top:8px">${g.msg}</div>` : ''}
+            </div>`;
+        }
+        renderGuide();
+        if (!reduceMotion) {
+            new IntersectionObserver(([entry]) => {
+                clearInterval(gTimer);
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                    revealObserver.unobserve(entry.target);
+                    gTimer = setInterval(() => { gIndex = (gIndex + 1) % GUIDE.length; renderGuide(); }, 2600);
                 }
-            });
-        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-
-        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-        /* Trigger hero reveals immediately */
-        setTimeout(() => {
-            document.querySelectorAll('.hero .reveal').forEach(el => el.classList.add('active'));
-        }, 100);
-
-        /* ========== COUNTER ANIMATION ========== */
-        const counterObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (!entry.isIntersecting) return;
-                const el = entry.target;
-                const target = +el.getAttribute('data-count');
-                const suffix = el.nextElementSibling?.textContent?.includes('%') ? '' : '+';
-                const duration = 1600;
-                const step = target / (duration / 16);
-                let current = 0;
-
-                const update = () => {
-                    current = Math.min(current + step, target);
-                    el.textContent = Math.floor(current).toLocaleString() + (current >= target ? suffix : '');
-                    if (current < target) requestAnimationFrame(update);
-                };
-                requestAnimationFrame(update);
-                counterObserver.unobserve(el);
-            });
-        }, { threshold: 0.5 });
-
-        document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
-
-        /* ========== PARTICLE CANVAS ========== */
-        const canvas = document.getElementById('particle-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = document.querySelector('.hero').offsetHeight;
+            }, { threshold: 0.4 }).observe(document.getElementById('guideMock'));
         }
-
-        class Particle {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.4;
-                this.speedY = (Math.random() - 0.5) * 0.4;
-                this.opacity = Math.random() * 0.35 + 0.05;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
-            }
-            draw() {
-                ctx.save();
-                ctx.globalAlpha = this.opacity;
-                ctx.fillStyle = '#3d7a5a';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            }
-        }
-
-        function initParticles() {
-            resize();
-            particles = Array.from({ length: 60 }, () => new Particle());
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateParticles);
-        }
-
-        window.addEventListener('resize', () => { resize(); }, { passive: true });
-        initParticles();
-        animateParticles();
     </script>
 </body>
 </html>

@@ -29,6 +29,33 @@
         ],
         "createdAt": "2026-11-08T13:06:32.606Z",
         "reason": "user confirmed: asked to preserve the existing DIGIPASS cream/forest palette (PRODUCT.md Brand Commitments)"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "frontend/index.html"
+        ],
+        "createdAt": "2026-11-10T13:33:15.571Z",
+        "reason": "user confirmed: asked to preserve the existing DIGIPASS cream/forest palette (PRODUCT.md Brand Commitments)"
+      },
+      {
+        "rule": "nested-cards",
+        "value": "*",
+        "files": [
+          "frontend/index.html"
+        ],
+        "createdAt": "2026-11-10T13:37:36.345Z",
+        "reason": "user confirmed: user picked 'The handover, played', whose hero is the product's own board of account cards inside columns"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "frontend/index.html"
+        ],
+        "createdAt": "2026-11-10T13:37:36.488Z",
+        "reason": "false positive: section content is inset by a .wrap container (width min(1240px, 100%-48px), centred); captures show 24px+ side margins"
       }
     ]
   }
