@@ -163,9 +163,12 @@
         }
 
         /* Inside the floating Picture-in-Picture window */
-        body.wf-pip { margin: 0; background: var(--card); overflow: hidden; }
-        body.wf-pip .wf-card { height: 100vh; border-radius: 0; box-shadow: none; }
-        body.wf-pip .wf-card-scroll { padding: 16px; }
+        /* The floating window is narrow, so the phone rules above also match inside it;
+           these override them so the card scrolls and the step bar stays docked. */
+        body.wf-pip { margin: 0; background: var(--card); overflow: hidden; height: 100vh; }
+        body.wf-pip .wf-card { height: 100vh; display: flex; flex-direction: column; overflow: hidden; border-radius: 0; box-shadow: none; }
+        body.wf-pip .wf-card-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px; }
+        body.wf-pip .wf-nav { position: static; flex: none; border-radius: 0; box-shadow: none; border-top: 1px solid var(--line); }
         body.wf-pip .wf-title { font-size: 19px; }
         body.wf-pip .wf-creds-body { grid-template-columns: 1fr; }
         body.wf-pip .wf-nav { padding: 10px 12px; }

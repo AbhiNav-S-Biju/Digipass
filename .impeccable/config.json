@@ -20,6 +20,15 @@
         ],
         "createdAt": "2026-11-08T07:06:20.179Z",
         "reason": "user confirmed: user supplied a kanban reference (cards inside board columns) and asked for this layout"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "frontend/workflow-window.html"
+        ],
+        "createdAt": "2026-11-08T13:06:32.606Z",
+        "reason": "user confirmed: asked to preserve the existing DIGIPASS cream/forest palette (PRODUCT.md Brand Commitments)"
       }
     ]
   }
