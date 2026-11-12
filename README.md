@@ -262,4 +262,5 @@ All routes are under `/api`. Owner routes need `Authorization: Bearer <owner tok
 - Login tokens are kept in the browser's `localStorage`.
 - Executor guide progress is saved per browser, so it doesn't follow an executor to another device.
 - On Render's free plan the server sleeps when idle, so the midnight Dead Man's Switch job only runs while it is awake. Use a paid instance or an external scheduler that calls the API for reliable checks.
+- Waking the sleeping server takes 30–60 seconds. Every page loads `frontend/js/server-status.js`, which pings `/api/health` on load (starting the wake-up early) and, if the answer is slow, shows a "Starting the DIGIPASS server…" bar with a seconds counter until it responds. Sign-in and sign-up forms wait for the server (`DigipassServer.whenReady()`) instead of failing.
 - Many root-level `check-*.js`, `migrate-*.js` and `test-*.js` files are one-off maintenance scripts from development.

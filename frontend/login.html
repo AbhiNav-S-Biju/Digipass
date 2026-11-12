@@ -411,6 +411,7 @@
         }
     </style>
     <script src="js/config.js?v=2"></script>
+    <script src="js/server-status.js?v=1"></script>
 </head>
 <body>
     <nav class="page-nav">
@@ -596,6 +597,14 @@
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            // The free server may be waking up; wait for it rather than failing
+            if (window.DigipassServer && !DigipassServer.isReady()) {
+                const btn = e.submitter || e.target.querySelector('[type="submit"]');
+                const label = btn ? btn.innerHTML : '';
+                if (btn) { btn.disabled = true; btn.textContent = 'Waiting for the server…'; }
+                await DigipassServer.whenReady();
+                if (btn) { btn.disabled = false; btn.innerHTML = label; }
+            }
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
@@ -621,7 +630,7 @@
                 }
             } catch (error) {
                 console.error(error);
-                showError('Unable to connect. Please try again later.');
+                showError('Could not reach the server. It may still be starting up: wait a few seconds and try again.');
             }
         });
 
